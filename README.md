@@ -19,6 +19,10 @@ The offline-policy estimand and estimator conventions are defined in
 `configs/tasks/` and `task_cards/`; independent clinician review is tracked in
 [CLINICAL_REVIEW.md](CLINICAL_REVIEW.md).
 
+Post-freeze audit evidence is in `evidence/audits/`. KDD094 identifies limits in
+target-policy provenance and OPE documentation; those limits take precedence
+over earlier aggregate summaries.
+
 ## Quick Start
 
 Python 3.11 or later is required.
@@ -52,6 +56,7 @@ The historical `kdd2027` command remains available as a compatibility alias.
 - `src/`: aggregate evaluator, fixture, split, gate, privacy, and submission code.
 - `fixtures/`: schema-compatible synthetic data only.
 - `evidence/`: publication-safe aggregate dynamics, temporal, and policy diagnostics.
+- `clinical_review/`: seven aggregate-safe external-review packets with blank responses.
 - `task_cards/`: human-readable task summaries.
 - `schemas/` and `submission/`: leaderboard interfaces.
 - `tests/`: clean-room, privacy, checksum, and contract tests.
@@ -78,4 +83,3 @@ counterfactual benefit claims, clinical deployment, and autonomous decisions.
 
 Citation metadata are in [CITATION.cff](CITATION.cff). Repository:
 <https://github.com/cys1102/ehrdyn-icu>.
-

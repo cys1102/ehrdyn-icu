@@ -15,6 +15,9 @@ predictions, or credentials.
   nonidentical and are not phenotype-matched external validation.
 - `policy/`: policy registry, behavior calibration, overlap, WIS/WPDIS,
   clipping, ESS, and FQE diagnostics. All rows remain diagnostic-only.
+- `audits/`: KDD091 headline reconciliation, KDD093 subject-cluster feasibility,
+  and KDD094 OPE code-to-document provenance. Audit rows override broader prose
+  whenever a convention is marked blocked.
 
 The evidence files preserve their immutable internal task and experiment IDs for
 provenance. User-facing interpretation follows [CANONICAL_SURFACES.md](../CANONICAL_SURFACES.md).

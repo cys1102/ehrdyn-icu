@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.3
+
+- Added KDD091 headline candidate-set reconciliation.
+- Added KDD093 subject-cluster feasibility and KDD094 OPE provenance audits.
+- Added seven aggregate-safe KDD092 clinical review packets with blank responses.
+- Corrected OPE documentation and explicitly blocked unsupported CWPDIS, exact
+  KDD078 probability-surface replay, and subject-cluster robustness claims.
+
 ## 1.0.2
 
 - Added aggregate rich-action role and fixed-family transition evidence.

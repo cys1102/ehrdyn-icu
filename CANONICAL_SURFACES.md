@@ -35,3 +35,11 @@ logged-action forecast, not an autonomous rollout under a candidate policy.
 - `evidence/temporal/`: no-retuning temporal rank confirmation.
 - `evidence/external/`: bounded eICU mapping and evaluator-portability evidence.
 - `evidence/policy/`: behavior, overlap, OPE, and FQE diagnostics.
+- `evidence/audits/`: post-freeze headline, inference-unit, and OPE provenance audits.
+
+## Post-Freeze Audit Boundary
+
+KDD091 confirms the all-method headline and the learned-only sensitivity.
+KDD093 does not establish subject-cluster robustness. KDD094 supports WIS and
+WPDIS but blocks CWPDIS availability, exact KDD078 probability-surface replay,
+and claims of one universal bootstrap/FQE-selection convention.
