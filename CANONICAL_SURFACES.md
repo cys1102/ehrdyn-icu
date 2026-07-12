@@ -30,6 +30,8 @@ logged-action forecast, not an autonomous rollout under a candidate policy.
 
 - `evidence/core/contract_transition_leaderboard.csv`: 533 controlled method-contract rows.
 - `evidence/core/horizon_rank_stability.csv`: one-step versus recursive ranks and seed comparison.
+- `evidence/rich_action/`: exact-reference task roles and fixed-family transition evidence.
+- `evidence/uncertainty/`: same-family NLL, Cov90, and Width90 by horizon.
 - `evidence/temporal/`: no-retuning temporal rank confirmation.
+- `evidence/external/`: bounded eICU mapping and evaluator-portability evidence.
 - `evidence/policy/`: behavior, overlap, OPE, and FQE diagnostics.
-

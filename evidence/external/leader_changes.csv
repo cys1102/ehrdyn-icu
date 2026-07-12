@@ -1,0 +1,3 @@
+experiment_id,task_id,one_step_leader,open_loop_leader,leader_changed,claim_boundary
+KDD086,eicu_respiratory_peep3,tree_residual_hgb,tree_residual_hgb,False,"External recorded-trajectory forecasting portability only; eICU mappings are not phenotype identity. EHRDyn-ICU v1.0 remains unchanged. Treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, and autonomous-decision claims remain blocked."
+KDD086,eicu_sepsis_vasopressor,grud_missingness_aware,tree_residual_hgb,True,"External recorded-trajectory forecasting portability only; eICU mappings are not phenotype identity. EHRDyn-ICU v1.0 remains unchanged. Treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, and autonomous-decision claims remain blocked."
