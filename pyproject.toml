@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=79,<81"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ehrdyn-icu"
+version = "1.0.1"
+description = "Clean-room utilities for the EHRDyn-ICU multi-cohort benchmark contract"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+ehrdyn-icu = "kdd2027_benchmark.cli:main"
+kdd2027 = "kdd2027_benchmark.cli:main"
+
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

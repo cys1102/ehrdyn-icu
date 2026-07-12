@@ -1,0 +1,66 @@
+{
+  "action": {
+    "action_count": 25,
+    "class_zero_semantics": "no_recorded_exposure_pair",
+    "families": [
+      "fluid",
+      "vasopressor"
+    ],
+    "levels_per_family": 5,
+    "missing_is_action_zero": null,
+    "train_only_bin_edges": "fluid:50.0;176.00840759277344;482.6717834472656|vasopressor:0.09994830563664436;0.4443626403808594;2.3999998569488525"
+  },
+  "allowed_tracks": [
+    "point_transition",
+    "uncertainty",
+    "policy_diagnostic"
+  ],
+  "benchmark_version": "KDD2027-E060-4H-v1.0.0+KDD089",
+  "claim_boundary": "Benchmark construction and recorded-trajectory forecasting, uncertainty, action-support, and offline-policy diagnostics only. Treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, and autonomous-decision claims are blocked.",
+  "cohort_anchor": "suspected infection plus SOFA>=2",
+  "cohort_id": "sepsis_reference",
+  "episode_contract": {
+    "bin_hours": 4,
+    "post_hours": 48,
+    "pre_hours": 24,
+    "steps": 18,
+    "unit": "icu_stay_internal",
+    "window_rule": "window_overlaps_stay"
+  },
+  "feature_dictionary": "dictionaries/features.csv",
+  "forbidden_tracks": [
+    "clinical_policy",
+    "treatment_recommendation",
+    "causal_effect",
+    "counterfactual_benefit",
+    "deployment"
+  ],
+  "inclusion_exclusion_summary": "Adult ICU stay, LOS>=24h, computable 90d mortality, cohort-specific anchor; sepsis exclusion applies to non-sepsis cards where frozen.",
+  "preprocessing_contract": "contracts/preprocessing_contract.json",
+  "rewards": [
+    {
+      "availability": "available",
+      "definition": "final transition receives +1 survival or -1 90d mortality",
+      "name": "terminal_only"
+    },
+    {
+      "availability": "available",
+      "definition": "SOFA/lactate/MAP/urine-output change",
+      "name": "intermediate_physiology"
+    },
+    {
+      "availability": "available",
+      "definition": "terminal + 0.25 * clipped intermediate physiology",
+      "name": "terminal_plus_intermediate"
+    }
+  ],
+  "runnable": true,
+  "split_contract_hash": "029e7452ae2ff99a974a76d31f0b2efa618b3412d071e17e4ef7dda36fb6b987",
+  "task_id": "sepsis_original25_reference",
+  "task_role": "frozen_reference",
+  "tier": "reference",
+  "timing": {
+    "negative_control": "next_window_action_leakage_control_only",
+    "primary": "current_4h_window_exposure_predicts_next_4h_state"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "benchmark_version": "KDD2027-E060-4H-v1.0.0+KDD089",
+  "claim_boundary_acknowledged": true,
+  "rows": [
+    {
+      "implementation_fidelity": "adapted",
+      "metrics": {
+        "one_step_mae": 0.5,
+        "one_step_rmse": 1.0,
+        "open_loop_mae": 0.7,
+        "open_loop_rmse": 1.2
+      },
+      "model_id": "example",
+      "task_id": "sepsis_original25_reference",
+      "track": "point_transition"
+    }
+  ],
+  "submission_id": "example-method-v1"
+}

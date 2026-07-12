@@ -1,0 +1,35 @@
+# Canonical Evidence Surfaces
+
+EHRDyn-ICU keeps task discovery, headline dynamics, confirmation, portability,
+and policy diagnostics separate. Results from different rows below must not be
+pooled or silently substituted for one another.
+
+| Surface | Frozen content | Purpose | Selection status |
+| --- | --- | --- | --- |
+| Core v1.0 dynamics | Five primary compact-action tasks, 41 controlled contracts, 11 forecasting methods | One-step versus conditional-recursive method ranking | Headline frozen benchmark surface |
+| Rich-action task audit | Exact sepsis 25-action reference plus promoted non-sepsis 25-action views and exclusions | Action support, task-role, and sepsis-relative diagnostics | Separate audit; never replaces core rankings |
+| Temporal lockbox | Five primary tasks and six representative methods on a later-period patient-disjoint split | No-retuning rank confirmation | Confirmation only; cannot select or retune models |
+| eICU portability pilot | Two nonidentically mapped tasks and 26 baseline-seed fits | Evaluator portability | Not phenotype-identical external validation |
+| Compact policy diagnostics | Five eligible compact-action tasks, 13--14 completed policy families, kNN and neural behavior denominators | Support, ESS, WIS/WPDIS, clipping, and FQE fragility | Diagnostic only; no policy winner |
+
+## Method Eligibility
+
+The headline ranking compares **forecasting methods**, including persistence and
+previous-window controls where they are eligible. It is not restricted to
+learned architectures. `implementation_label` and baseline fidelity must be
+reported for every row.
+
+## Recursive Forecast Contract
+
+The recursive evaluator starts from the first recorded state, feeds predicted
+values into subsequent transitions, and advances recency causally. Logged future
+actions are held fixed. The result is therefore a conditional recursive
+logged-action forecast, not an autonomous rollout under a candidate policy.
+
+## Aggregate Evidence
+
+- `evidence/core/contract_transition_leaderboard.csv`: 533 controlled method-contract rows.
+- `evidence/core/horizon_rank_stability.csv`: one-step versus recursive ranks and seed comparison.
+- `evidence/temporal/`: no-retuning temporal rank confirmation.
+- `evidence/policy/`: behavior, overlap, OPE, and FQE diagnostics.
+

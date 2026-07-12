@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "benchmark_version": {
+      "const": "KDD2027-E060-4H-v1.0.0+KDD089"
+    },
+    "claim_boundary": {
+      "type": "string"
+    },
+    "cov80": {
+      "type": "number"
+    },
+    "cov90": {
+      "type": "number"
+    },
+    "gaussian_crps": {
+      "type": "number"
+    },
+    "gaussian_nll": {
+      "type": "number"
+    },
+    "interval_score90": {
+      "type": "number"
+    },
+    "overall_mae": {
+      "type": "number"
+    },
+    "overall_rmse": {
+      "type": "number"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "width80": {
+      "type": "number"
+    },
+    "width90": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "benchmark_version",
+    "task_id",
+    "overall_rmse",
+    "overall_mae",
+    "claim_boundary"
+  ],
+  "type": "object"
+}

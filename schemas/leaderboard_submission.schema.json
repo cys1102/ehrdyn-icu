@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "benchmark_version": {
+      "const": "KDD2027-E060-4H-v1.0.0+KDD089"
+    },
+    "claim_boundary_acknowledged": {
+      "const": true
+    },
+    "rows": {
+      "minItems": 1,
+      "type": "array"
+    },
+    "submission_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "benchmark_version",
+    "submission_id",
+    "claim_boundary_acknowledged",
+    "rows"
+  ],
+  "type": "object"
+}

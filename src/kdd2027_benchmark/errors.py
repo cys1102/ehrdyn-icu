@@ -1,0 +1,2 @@
+class ReleaseContractError(RuntimeError):
+    pass

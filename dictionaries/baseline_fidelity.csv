@@ -1,0 +1,14 @@
+baseline_id,baseline_name,implementation_label,label_boundary
+clean_world_model_transition,KDD-compatible clean E211/E225-style residual ensemble,adapted_not_exact_five_member_residual_ensemble,adapted
+dreamer_v1_gaussian_rssm,Dreamer V1-style Gaussian RSSM,style_adapter_distinct_gaussian,adapted
+dreamer_v3_categorical_rssm,Dreamer V3-style categorical RSSM,style_adapter_distinct_categorical,adapted
+gru_sequence,GRU sequence,exact_local,exact
+grud_missingness_aware,GRU-D missingness-aware,explicit_local,local_control
+no_action_control,No-action control,clean_world_model_control,local_control
+persistence_locf,Persistence / LOCF,exact_local,exact
+previous_window_distinct,Previous-window distinct,exact_local,exact
+ridge_residual,Ridge residual,exact_local,exact
+sepsisagent_style_adapted,SepsisAgent-style transition,adapted_not_exact,adapted
+shuffled_action_control,Shuffled-action control,clean_world_model_control,local_control
+transformer_sequence,Causal Transformer sequence,exact_local,exact
+tree_residual_hgb,Per-feature HGB residual,exact_local,exact

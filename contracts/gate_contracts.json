@@ -1,0 +1,23 @@
+{
+  "absolute_policy": {
+    "ess_fraction_min": 0.01,
+    "ess_min": 100,
+    "implementation": "kdd2027_benchmark.gates.absolute_policy_gate",
+    "requires": [
+      "finite WIS/WPDIS/CWPDIS",
+      "FQE",
+      "clipping stability",
+      "denominator ranking stability",
+      "reward robustness",
+      "naive-policy sanity"
+    ]
+  },
+  "benchmark_version": "KDD2027-E060-4H-v1.0.0+KDD089",
+  "layer_conflation_forbidden": true,
+  "sepsis_relative": {
+    "behavior_threshold_status": "caller_must_supply_frozen_matched_denominator_limit",
+    "coverage_abs_difference_max": 0.05,
+    "implementation": "kdd2027_benchmark.gates.sepsis_relative_gate",
+    "rmse_ratio_max": 1.1
+  }
+}

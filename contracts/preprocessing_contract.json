@@ -1,0 +1,33 @@
+{
+  "action_timing": "current 4h exposure predicts next 4h state",
+  "adult": true,
+  "benchmark_version": "KDD2027-E060-4H-v1.0.0+KDD089",
+  "bin_hours": 4,
+  "claim_boundary": "Benchmark construction and recorded-trajectory forecasting, uncertainty, action-support, and offline-policy diagnostics only. Treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, and autonomous-decision claims are blocked.",
+  "episode_unit": "ICU stay",
+  "features": {
+    "count": 40,
+    "future_or_backward_fill": false,
+    "imputation": "train median then within-episode past-only LOCF",
+    "observation_channels": [
+      "value",
+      "mask",
+      "log_recency"
+    ],
+    "scaling": "train mean/std",
+    "train_only_statistics": true
+  },
+  "minimum_los_hours": 24,
+  "mortality_horizon_days": 90,
+  "split": {
+    "algorithm": "opaque deterministic hash",
+    "hash": "029e7452ae2ff99a974a76d31f0b2efa618b3412d071e17e4ef7dda36fb6b987",
+    "membership_exported": false,
+    "unit": "subject_internal"
+  },
+  "steps": 18,
+  "window_hours": [
+    -24,
+    48
+  ]
+}

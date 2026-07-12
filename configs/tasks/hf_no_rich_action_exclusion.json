@@ -1,0 +1,56 @@
+{
+  "action": {
+    "action_count": 0,
+    "class_zero_semantics": "not_applicable",
+    "families": [],
+    "levels_per_family": 0,
+    "missing_is_action_zero": null,
+    "train_only_bin_edges": ""
+  },
+  "allowed_tracks": [
+    "documentation"
+  ],
+  "benchmark_version": "KDD2027-E060-4H-v1.0.0+KDD089",
+  "claim_boundary": "Benchmark construction and recorded-trajectory forecasting, uncertainty, action-support, and offline-policy diagnostics only. Treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, and autonomous-decision claims are blocked.",
+  "cohort_anchor": "HF decongestion or volume-overload anchor",
+  "cohort_id": "hf_diuretic_decongestion",
+  "episode_contract": {
+    "bin_hours": 4,
+    "post_hours": 48,
+    "pre_hours": 24,
+    "steps": 18,
+    "unit": "icu_stay_internal",
+    "window_rule": "window_overlaps_stay"
+  },
+  "feature_dictionary": "dictionaries/features.csv",
+  "forbidden_tracks": [
+    "clinical_policy",
+    "treatment_recommendation",
+    "causal_effect",
+    "counterfactual_benefit",
+    "deployment"
+  ],
+  "inclusion_exclusion_summary": "Adult ICU stay, LOS>=24h, computable 90d mortality, cohort-specific anchor; sepsis exclusion applies to non-sepsis cards where frozen.",
+  "preprocessing_contract": "contracts/preprocessing_contract.json",
+  "rewards": [
+    {
+      "availability": "unavailable",
+      "definition": "final transition receives +1 survival or -1 90d mortality",
+      "name": "terminal_only"
+    },
+    {
+      "availability": "unavailable",
+      "definition": "not frozen",
+      "name": "intermediate_physiology"
+    }
+  ],
+  "runnable": false,
+  "split_contract_hash": "029e7452ae2ff99a974a76d31f0b2efa618b3412d071e17e4ef7dda36fb6b987",
+  "task_id": "hf_no_rich_action_exclusion",
+  "task_role": "no_rich_action_exclusion",
+  "tier": "exclusion",
+  "timing": {
+    "negative_control": "next_window_action_leakage_control_only",
+    "primary": "not_applicable_no_rich_action"
+  }
+}

@@ -1,0 +1,41 @@
+feature_index,feature_name,official_name,group,implementation,release_role
+0,age,Age,demographics,MIMIC-IV patients.anchor_age.,common_40_feature_values_masks_log_recency
+1,gender_male,Gender,demographics,"Male=1, female=0 from patients.gender.",common_40_feature_values_masks_log_recency
+2,weight,Weight,demographics,ICU charted weight; missing remains masked.,common_40_feature_values_masks_log_recency
+3,readmission,Readmission,demographics,Admission is not subject's first admission.,common_40_feature_values_masks_log_recency
+4,elixhauser_score_proxy,Elixhauser Score,demographics,v0 proxy: number of broad non-sepsis ICD diagnosis prefixes in admission.,common_40_feature_values_masks_log_recency
+5,heart_rate,Heart Rate,vital_signs,ICU chartevents median within 4h bin.,common_40_feature_values_masks_log_recency
+6,sbp,SBP,vital_signs,ICU arterial/non-invasive systolic BP median within 4h bin.,common_40_feature_values_masks_log_recency
+7,mbp,MBP,vital_signs,ICU arterial/non-invasive mean BP median within 4h bin.,common_40_feature_values_masks_log_recency
+8,dbp,DBP,vital_signs,ICU arterial/non-invasive diastolic BP median within 4h bin.,common_40_feature_values_masks_log_recency
+9,respiratory_rate,Respiratory rate,vital_signs,ICU respiratory-rate chart median.,common_40_feature_values_masks_log_recency
+10,temperature_c,Temperature,vital_signs,ICU temperature converted to Celsius when needed.,common_40_feature_values_masks_log_recency
+11,spo2,SpO2,vital_signs,ICU SpO2 chart median.,common_40_feature_values_masks_log_recency
+12,shock_index,Shock Index,vital_signs,Derived heart_rate / SBP when both observed.,common_40_feature_values_masks_log_recency
+13,sofa_proxy,SOFA,vital_signs,Simplified SOFA proxy from available bin measurements.,common_40_feature_values_masks_log_recency
+14,gcs_proxy,GCS,vital_signs,Charted total/component GCS proxy.,common_40_feature_values_masks_log_recency
+15,fio2,FiO2,vital_signs,Charted FiO2 percent proxy.,common_40_feature_values_masks_log_recency
+16,sirs_proxy,SIRS,vital_signs,Simplified SIRS proxy from temp/HR/RR/PaCO2/WBC.,common_40_feature_values_masks_log_recency
+17,lactate,Lactate,lab_values,Hospital/ICU lab median within 4h bin.,common_40_feature_values_masks_log_recency
+18,pao2,PaO2,lab_values,Blood gas pO2 median within 4h bin.,common_40_feature_values_masks_log_recency
+19,paco2,PaCO2,lab_values,Blood gas pCO2 median within 4h bin.,common_40_feature_values_masks_log_recency
+20,ph,pH,lab_values,Blood gas pH median within 4h bin.,common_40_feature_values_masks_log_recency
+21,base_excess,Base excess,lab_values,Blood gas base excess median within 4h bin.,common_40_feature_values_masks_log_recency
+22,co2_bicarbonate,CO2,lab_values,Bicarbonate/CO2 proxy median within 4h bin.,common_40_feature_values_masks_log_recency
+23,pao2_fio2,PaO2/FiO2,lab_values,Derived PaO2 / FiO2 fraction.,common_40_feature_values_masks_log_recency
+24,wbc,WBC,lab_values,White blood cell count median.,common_40_feature_values_masks_log_recency
+25,platelet,Platelet,lab_values,Platelet count median.,common_40_feature_values_masks_log_recency
+26,bun,BUN,lab_values,Blood urea nitrogen median.,common_40_feature_values_masks_log_recency
+27,creatinine,Creatinine,lab_values,Creatinine median.,common_40_feature_values_masks_log_recency
+28,ptt,PTT,lab_values,Partial thromboplastin time median.,common_40_feature_values_masks_log_recency
+29,pt,PT,lab_values,Prothrombin time median.,common_40_feature_values_masks_log_recency
+30,inr,INR,lab_values,INR median.,common_40_feature_values_masks_log_recency
+31,ast,AST,lab_values,AST median.,common_40_feature_values_masks_log_recency
+32,alt,ALT,lab_values,ALT median.,common_40_feature_values_masks_log_recency
+33,total_bilirubin,Total Bilirubin,lab_values,Total bilirubin median.,common_40_feature_values_masks_log_recency
+34,magnesium,Magnesium,lab_values,Magnesium median.,common_40_feature_values_masks_log_recency
+35,ionized_calcium,Ionized Calcium,lab_values,Free/ionized calcium median.,common_40_feature_values_masks_log_recency
+36,calcium,Calcium,lab_values,Total calcium median.,common_40_feature_values_masks_log_recency
+37,urine_output,Urine Output,lab_values,ICU outputevents urine volume summed within 4h bin.,common_40_feature_values_masks_log_recency
+38,mechanical_ventilation,Mechanical Ventilation,lab_values,ICU ventilation event indicator.,common_40_feature_values_masks_log_recency
+39,step_id,Step ID,other,0-indexed 4h step within the -24h to +48h window.,common_40_feature_values_masks_log_recency

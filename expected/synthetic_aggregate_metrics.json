@@ -1,0 +1,23 @@
+{
+  "action_count_observed": 3,
+  "benchmark_version": "KDD2027-E060-4H-v1.0.0+KDD089",
+  "claim_boundary": "Benchmark construction and recorded-trajectory forecasting diagnostics only. Treatment, causal, counterfactual, clinical-utility, policy-improvement, optimization, deployment, and autonomous-decision claims are blocked.",
+  "cov80": 0.9852941176470589,
+  "cov90": 1.0,
+  "dynamic_rmse": 0.10219049871355723,
+  "episode_count": 8,
+  "feature_count": 4,
+  "gaussian_crps": 0.051000238790168004,
+  "gaussian_nll": -0.8257244553957995,
+  "interval_score90": 0.5036541421724653,
+  "overall_mae": 0.06310195023897062,
+  "overall_rmse": 0.07875044801578655,
+  "reward_nonzero_density": 1.0,
+  "row_count": 544,
+  "sparse_lab_rmse": 0.08132198324098931,
+  "synthetic_fixture": true,
+  "task_id": "sepsis_original25_reference",
+  "uncertainty_absolute_error_spearman": 0.06637131663451533,
+  "width80": 0.39241105945118115,
+  "width90": 0.5036541421724653
+}
