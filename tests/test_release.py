@@ -138,6 +138,22 @@ class KDD089ReleaseTests(unittest.TestCase):
         self.assertIn("restricted_outputs",(ROOT/"credentialed/build_local_contract.py").read_text(encoding="utf-8"))
 
     @unittest.skipUnless(importlib.util.find_spec("pandas"), "credentialed extra is not installed")
+    def test_credentialed_action_encoders_preserve_frozen_levels(self):
+        path=ROOT/"credentialed/build_local_contract.py"
+        spec=importlib.util.spec_from_file_location("ehrdyn_credentialed_builder",path)
+        if spec is None or spec.loader is None:
+            self.fail("Could not load the credentialed builder module")
+        module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        peep=module.pd.DataFrame({"peep":[float("nan"),4.0,5.5,7.0]})
+        self.assertEqual(module._encode_action("kdd2027_respiratory_peep_5bin",peep).tolist(),[0,1,2,3])
+        levels=[0.0,0.5,1.0]
+        aki=module.pd.DataFrame({
+            "diuretic":[value for value in levels for _ in levels],
+            "rrt_crrt":levels*len(levels),
+        })
+        self.assertEqual(module._encode_action("kdd2027_aki_diuretic_rrt_factorized_3bin",aki).tolist(),list(range(9)))
+
+    @unittest.skipUnless(importlib.util.find_spec("pandas"), "credentialed extra is not installed")
     def test_credentialed_builder_smoke(self):
         task_ids=[json.loads(path.read_text(encoding="utf-8"))["task_id"] for path in sorted((ROOT/"configs/tasks").glob("*.json"))]
         action_fields=["subject_id","stay_id","task_id","step_index","mortality_90d","fluid_bolus","vasopressor","diuretic","inotrope","rate_rhythm_control","anticoagulation","rrt_crrt","peep"]

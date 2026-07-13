@@ -136,6 +136,15 @@ def _build_task(task_id, config, all_observations, actions, static, output_dir):
     transformed, imputed, recency, stats = _preprocess(values, mask, split)
     terminal_reward = np.zeros((len(episodes), 18), dtype=np.float32)
     terminal_reward[:, -1] = np.where(episodes["mortality_90d"].to_numpy(dtype=int) == 1, -1.0, 1.0)
+    configured_action_count = int(config["action"]["action_count"])
+    if encoded_actions.min() < 0 or encoded_actions.max() >= configured_action_count:
+        raise ValueError(
+            f"{task_id} produced action outside [0, {configured_action_count - 1}]"
+        )
+    action_ids, action_counts = np.unique(encoded_actions, return_counts=True)
+    action_histogram = {
+        str(index): int(count) for index, count in zip(action_ids, action_counts, strict=True)
+    }
     np.savez_compressed(
         output_dir / f"{task_id}.restricted.npz",
         values=transformed,
@@ -157,8 +166,10 @@ def _build_task(task_id, config, all_observations, actions, static, output_dir):
         "observation_fraction": float(mask.mean()),
         "mortality_90d": float(episodes["mortality_90d"].mean()),
         "split_counts": {name: int(np.sum(split == name)) for name in ("train", "val", "test")},
-        "action_count_observed": int(np.unique(encoded_actions).size),
-        "configured_action_count": int(config["action"]["action_count"]),
+        "action_count_observed": int(action_ids.size),
+        "configured_action_count": configured_action_count,
+        "action_count_matches_config": int(action_ids.size) == configured_action_count,
+        "action_class_counts": action_histogram,
     }
 
 
@@ -267,7 +278,14 @@ def _parity_rows(receipts, expected):
     result = []
     for row in expected.itertuples(index=False):
         metric = str(row.metric)
-        observed = by_task[str(row.task_id)][{"full_eligible_episodes": "episodes", "full_eligible_windows": "windows", "full_subjects": "subjects", "full_observation_fraction": "observation_fraction", "mortality_90d": "mortality_90d"}[metric]]
+        observed = by_task[str(row.task_id)][{
+            "full_eligible_episodes": "episodes",
+            "full_eligible_windows": "windows",
+            "full_subjects": "subjects",
+            "full_observation_fraction": "observation_fraction",
+            "mortality_90d": "mortality_90d",
+            "action_count_observed": "action_count_observed",
+        }[metric]]
         tolerance = float(row.absolute_tolerance)
         result.append({"task_id": str(row.task_id), "metric": metric, "expected": float(row.expected_value), "observed": float(observed), "absolute_tolerance": tolerance, "pass": abs(float(observed) - float(row.expected_value)) <= tolerance})
     return result

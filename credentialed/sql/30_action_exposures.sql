@@ -1,15 +1,34 @@
--- Frozen action proxies. Validate local item labels against MIMIC-IV v3.1.
+-- Frozen recorded-exposure proxies. Validate local item labels and units against
+-- MIMIC-IV v3.1 before interpreting any axis clinically.
 CREATE MATERIALIZED VIEW ehrdyn_icu_internal.action_exposures AS
-WITH medication AS (
+WITH medication_event AS (
     SELECT w.stay_id, w.task_id, w.step_index,
            LOWER(COALESCE(d.label, '')) AS label,
-           COALESCE(SUM(i.amount), 0.0) AS amount,
-           COALESCE(MAX(COALESCE(i.rate, i.amount)), 0.0) AS max_rate
+           CASE
+             WHEN i.amount IS NULL THEN 0.0
+             WHEN COALESCE(i.endtime, i.starttime) > i.starttime THEN
+               i.amount * EXTRACT(EPOCH FROM (
+                 LEAST(COALESCE(i.endtime, i.starttime), w.window_end)
+                 - GREATEST(i.starttime, w.window_start)
+               )) / NULLIF(EXTRACT(EPOCH FROM (
+                 COALESCE(i.endtime, i.starttime) - i.starttime
+               )), 0.0)
+             WHEN i.starttime >= w.window_start AND i.starttime < w.window_end
+               THEN i.amount
+             ELSE 0.0
+           END AS overlap_amount,
+           i.rate AS recorded_rate
     FROM ehrdyn_icu_internal.four_hour_windows AS w
     JOIN mimiciv_icu.inputevents AS i
       ON i.stay_id = w.stay_id AND i.starttime < w.window_end AND COALESCE(i.endtime, i.starttime) >= w.window_start
     JOIN mimiciv_icu.d_items AS d USING (itemid)
-    GROUP BY w.stay_id, w.task_id, w.step_index, LOWER(COALESCE(d.label, ''))
+),
+medication AS (
+    SELECT stay_id, task_id, step_index, label,
+           COALESCE(SUM(overlap_amount), 0.0) AS amount,
+           COALESCE(MAX(COALESCE(recorded_rate, overlap_amount)), 0.0) AS max_rate
+    FROM medication_event
+    GROUP BY stay_id, task_id, step_index, label
 ),
 ventilator AS (
     SELECT w.stay_id, w.task_id, w.step_index,
@@ -21,7 +40,19 @@ ventilator AS (
     GROUP BY w.stay_id, w.task_id, w.step_index
 ),
 renal_support AS (
-    SELECT w.stay_id, w.task_id, w.step_index, 1 AS rrt_crrt
+    SELECT w.stay_id, w.task_id, w.step_index,
+           LEAST(1.0, SUM(
+             CASE
+               WHEN COALESCE(p.endtime, p.starttime) > p.starttime THEN
+                 EXTRACT(EPOCH FROM (
+                   LEAST(COALESCE(p.endtime, p.starttime), w.window_end)
+                   - GREATEST(p.starttime, w.window_start)
+                 )) / 14400.0
+               WHEN p.starttime >= w.window_start AND p.starttime < w.window_end
+                 THEN 1.0
+               ELSE 0.0
+             END
+           )) AS rrt_crrt
     FROM ehrdyn_icu_internal.four_hour_windows AS w
     JOIN mimiciv_icu.procedureevents AS p
       ON p.stay_id = w.stay_id AND p.starttime < w.window_end AND COALESCE(p.endtime, p.starttime) >= w.window_start

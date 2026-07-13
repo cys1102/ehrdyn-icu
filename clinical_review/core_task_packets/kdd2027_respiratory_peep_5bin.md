@@ -1,4 +1,4 @@
-# Respiratory failure / ventilation: peep_setting__five_bin
+# Respiratory failure / ventilation: nominal five-bin PEEP view (empirical K=4)
 
 - Benchmark version: `KDD2027-E060-4H-v1.0.0+KDD089`
 - Task ID: `kdd2027_respiratory_peep_5bin`
@@ -106,7 +106,7 @@ No scalar reward is released. Terminal, intermediate physiology, and safety/burd
 
 ## Readiness And Limits
 
-- Tier reason: Large full scale, directly charted setting, measured five-bin gain, adequate support, and runnable controls.
+- Tier reason: Large full scale, directly charted setting, measured gain for the nominal five-bin contract after duplicate train quantiles collapse to empirical K=4, adequate support, and runnable controls.
 - Uncertainty warning: KDD067 intervals overcovered; respiratory feature-wise calibration remains required after KDD069.
 - Known limitations: PEEP charting is observation-process coupled and does not by itself define invasive ventilation onset.
 - Runnable baselines: `persistence_last_visible;fixed_ridge_residual_alpha_1`.

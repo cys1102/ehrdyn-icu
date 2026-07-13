@@ -34,3 +34,10 @@ KDD2027-E060-4H-v1.0.0,kdd2027_shock_fluid_bolus_binary,full_eligible_windows,55
 KDD2027-E060-4H-v1.0.0,kdd2027_shock_fluid_bolus_binary,full_subjects,25970.0,0.0,credentialed_mimiciv_v3_1_full_profile
 KDD2027-E060-4H-v1.0.0,kdd2027_shock_fluid_bolus_binary,full_observation_fraction,0.3934540450572967,1e-12,credentialed_mimiciv_v3_1_full_profile
 KDD2027-E060-4H-v1.0.0,kdd2027_shock_fluid_bolus_binary,mortality_90d,0.1890848411477931,1e-12,credentialed_mimiciv_v3_1_full_profile
+KDD2027-E060-4H-v1.0.0,kdd2027_sepsis_vasopressor_3bin,action_count_observed,3.0,0.0,credentialed_mimiciv_v3_1_full_profile
+KDD2027-E060-4H-v1.0.0,kdd2027_respiratory_peep_5bin,action_count_observed,4.0,0.0,credentialed_mimiciv_v3_1_full_profile
+KDD2027-E060-4H-v1.0.0,kdd2027_aki_diuretic_rrt_factorized_3bin,action_count_observed,9.0,0.0,credentialed_mimiciv_v3_1_full_profile
+KDD2027-E060-4H-v1.0.0,kdd2027_af_rate_anticoag_compact_3bin,action_count_observed,9.0,0.0,credentialed_mimiciv_v3_1_full_profile
+KDD2027-E060-4H-v1.0.0,kdd2027_hf_diuretic_binary,action_count_observed,2.0,0.0,credentialed_mimiciv_v3_1_full_profile
+KDD2027-E060-4H-v1.0.0,kdd2027_ami_hemodynamic_compact_3bin,action_count_observed,9.0,0.0,credentialed_mimiciv_v3_1_full_profile
+KDD2027-E060-4H-v1.0.0,kdd2027_shock_fluid_bolus_binary,action_count_observed,2.0,0.0,credentialed_mimiciv_v3_1_full_profile

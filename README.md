@@ -1,10 +1,11 @@
-# EHRDyn-ICU v1.1
+# EHRDyn-ICU v1.1.1
 
 EHRDyn-ICU is a frozen, multi-cohort benchmark contract for recorded ICU
-trajectory forecasting and offline-RL diagnostics. The immutable scientific
-contract identifier is `KDD2027-E060-4H-v1.0.0`; v1.1 adds the public
-credentialed-construction path and paper-to-artifact manifests without changing
-the frozen scientific results.
+trajectory forecasting and offline-RL readiness diagnostics. The immutable
+scientific contract identifier is `KDD2027-E060-4H-v1.0.0`; v1.1 adds the
+public credentialed-construction path and paper-to-artifact manifests without
+changing the frozen scientific results. Version 1.1.1 adds action-cardinality
+parity checks and corrects overlap handling in the public construction path.
 
 This repository contains software, task definitions, synthetic fixtures, and
 aggregate evidence. It does **not** contain MIMIC-IV rows, patient identifiers,

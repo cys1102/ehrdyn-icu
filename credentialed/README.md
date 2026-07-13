@@ -21,10 +21,18 @@ encoders. It emits restricted arrays plus an aggregate parity receipt.
 ## Required Parity
 
 `expected/frozen_task_aggregate_checks.csv` freezes episode, window, subject,
-observation-fraction, and mortality summaries. A local build is not the paper
-contract unless every exact-tolerance check passes. This gate checks
+observation-fraction, mortality, and occupied action-count summaries. The
+aggregate receipt also reports every action-class count and whether observed
+and configured cardinalities match. A local build is not the paper contract
+unless every exact-tolerance check passes. This gate checks
 construction consistency; it does not establish clinical validity, causal
 identification, policy evaluability, or deployment safety.
+
+Medication amounts are prorated by event-window overlap; RRT/CRRT is represented
+as the fraction of each four-hour window covered by a structured procedure
+interval. Drug-family values remain recorded-exposure proxies rather than
+cross-drug dose-equivalent treatment intensities. Their units and item mappings
+require credentialed verification and independent clinical adjudication.
 
 ## Privacy
 

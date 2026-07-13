@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.1
+
+- Prorated medication amounts by event-window overlap and represented RRT/CRRT
+  as four-hour procedure-overlap fraction, closing the binary-to-three-level
+  construction mismatch.
+- Added occupied action cardinality and class histograms to credentialed build
+  receipts and the exact parity gate.
+- Added direct tests for empirical respiratory `K=4` and the complete AKI
+  factorized `3 x 3` encoder.
+- Clarified that drug-family values are recorded-exposure proxies, not
+  cross-drug dose-equivalent treatment intensities, and that the respiratory
+  task has a historical nominal five-bin name but empirical `K=4`.
+
 ## 1.1.0
 
 - Published credentialed MIMIC-IV SQL and preprocessing for all seven compact
