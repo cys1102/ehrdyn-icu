@@ -3,6 +3,9 @@
   "claim_boundary_acknowledged": true,
   "rows": [
     {
+      "action_view": "vasopressor__three_bin",
+      "evaluator_version": "KDD2027-E060-4H-v1.0.0+KDD089",
+      "horizon": "conditional_recursive_17",
       "implementation_fidelity": "adapted",
       "metrics": {
         "one_step_mae": 0.5,
@@ -11,8 +14,12 @@
         "open_loop_rmse": 1.2
       },
       "model_id": "example",
-      "task_id": "sepsis_original25_reference",
-      "track": "point_transition"
+      "seed_count": 3,
+      "source_commit": "0123456",
+      "task_id": "kdd2027_sepsis_vasopressor_3bin",
+      "timing_view": "current_4h_window_exposure_predicts_next_4h_state",
+      "track": "point_transition",
+      "training_budget": "3 seeds; fixed train split; no test tuning"
     }
   ],
   "submission_id": "example-method-v1"

@@ -13,6 +13,32 @@ MIMIC-IV v3.1 is credentialed data. This release does not redistribute it.
 6. Run extraction only in the credentialed environment. Replace schema names
    through database configuration rather than copying source tables.
 
+## Frozen Credentialed Path
+
+Run `credentialed/sql/00_base_eligible_stays.sql` through
+`credentialed/sql/45_static_context.sql` in numeric order. Export the following
+internal views only to secure local storage:
+
+- `ehrdyn_icu_internal.observation_events`
+- `ehrdyn_icu_internal.action_exposures`
+- `ehrdyn_icu_internal.static_context`
+
+Then install the credentialed extra and build private arrays:
+
+```bash
+python -m pip install -e '.[credentialed]'
+python credentialed/build_local_contract.py \
+  --observations /secure/ehrdyn/observation_events.csv \
+  --actions /secure/ehrdyn/action_exposures.csv \
+  --static-context /secure/ehrdyn/static_context.csv \
+  --output-dir /secure/ehrdyn/contract-v1
+```
+
+The command fails if frozen aggregate parity is not reproduced. Its arrays,
+preprocessing statistics, keys, and split membership are restricted local
+artifacts and must never be committed. Only a separately reviewed aggregate
+receipt may be considered for release.
+
 Official references:
 
 - MIMIC-IV v3.1: https://physionet.org/content/mimiciv/3.1/

@@ -4,6 +4,16 @@ This document describes the frozen aggregate KDD078/KDD079 diagnostics after the
 KDD094 code-to-document audit. It is explanatory documentation, not an exact
 target-policy replay package and not evidence of causal treatment-policy value.
 
+## Quarantine Status
+
+Offline-policy rows are not accepted by the public leaderboard submission
+validator in v1.1.0. They remain frozen aggregate stress tests because exact
+KDD078 target-policy probability surfaces are unavailable and no public
+task-policy registry can reproduce every reported value. A future policy track
+requires a new version with policy probabilities, task-policy-denominator row
+keys, a frozen FQE protocol, and subject-cluster inference. It must not silently
+reuse the current diagnostics.
+
 ## Population, Horizon, And Reward
 
 - Population: held-out test episodes from each support-eligible frozen task.
@@ -20,7 +30,7 @@ target-policy replay package and not evidence of causal treatment-policy value.
 
 ## Policies And Behavior Denominators
 
-`evidence/policy/baseline_catalog.csv` is a policy-family catalog, not an exact
+`evidence/quarantine/policy/baseline_catalog.csv` is a policy-family catalog, not an exact
 registry of KDD078 probability surfaces. KDD078 reconstructs policy IDs,
 configurations, and seeds, but the original probability surfaces were not
 retained. KDD079 fits and freezes its own rows. Learned policies use seeds
@@ -81,3 +91,7 @@ concentration, and fidelity label. Exact KDD078 policy-specific attribution is
 blocked where probability provenance is unavailable. Denominator or estimator
 rank disagreement blocks a policy-winner declaration. See
 `evidence/audits/kdd094/` for the authoritative mismatch matrix.
+
+The machine-readable status is in `contracts/ope_provenance_registry.csv`.
+Missing probability provenance is an availability block, not a negative
+policy-performance result.

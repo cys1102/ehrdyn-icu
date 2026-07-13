@@ -27,11 +27,12 @@ def install(source: Path) -> Path:
     if package_target.exists():
         raise FileExistsError(f"Package target already exists: {package_target.name}")
     _ = shutil.copytree(package_source, package_target)
-    launcher = Path(sys.executable).parent / "kdd2027"
     script = f"#!{sys.executable}\nfrom kdd2027_benchmark.cli import main\nraise SystemExit(main())\n"
-    _ = launcher.write_text(script, encoding="utf-8")
-    launcher.chmod(launcher.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-    return launcher
+    launchers = [Path(sys.executable).parent / name for name in ("ehrdyn-icu", "kdd2027")]
+    for launcher in launchers:
+        _ = launcher.write_text(script, encoding="utf-8")
+        launcher.chmod(launcher.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    return launchers[0]
 
 
 def main() -> int:

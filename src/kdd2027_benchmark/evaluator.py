@@ -7,8 +7,7 @@ from pathlib import Path
 from . import BENCHMARK_VERSION, CLAIM_BOUNDARY
 from .errors import ReleaseContractError
 
-REQUIRED_COLUMNS = {
-    "synthetic_episode_key",
+MEASUREMENT_COLUMNS = {
     "step_index",
     "feature_name",
     "feature_group",
@@ -20,16 +19,29 @@ REQUIRED_COLUMNS = {
     "action_index",
     "reward_component",
 }
+REQUIRED_COLUMNS = MEASUREMENT_COLUMNS | {"synthetic_episode_key"}
 
 
 def evaluate_fixture(path: Path, task_id: str) -> dict[str, str | int | float | bool]:
+    return evaluate_predictions(path, task_id, "synthetic_episode_key", synthetic=True)
+
+
+def evaluate_predictions(
+    path: Path,
+    task_id: str,
+    episode_key_column: str,
+    *,
+    synthetic: bool = False,
+) -> dict[str, str | int | float | bool]:
     with path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
-        missing = REQUIRED_COLUMNS - set(reader.fieldnames or ())
+        missing = (MEASUREMENT_COLUMNS | {episode_key_column}) - set(reader.fieldnames or ())
         if missing:
-            raise ReleaseContractError(f"Fixture is missing columns: {','.join(sorted(missing))}")
+            raise ReleaseContractError(f"Prediction file is missing columns: {','.join(sorted(missing))}")
         rows = list(reader)
-    if not rows or any(not row["synthetic_episode_key"].startswith("syn-") for row in rows):
+    if not rows:
+        raise ReleaseContractError("Prediction file must contain at least one row")
+    if synthetic and any(not row[episode_key_column].startswith("syn-") for row in rows):
         raise ReleaseContractError("Fixture must contain synthetic-only episode keys")
     errors = [_float(row, "prediction_mean") - _float(row, "target_value") for row in rows]
     dynamic = [error for error, row in zip(errors, rows, strict=True) if abs(_float(row, "target_value") - _float(row, "current_value")) > 0.05]
@@ -44,9 +56,9 @@ def evaluate_fixture(path: Path, task_id: str) -> dict[str, str | int | float | 
     return {
         "benchmark_version": BENCHMARK_VERSION,
         "task_id": task_id,
-        "synthetic_fixture": True,
+        "synthetic_fixture": synthetic,
         "row_count": len(rows),
-        "episode_count": len({row["synthetic_episode_key"] for row in rows}),
+        "episode_count": len({row[episode_key_column] for row in rows}),
         "feature_count": len({row["feature_name"] for row in rows}),
         "overall_rmse": _rmse(errors),
         "overall_mae": _mae(errors),

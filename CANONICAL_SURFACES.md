@@ -12,6 +12,12 @@ pooled or silently substituted for one another.
 | eICU portability pilot | Two nonidentically mapped tasks and 26 baseline-seed fits | Evaluator portability | Not phenotype-identical external validation |
 | Compact policy diagnostics | Five eligible compact-action tasks, 13--14 completed policy families, kNN and neural behavior denominators | Support, ESS, WIS/WPDIS, clipping, and FQE fragility | Diagnostic only; no policy winner |
 
+The seven paper task IDs map one-to-one to `configs/tasks/` through
+`contracts/paper_task_manifest.csv`. All 41 headline contracts map to the 533
+public method rows through `contracts/paper_contract_manifest.csv`. The separate
+K25 and exclusion configs are retained under `configs/rich_action/` and cannot
+replace a compact paper task.
+
 ## Method Eligibility
 
 The headline ranking compares **forecasting methods**, including persistence and
@@ -34,7 +40,7 @@ logged-action forecast, not an autonomous rollout under a candidate policy.
 - `evidence/uncertainty/`: same-family NLL, Cov90, and Width90 by horizon.
 - `evidence/temporal/`: no-retuning temporal rank confirmation.
 - `evidence/external/`: bounded eICU mapping and evaluator-portability evidence.
-- `evidence/policy/`: behavior, overlap, OPE, and FQE diagnostics.
+- `evidence/quarantine/policy/`: behavior, overlap, OPE, and FQE diagnostics.
 - `evidence/audits/`: post-freeze headline, inference-unit, and OPE provenance audits.
 
 ## Post-Freeze Audit Boundary

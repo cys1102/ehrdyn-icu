@@ -1,9 +1,10 @@
-# EHRDyn-ICU v1.0
+# EHRDyn-ICU v1.1
 
 EHRDyn-ICU is a frozen, multi-cohort benchmark contract for recorded ICU
 trajectory forecasting and offline-RL diagnostics. The immutable scientific
-contract identifier is `KDD2027-E060-4H-v1.0.0`; this repository is the
-`KDD089` public artifact build.
+contract identifier is `KDD2027-E060-4H-v1.0.0`; v1.1 adds the public
+credentialed-construction path and paper-to-artifact manifests without changing
+the frozen scientific results.
 
 This repository contains software, task definitions, synthetic fixtures, and
 aggregate evidence. It does **not** contain MIMIC-IV rows, patient identifiers,
@@ -18,6 +19,11 @@ The offline-policy estimand and estimator conventions are defined in
 [OPE_CONTRACT.md](OPE_CONTRACT.md). Clinical task definitions are versioned in
 `configs/tasks/` and `task_cards/`; independent clinician review is tracked in
 [CLINICAL_REVIEW.md](CLINICAL_REVIEW.md).
+
+`contracts/paper_task_manifest.csv` maps every paper task to one canonical
+config and clinical packet. `contracts/paper_contract_manifest.csv` maps all 41
+headline contracts to the 533 public leaderboard rows. Rich K25 audits are
+separate under `configs/rich_action/`.
 
 Post-freeze audit evidence is in `evidence/audits/`. KDD094 identifies limits in
 target-policy provenance and OPE documentation; those limits take precedence
@@ -36,8 +42,12 @@ ehrdyn-icu validate-config --config-dir configs/tasks
 ehrdyn-icu generate-fixture --output /tmp/ehrdyn_fixture.csv
 ehrdyn-icu evaluate \
   --fixture /tmp/ehrdyn_fixture.csv \
-  --task-config configs/tasks/sepsis_original25_reference.json \
+  --task-config configs/tasks/kdd2027_sepsis_vasopressor_3bin.json \
   --output /tmp/ehrdyn_metrics.json
+ehrdyn-icu validate-manifest \
+  --task-manifest contracts/paper_task_manifest.csv \
+  --contract-manifest contracts/paper_contract_manifest.csv \
+  --evidence evidence/core/contract_transition_leaderboard.csv
 ehrdyn-icu validate-submission \
   --submission submission/leaderboard_submission_template.json \
   --config-dir configs/tasks
@@ -50,8 +60,10 @@ The historical `kdd2027` command remains available as a compatibility alias.
 
 ## Repository Contents
 
-- `configs/tasks/`: seven frozen task or exclusion contracts.
+- `configs/tasks/`: five primary and two extended compact paper contracts.
+- `configs/rich_action/`: separate K25/reference/exclusion audit contracts.
 - `contracts/`: preprocessing and layered gate definitions.
+- `credentialed/`: public SQL, preprocessing, action encoding, and aggregate parity targets for authorized local MIMIC-IV execution.
 - `dictionaries/`: feature, action, reward, metric, and baseline provenance.
 - `src/`: aggregate evaluator, fixture, split, gate, privacy, and submission code.
 - `fixtures/`: schema-compatible synthetic data only.
@@ -64,16 +76,17 @@ The historical `kdd2027` command remains available as a compatibility alias.
 ## Credentialed Benchmark Execution
 
 MIMIC-IV remains governed by PhysioNet credentialing and is not redistributed.
-See [MIMIC_ACCESS.md](MIMIC_ACCESS.md). Extraction must run in an authorized
-environment. Only aggregate evaluator outputs may be exported into this public
-artifact.
+See [MIMIC_ACCESS.md](MIMIC_ACCESS.md). Extraction and preprocessing must run in
+an authorized environment. `ehrdyn-icu evaluate-local` converts a local
+cell-level prediction file to aggregate metrics without exporting row keys.
+Only separately privacy-reviewed aggregate outputs may be contributed.
 
 ## Evidence Boundary
 
 The dynamics track evaluates one-step and conditional recursive forecasts under
 logged future actions. It does not simulate outcomes under a new treatment
-policy. The policy track diagnoses support and estimator sensitivity; it is not
-a clinical policy leaderboard. See [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)
+policy. Existing policy evidence is quarantined as a frozen aggregate diagnostic
+and is not accepted by the public leaderboard validator. See [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)
 and [ETHICS_AND_MISUSE.md](ETHICS_AND_MISUSE.md).
 
 Unsupported uses include treatment recommendation, causal effect estimation,

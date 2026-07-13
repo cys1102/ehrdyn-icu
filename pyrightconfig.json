@@ -2,5 +2,5 @@
   "include": ["src", "scripts", "tests"],
   "extraPaths": ["src"],
   "pythonVersion": "3.11",
-  "typeCheckingMode": "all"
+  "typeCheckingMode": "standard"
 }

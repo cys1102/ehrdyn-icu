@@ -4,12 +4,13 @@
     "ess_min": 100,
     "implementation": "kdd2027_benchmark.gates.absolute_policy_gate",
     "requires": [
-      "finite WIS/WPDIS/CWPDIS",
+      "finite WIS/WPDIS",
       "FQE",
       "clipping stability",
       "denominator ranking stability",
       "reward robustness",
-      "naive-policy sanity"
+      "naive-policy sanity",
+      "complete task-policy-denominator provenance"
     ]
   },
   "benchmark_version": "KDD2027-E060-4H-v1.0.0+KDD089",

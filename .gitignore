@@ -1,8 +1,9 @@
-.DS_Store
-.pytest_cache/
 .venv/
 __pycache__/
+.pytest_cache/
 *.egg-info/
 build/
 dist/
-
+credentialed/local/
+*.restricted.npz
+*.preprocessing.json

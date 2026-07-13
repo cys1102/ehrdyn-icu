@@ -9,6 +9,25 @@
     },
     "rows": {
       "minItems": 1,
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "action_view": {"type": "string"},
+          "evaluator_version": {"const": "KDD2027-E060-4H-v1.0.0+KDD089"},
+          "horizon": {"enum": ["one_step", "conditional_recursive_17"]},
+          "implementation_fidelity": {"enum": ["exact", "adapted", "proxy", "local_control"]},
+          "metrics": {"type": "object"},
+          "model_id": {"type": "string"},
+          "seed_count": {"minimum": 1, "type": "integer"},
+          "source_commit": {"pattern": "^[0-9a-fA-F]{7,40}$", "type": "string"},
+          "task_id": {"type": "string"},
+          "timing_view": {"type": "string"},
+          "track": {"enum": ["point_transition", "uncertainty"]},
+          "training_budget": {"minLength": 1, "type": "string"}
+        },
+        "required": ["action_view", "evaluator_version", "horizon", "implementation_fidelity", "metrics", "model_id", "seed_count", "source_commit", "task_id", "timing_view", "track", "training_budget"],
+        "type": "object"
+      },
       "type": "array"
     },
     "submission_id": {

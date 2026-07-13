@@ -13,7 +13,7 @@ predictions, or credentials.
   model selection is permitted.
 - `external/`: bounded eICU evaluator-portability summaries. The mappings are
   nonidentical and are not phenotype-matched external validation.
-- `policy/`: policy registry, behavior calibration, overlap, WIS/WPDIS,
+- `quarantine/policy/`: policy registry, behavior calibration, overlap, WIS/WPDIS,
   clipping, ESS, and FQE diagnostics. All rows remain diagnostic-only.
 - `audits/`: KDD091 headline reconciliation, KDD093 subject-cluster feasibility,
   and KDD094 OPE code-to-document provenance. Audit rows override broader prose

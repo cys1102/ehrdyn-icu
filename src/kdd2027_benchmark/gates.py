@@ -20,18 +20,21 @@ def sepsis_relative_gate(candidate: Mapping[str, object], reference: Mapping[str
 
 
 def absolute_policy_gate(metrics: Mapping[str, object]) -> dict[str, object]:
-    required = ("ess", "ess_fraction", "wis", "wpdis", "cwpdis", "fqe_finite", "clipping_stable", "denominator_ranking_stable", "reward_robust", "naive_policy_sanity")
+    required = ("ess", "ess_fraction", "wis", "wpdis", "fqe_finite", "clipping_stable", "denominator_ranking_stable", "reward_robust", "naive_policy_sanity", "ope_provenance_complete")
     missing = [name for name in required if name not in metrics]
     if missing:
         return {"gate": "absolute_policy_evaluability", "pass": False, "missing": ";".join(missing)}
-    finite = all(math.isfinite(_number(metrics, name)) for name in ("wis", "wpdis", "cwpdis"))
-    passed = _number(metrics, "ess") >= 100 and _number(metrics, "ess_fraction") >= .01 and finite and all(bool(metrics[name]) for name in required[5:])
+    finite = all(math.isfinite(_number(metrics, name)) for name in ("wis", "wpdis"))
+    passed = _number(metrics, "ess") >= 100 and _number(metrics, "ess_fraction") >= .01 and finite and all(bool(metrics[name]) for name in required[4:])
     return {"gate": "absolute_policy_evaluability", "pass": passed, "missing": ""}
 
 
 def _number(values: Mapping[str, object], key: str) -> float:
     try:
-        value = float(values[key])
+        raw = values[key]
+        if not isinstance(raw, int | float | str):
+            raise TypeError
+        value = float(raw)
     except (KeyError, TypeError, ValueError) as error:
         raise ReleaseContractError(f"Missing or invalid gate metric: {key}") from error
     if not math.isfinite(value):

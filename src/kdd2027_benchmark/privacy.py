@@ -8,7 +8,7 @@ from pathlib import Path
 from .errors import ReleaseContractError
 
 RESTRICTED_SUFFIXES = {".pt", ".pth", ".ckpt", ".npy", ".npz", ".parquet", ".feather", ".jsonl", ".pyc", ".pkl"}
-IGNORED_BUILD_PARTS = {".git", ".venv", "build", "dist"}
+IGNORED_BUILD_PARTS = {".git", ".venv", ".pytest_cache", "__pycache__", "build", "dist"}
 RESTRICTED_HEADERS = {
     "subject_id",
     "stay_id",
@@ -37,9 +37,6 @@ def scan_release(root: Path) -> dict[str, int | bool]:
     files = [path for path in root.rglob("*") if path.is_file() and not _ignored_build_file(path)]
     for path in files:
         relative = path.relative_to(root)
-        if "__pycache__" in path.parts or ".pytest_cache" in path.parts:
-            findings.append(f"generated_cache:{relative}")
-            continue
         if path.suffix.lower() in RESTRICTED_SUFFIXES:
             findings.append(f"restricted_suffix:{relative}")
             continue

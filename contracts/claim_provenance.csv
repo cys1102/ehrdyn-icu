@@ -1,0 +1,9 @@
+claim_id,public_evidence,selector_or_validator,status,allowed_interpretation
+paper_tasks,contracts/paper_task_manifest.csv,ehrdyn-icu validate-manifest,available,seven paper tasks map one-to-one to public compact configs and review packets
+transition_matrix,evidence/core/contract_transition_leaderboard.csv;contracts/paper_contract_manifest.csv,contract_id plus task_id plus baseline_id,available,533 aggregate model-contract transition rows over 41 contracts
+horizon_rank,evidence/core/horizon_rank_stability.csv;contracts/paper_contract_manifest.csv,contract_id plus horizon,available,one-step and conditional-recursive model ranks may differ
+temporal_confirmation,evidence/temporal/rank_stability.csv; evidence/temporal/leader_rank_comparison_vs_v1.csv,frozen task plus model plus horizon,available,no-retuning temporal recorded-trajectory rank confirmation
+uncertainty,evidence/uncertainty/fixed_family_uncertainty.csv,task plus model plus horizon,available,same-family calibration and sharpness diagnostics
+ope,evidence/quarantine/policy/; evidence/audits/kdd094/; contracts/ope_provenance_registry.csv,not accepted by submission validator,quarantined,aggregate estimator stress tests only and no policy winner or value claim
+clinical_review,clinical_review/core_review_status.csv,task_id,pending,review packets are public but independent clinician approval is not yet complete
+credentialed_reproduction,credentialed/; credentialed/expected/frozen_task_aggregate_checks.csv,exact local parity gate,pending_external_execution,construction code is public but exact MIMIC parity requires an authorized environment

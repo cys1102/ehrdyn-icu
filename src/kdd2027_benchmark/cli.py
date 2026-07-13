@@ -11,8 +11,9 @@ from . import BENCHMARK_VERSION
 from .baseline import BASELINES, run_baseline
 from .config import validate_config_directory, validate_task_config
 from .errors import ReleaseContractError
-from .evaluator import evaluate_fixture
+from .evaluator import evaluate_fixture, evaluate_predictions
 from .fixture import generate_fixture
+from .manifest import validate_paper_manifests
 from .privacy import scan_release, verify_checksums
 from .report import write_aggregate_report
 from .split import deterministic_split
@@ -37,6 +38,11 @@ class CliArgs(argparse.Namespace):
     entity_key: str = ""
     root: Path = Path()
     submission: Path = Path()
+    predictions: Path = Path()
+    episode_key_column: str = "local_episode_key"
+    task_manifest: Path = Path()
+    contract_manifest: Path = Path()
+    evidence: Path = Path()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -54,6 +60,14 @@ def build_parser() -> argparse.ArgumentParser:
     _ = evaluate.add_argument("--fixture", type=Path, required=True)
     _ = evaluate.add_argument("--task-config", type=Path, required=True)
     _ = evaluate.add_argument("--output", type=Path, required=True)
+    evaluate_local = commands.add_parser(
+        "evaluate-local",
+        help="Aggregate a credentialed local prediction file without exporting row keys.",
+    )
+    _ = evaluate_local.add_argument("--predictions", type=Path, required=True)
+    _ = evaluate_local.add_argument("--episode-key-column", default="local_episode_key")
+    _ = evaluate_local.add_argument("--task-config", type=Path, required=True)
+    _ = evaluate_local.add_argument("--output", type=Path, required=True)
     baseline = commands.add_parser("baseline", help="Run a deterministic synthetic forecasting baseline.")
     _ = baseline.add_argument("--fixture", type=Path, required=True)
     _ = baseline.add_argument("--task-config", type=Path, required=True)
@@ -72,6 +86,13 @@ def build_parser() -> argparse.ArgumentParser:
     submission = commands.add_parser("validate-submission", help="Validate an aggregate leaderboard submission.")
     _ = submission.add_argument("--submission", type=Path, required=True)
     _ = submission.add_argument("--config-dir", type=Path, required=True)
+    manifest = commands.add_parser(
+        "validate-manifest",
+        help="Validate paper task and contract mappings against public evidence.",
+    )
+    _ = manifest.add_argument("--task-manifest", type=Path, required=True)
+    _ = manifest.add_argument("--contract-manifest", type=Path, required=True)
+    _ = manifest.add_argument("--evidence", type=Path, required=True)
     return parser
 
 
@@ -101,6 +122,12 @@ def _dispatch(args: CliArgs) -> int:
     elif args.command == "evaluate":
         config = validate_task_config(args.task_config)
         _write_json(args.output, evaluate_fixture(args.fixture, str(config["task_id"])))
+    elif args.command == "evaluate-local":
+        config = validate_task_config(args.task_config)
+        _write_json(
+            args.output,
+            evaluate_predictions(args.predictions, str(config["task_id"]), args.episode_key_column),
+        )
     elif args.command == "baseline":
         config = validate_task_config(args.task_config)
         _write_json(args.output, run_baseline(args.fixture, args.output_fixture, str(config["task_id"]), args.baseline))
@@ -113,9 +140,15 @@ def _dispatch(args: CliArgs) -> int:
     elif args.command == "verify-checksums":
         print(json.dumps(verify_checksums(args.root), sort_keys=True))
     elif args.command == "validate-submission":
-        configs = validate_config_directory(args.config_dir)
-        task_ids = {str(config["task_id"]) for config in configs}
-        print(json.dumps(validate_submission(args.submission, task_ids), sort_keys=True))
+        configs = validate_config_directory(_required_path(args.config_dir))
+        print(json.dumps(validate_submission(args.submission, configs), sort_keys=True))
+    elif args.command == "validate-manifest":
+        print(
+            json.dumps(
+                validate_paper_manifests(args.task_manifest, args.contract_manifest, args.evidence),
+                sort_keys=True,
+            )
+        )
     return 0
 
 
