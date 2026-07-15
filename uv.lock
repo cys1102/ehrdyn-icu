@@ -15,19 +15,21 @@ resolution-markers = [
 
 [[package]]
 name = "ehrdyn-icu"
-version = "1.1.1"
+version = "1.2.0rc1"
 source = { editable = "." }
+dependencies = [
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
 
 [package.optional-dependencies]
 credentialed = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pandas" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "numpy", marker = "extra == 'credentialed'", specifier = ">=1.26" },
+    { name = "numpy", specifier = ">=1.26,<3" },
     { name = "pandas", marker = "extra == 'credentialed'", specifier = ">=2.2" },
 ]
 provides-extras = ["credentialed"]

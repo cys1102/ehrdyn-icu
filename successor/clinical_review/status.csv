@@ -1,0 +1,6 @@
+task_id,task_version,required_specialty,status,decision,requested_changes,completed_date
+sepsis,KDD-RV-SEPSIS-SI-OD-v1.0.0,critical_care_and_infectious_diseases,pending,,,
+respiratory,KDD-RV-RESP-SUPPORT-v1.0.0,pulmonary_and_critical_care,pending,,,
+aki,KDD-RV-AKI-KDIGO-CR-RRT-v1.0.0,nephrology_and_critical_care,pending,,,
+af_flutter,KDD-RV-AF-PRIOR-DX-RR-v1.0.0,cardiology_or_electrophysiology_and_critical_care,pending,,,
+heart_failure,KDD-RV-HF-PRIOR-DX-DECONG-v1.0.0,heart_failure_cardiology_and_critical_care,pending,,,

@@ -1,0 +1,29 @@
+{
+  "action_contract": "Binary recorded diuretic exposure; vasodilator exposure may be pre-action context only when it ends before t.",
+  "action_interval": "[t,t+4h)",
+  "anchor_contract": "Completed prior-encounter heart-failure diagnosis followed by the first current ICU diuretic or vasodilator event; no current-admission diagnosis, medication-defined disease, or generic volume-overload fallback.",
+  "benchmark_version": "KDD-RV-SUCCESSOR-RC1",
+  "claim_boundary": "Recorded-trajectory forecasting and benchmark-validity auditing only. Treatment, causal, counterfactual, policy-selection, clinical-utility, deployment, and autonomous-decision claims are blocked.",
+  "clinical_review_status": "pending_not_simulated",
+  "episode_contract": {
+    "bin_hours": 4,
+    "fully_stay_contained": true,
+    "history_bins": 6,
+    "post_anchor_grid_hours": 48,
+    "pre_anchor_history_hours": 24
+  },
+  "role_contract": {
+    "ranges": {
+      "sealed_test": [8500, 10000],
+      "train": [0, 7000],
+      "validation": [7000, 8500]
+    },
+    "salt": "KDD-RV-SUBJECT-ROLE-v1|"
+  },
+  "state_interval": "Fully contained pre-action four-hour history bins ending before t; prior completed-encounter evidence may be included as a fixed flag.",
+  "status": "defined_pending_clinical_review",
+  "target_interval": "Observed physiology values, masks, and recencies in [t+4h,t+8h).",
+  "task_contract_row_sha256": "cfe9ce69c3c65c9670817613aafb81d32c4ac34515d4a637019a99c9ce3e359a",
+  "task_id": "heart_failure",
+  "task_version": "KDD-RV-HF-PRIOR-DX-DECONG-v1.0.0"
+}

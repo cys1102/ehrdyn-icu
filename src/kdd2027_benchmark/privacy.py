@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import io
 import re
+import tarfile
+import zipfile
 from pathlib import Path
 
 from .errors import ReleaseContractError
@@ -77,6 +80,61 @@ def verify_checksums(root: Path) -> dict[str, int | bool]:
     if actual != listed:
         raise ReleaseContractError("Checksum manifest file set does not match release contents")
     return {"files_checked": checked, "mismatches": 0, "pass": True}
+
+
+def audit_distribution_archives(dist_root: Path) -> dict[str, object]:
+    archives = sorted(
+        path for path in dist_root.iterdir() if path.is_file() and (path.suffix == ".whl" or path.name.endswith(".tar.gz"))
+    )
+    if not archives:
+        raise ReleaseContractError("No wheel or source distribution was found")
+    files_scanned = 0
+    findings: list[str] = []
+    digests: dict[str, str] = {}
+    for archive in archives:
+        digests[archive.name] = hashlib.sha256(archive.read_bytes()).hexdigest()
+        if archive.suffix == ".whl":
+            with zipfile.ZipFile(archive) as handle:
+                members = [(item.filename, handle.read(item)) for item in handle.infolist() if not item.is_dir()]
+        else:
+            with tarfile.open(archive, mode="r:gz") as handle:
+                members = []
+                for item in handle.getmembers():
+                    if not item.isfile():
+                        continue
+                    extracted = handle.extractfile(item)
+                    if extracted is None:
+                        continue
+                    members.append((item.name, extracted.read()))
+        for name, data in members:
+            files_scanned += 1
+            _scan_archive_member(archive.name, name, data, findings)
+    if findings:
+        raise ReleaseContractError("Distribution privacy scan failed: " + ";".join(findings))
+    return {
+        "archives_scanned": len(archives),
+        "archive_files_scanned": files_scanned,
+        "archive_sha256": digests,
+        "findings": 0,
+        "pass": True,
+    }
+
+
+def _scan_archive_member(archive: str, name: str, data: bytes, findings: list[str]) -> None:
+    path = Path(name)
+    if path.is_absolute() or ".." in path.parts:
+        findings.append(f"archive_path_escape:{archive}:{name}")
+        return
+    if path.suffix.lower() in RESTRICTED_SUFFIXES:
+        findings.append(f"restricted_suffix:{archive}:{name}")
+        return
+    text = data.decode("utf-8", errors="ignore")
+    if any(pattern.search(text) for pattern in SECRET_PATTERNS):
+        findings.append(f"secret_or_local_path:{archive}:{name}")
+    if path.suffix == ".csv":
+        headers = set(next(csv.reader(io.StringIO(text)), ()))
+        if headers & RESTRICTED_HEADERS:
+            findings.append(f"restricted_csv_header:{archive}:{name}")
 
 
 def _ignored_build_file(path: Path) -> bool:

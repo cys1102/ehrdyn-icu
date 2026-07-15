@@ -1,0 +1,7 @@
+cohort,eligible_subjects,materialized_transitions,action_dimension,train_supported_action_classes,count_scope
+sepsis,3391,34245,25,22,subject-disjoint development train plus validation
+respiratory,18709,125246,25,12,development task materialization
+shock,37015,390341,25,25,development task materialization
+af flutter,2551,33836,25,16,development task materialization
+aki,16380,181311,4,4,development task materialization
+heart failure,2378,32198,2,2,development task materialization

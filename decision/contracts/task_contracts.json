@@ -1,0 +1,80 @@
+{
+  "benchmark_id": "EHRDYN-ICU-DECISION-RC1",
+  "ehr_world_model_tasks": [
+    {
+      "task": "sepsis",
+      "components": "P/R/T",
+      "interval_hours": 4,
+      "action_count": 25,
+      "evaluation_role": "canonical_reference_and_retrospective_diagnostics"
+    },
+    {
+      "task": "respiratory",
+      "components": "P/R/T",
+      "interval_hours": 4,
+      "action_count": 25,
+      "evaluation_role": "known_value_policy_comparison"
+    },
+    {
+      "task": "shock",
+      "components": "P/R/T",
+      "interval_hours": 4,
+      "action_count": 25,
+      "evaluation_role": "known_value_policy_comparison"
+    },
+    {
+      "task": "af_flutter",
+      "components": "P/T",
+      "interval_hours": 4,
+      "action_count": 25,
+      "evaluation_role": "world_model_only"
+    },
+    {
+      "task": "aki",
+      "components": "P/T",
+      "interval_hours": 4,
+      "action_count": 4,
+      "evaluation_role": "world_model_plus_separate_known_value_task"
+    },
+    {
+      "task": "heart_failure",
+      "components": "P/T",
+      "interval_hours": 4,
+      "action_count": 2,
+      "evaluation_role": "world_model_plus_separate_known_value_task"
+    }
+  ],
+  "known_value_policy_tasks": [
+    {
+      "task": "respiratory",
+      "interval_hours": 4,
+      "action_count": 25,
+      "decision_horizon": 11,
+      "response_regimes": ["null_response", "weak", "moderate", "delayed"]
+    },
+    {
+      "task": "shock",
+      "interval_hours": 4,
+      "action_count": 25,
+      "decision_horizon": 11,
+      "response_regimes": ["null_response", "weak", "moderate", "delayed"]
+    },
+    {
+      "task": "aki_rrt",
+      "interval_hours": 24,
+      "action_count": 2,
+      "decision_horizon": 3,
+      "action_semantics": "wait_vs_initiate_rrt_absorbing",
+      "response_regimes": ["null_response", "weak", "moderate", "delayed"]
+    },
+    {
+      "task": "heart_failure",
+      "interval_hours": 6,
+      "action_count": 8,
+      "decision_horizon": 12,
+      "action_semantics": "loop_diuretic_quartile_x_vaso_inotrope_indicator",
+      "response_regimes": ["null_response", "weak", "moderate", "delayed"]
+    }
+  ],
+  "retrospective_ehr_policy_value": "not_executed"
+}

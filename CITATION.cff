@@ -1,18 +1,17 @@
 cff-version: 1.2.0
 message: "If you use this benchmark software, please cite this release."
-title: "EHRDyn-ICU: A Frozen Multi-Cohort Benchmark for ICU Dynamics and Offline-RL Readiness Diagnostics"
+title: "EHRDyn-ICU: Decision Evaluation for EHR World Models and Offline Reinforcement Learning"
 type: software
-version: "1.1.1"
-date-released: 2026-07-13
+version: "1.2.0rc1"
+date-released: 2026-07-15
 license: MIT
 authors:
-  - family-names: Chung
-    given-names: Yunsung
-    affiliation: Tulane University
-    email: ychung3@tulane.edu
-repository-code: "https://github.com/cys1102/ehrdyn-icu"
-url: "https://github.com/cys1102/ehrdyn-icu"
+  - family-names: Authors
+    given-names: Anonymous
+    affiliation: Anonymous Institution
+repository-code: "https://anonymous.4open.science/r/ehrdyn-icu-65FB"
+url: "https://anonymous.4open.science/r/ehrdyn-icu-65FB"
 identifiers:
   - type: other
-    value: "KDD2027-E060-4H-v1.0.0+KDD089"
-    description: "Frozen public artifact build"
+    value: "EHRDYN-ICU-DECISION-RC1"
+    description: "Anonymous decision-benchmark release candidate"

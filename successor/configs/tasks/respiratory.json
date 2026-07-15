@@ -1,0 +1,29 @@
+{
+  "action_contract": "Observed PEEP in the action window; missing remains missing and is never class zero; continuous-clipped versus preregistered train-quantile five-bin encoding is selected on validation only.",
+  "action_interval": "[t,t+4h)",
+  "anchor_contract": "First qualifying structured respiratory-support event with observed ventilator settings inside the ICU; no ICU-start or diagnosis-only fallback and no exact invasive-onset relabeling.",
+  "benchmark_version": "KDD-RV-SUCCESSOR-RC1",
+  "claim_boundary": "Recorded-trajectory forecasting and benchmark-validity auditing only. Treatment, causal, counterfactual, policy-selection, clinical-utility, deployment, and autonomous-decision claims are blocked.",
+  "clinical_review_status": "pending_not_simulated",
+  "episode_contract": {
+    "bin_hours": 4,
+    "fully_stay_contained": true,
+    "history_bins": 6,
+    "post_anchor_grid_hours": 48,
+    "pre_anchor_history_hours": 24
+  },
+  "role_contract": {
+    "ranges": {
+      "sealed_test": [8500, 10000],
+      "train": [0, 7000],
+      "validation": [7000, 8500]
+    },
+    "salt": "KDD-RV-SUBJECT-ROLE-v1|"
+  },
+  "state_interval": "Fully contained pre-action four-hour history bins ending before t; current PEEP and FiO2 are excluded from state.",
+  "status": "defined_pending_clinical_review",
+  "target_interval": "Observed physiology values, masks, and recencies in [t+4h,t+8h).",
+  "task_contract_row_sha256": "21085b43c2bc7f7dca09fd39a02761e31eb3c09a7d00e04ff1aada17ffc56779",
+  "task_id": "respiratory",
+  "task_version": "KDD-RV-RESP-SUPPORT-v1.0.0"
+}

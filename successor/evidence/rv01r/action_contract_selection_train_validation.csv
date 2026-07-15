@@ -1,0 +1,6 @@
+task,selected_encoding,selection_roles,supported_training_classes,minimum_required,status
+sepsis,vasopressor_train_median_3class,train;validation,3,2,pass
+respiratory,peep_train_quantile_5class,train;validation,3,2,pass
+aki,diuretic_rrt_factorized_binary,train;validation,4,2,pass
+af_flutter,rate_rhythm_control_binary,train;validation,2,2,pass
+heart_failure,diuretic_binary,train;validation,2,2,pass

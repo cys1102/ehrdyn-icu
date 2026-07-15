@@ -1,0 +1,67 @@
+{
+  "contract_version": "kdd_x08_task_matched_evaluator_v1",
+  "authoritative_predecessors": {
+    "e01": "kdd_benchmark_discovery/results/kdd_e01_evaluator_repair_preflight_20260714_184411",
+    "e02": "kdd_benchmark_discovery/results/kdd_e02_known_value_full_20260714_190217",
+    "x04": "kdd_benchmark_discovery/results/kdd_x04_af_policy_promotion_20260715_042938",
+    "x05": "kdd_benchmark_discovery/results/kdd_x05_aki_rrt_policy_task_20260715_050038",
+    "x06": "kdd_benchmark_discovery/results/kdd_x06_hf_policy_feasibility_20260715_062500",
+    "x07": "kdd_benchmark_discovery/results/kdd_x07_reference_compatibility_20260715_071500"
+  },
+  "eligible_tasks": {
+    "aki_rrt": {
+      "source_decision": "aki_rrt_policy_extension_ready_for_known_value_validation",
+      "action_contract": "wait_vs_initiate_rrt_K2_absorbing",
+      "decision_interval_hours": 24,
+      "maximum_decisions": 3,
+      "ope_horizons": [1, 2, 3],
+      "primary_benchmark_proxy": "in_hospital_survival_discharge"
+    },
+    "heart_failure": {
+      "source_decision": "hf_policy_extension_ready_for_known_value_validation",
+      "action_contract": "loop_diuretic_4_x_vaso_inotrope_2_K8",
+      "decision_interval_hours": 6,
+      "maximum_decisions": 12,
+      "ope_horizons": [1, 2, 4, 8, 12],
+      "primary_benchmark_proxy": "observed_post_action_urine_output"
+    }
+  },
+  "ineligible_task_receipts": {
+    "af_flutter": "af_remains_world_model_only",
+    "respiratory_reference": "reference_compatible_sensitivity_only",
+    "shock_reference": "reference_compatible_sensitivity_only"
+  },
+  "tiers": ["tier1_exact_finite", "tier2_ehr_calibrated_semisynthetic"],
+  "regimes": ["null", "weak", "moderate", "delayed"],
+  "training_seeds": [3408, 3411, 3414],
+  "evaluation_seeds": [9401, 9402, 9403],
+  "bootstrap_seeds": [8401, 8402, 8403],
+  "bootstrap_replicates": 500,
+  "logged_episodes": 1024,
+  "denominators": ["exact_behavior", "misspecified_behavior", "paper_lstm_h16", "crossfit_stronger"],
+  "clipping": ["none", 20.0],
+  "estimators": ["IS", "WIS", "PDIS", "WPDIS", "CWPDIS", "DR", "WDR", "FQE", "support_restricted_WPDIS"],
+  "planners": {
+    "H1_exhaustive": {"exact_supported_action_search": true},
+    "H4_categorical_CEM": {"iterations": 3, "candidates": 64, "elite_fraction": 0.125, "smoothing": 0.2, "receding_horizon": true},
+    "H8_categorical_CEM": {"iterations": 3, "candidates": 64, "elite_fraction": 0.125, "smoothing": 0.2, "receding_horizon": true}
+  },
+  "monte_carlo": {"initial_episodes": 512, "maximum_episodes": 8192, "maximum_paired_se": 0.03, "common_random_numbers": true},
+  "acceptance_thresholds": {
+    "coverage_rate_min": 0.90,
+    "spearman_rank_recovery_min": 0.80,
+    "pairwise_order_recovery_min": 0.80,
+    "behavior_relative_sign_recovery_min": 0.90,
+    "false_improvement_rate_max": 0.05,
+    "median_ess_min": 100,
+    "median_ess_fraction_min": 0.05,
+    "unsupported_action_mass_max": 0.0,
+    "maximum_paired_true_return_se": 0.03
+  },
+  "privacy": {
+    "aggregate_only": true,
+    "patient_rows_exported": false,
+    "retrospective_ehr_policy_value_computed": false,
+    "existing_evaluation_roles_opened": false
+  }
+}

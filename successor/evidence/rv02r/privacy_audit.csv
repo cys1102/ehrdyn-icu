@@ -1,0 +1,7 @@
+check,status,value
+patient_or_encounter_identifiers_exported,pass,False
+membership_rows_exported,pass,False
+exact_clinical_timestamps_exported,pass,False
+predictions_or_probabilities_exported,pass,False
+checkpoints_restricted_to_backend,pass,True
+aggregate_metrics_only,pass,True

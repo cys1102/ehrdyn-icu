@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Logical schema for a restricted local KDD-RV successor prediction row. Local keys are consumed only by the evaluator and must never be released.",
+  "properties": {
+    "action_class": {"enum": ["0", "1", "2", "3"]},
+    "feature_name": {"enum": ["heart_rate", "sbp", "mbp", "dbp", "respiratory_rate", "temperature_c", "spo2", "shock_index", "gcs_proxy", "fio2", "sirs_proxy", "lactate", "pao2", "paco2", "ph", "base_excess", "co2_bicarbonate", "pao2_fio2", "wbc", "platelet", "bun", "creatinine", "ptt", "pt", "inr", "ast", "alt", "total_bilirubin", "magnesium", "ionized_calcium", "calcium", "urine_output", "mechanical_ventilation"]},
+    "horizon": {"minimum": 1, "type": "integer"},
+    "local_sequence_key": {"minLength": 1, "type": "string"},
+    "local_subject_key": {"minLength": 1, "type": "string"},
+    "method_id": {"minLength": 1, "type": "string"},
+    "mode": {"enum": ["one_step", "conditional_recursive"]},
+    "prediction_mean": {"type": "number"},
+    "prediction_std": {"exclusiveMinimum": 0, "type": ["number", "null"]},
+    "role": {"const": "sealed_test"},
+    "target_observed": {"enum": [0, 1]},
+    "target_value": {"type": "number"},
+    "task_id": {"enum": ["sepsis", "respiratory", "aki", "af_flutter", "heart_failure"]},
+    "transition_index": {"minimum": 0, "type": "integer"}
+  },
+  "required": ["local_subject_key", "local_sequence_key", "role", "task_id", "mode", "method_id", "transition_index", "horizon", "feature_name", "target_value", "target_observed", "prediction_mean", "prediction_std", "action_class"],
+  "allOf": [
+    {"if": {"properties": {"task_id": {"enum": ["af_flutter", "heart_failure"]}}}, "then": {"properties": {"action_class": {"enum": ["0", "1"]}}}},
+    {"if": {"properties": {"task_id": {"enum": ["sepsis", "respiratory"]}}}, "then": {"properties": {"action_class": {"enum": ["0", "1", "2"]}}}},
+    {"if": {"properties": {"mode": {"const": "one_step"}}}, "then": {"properties": {"horizon": {"const": 1}}}}
+  ],
+  "title": "KDD-RV successor restricted prediction row",
+  "type": "object"
+}

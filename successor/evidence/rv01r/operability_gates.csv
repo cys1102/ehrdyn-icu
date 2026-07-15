@@ -1,0 +1,6 @@
+task,subjects,subjects_floor,subjects_status,validation_subjects,validation_floor,validation_status,sealed_test_subjects,sealed_test_floor,sealed_test_status,action_class_status,overall_status
+sepsis,3935,1000,pass,621,200,pass,616,200,pass,pass,pass
+respiratory,26457,1000,pass,4042,200,pass,3995,200,pass,pass,pass
+aki,19454,1000,pass,2961,200,pass,2948,200,pass,pass,pass
+af_flutter,2986,1000,pass,477,200,pass,452,200,pass,pass,pass
+heart_failure,2799,1000,pass,437,200,pass,434,200,pass,pass,pass

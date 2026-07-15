@@ -1,0 +1,9 @@
+method,evaluation_mode,tasks,model_seed_rows,mean_crps,mean_coverage90,mean_width90,mean_absolute_coverage_error,aggregation
+dreamer_v3_categorical_rssm,one_step,6,18,0.37090163744105603,0.9138515242440494,2.306340566061987,0.045543962317107646,task-balanced mean after averaging executed seeds within each task
+dreamer_v3_categorical_rssm,recursive,6,18,0.5266648546607912,0.7945479286575513,2.2672191501497965,0.08820047107798058,task-balanced mean after averaging executed seeds within each task
+gaussian_transition_ensemble,one_step,6,6,0.33828631172355506,0.9224180940488326,2.148234786030935,0.046604437343361345,task-balanced mean after averaging executed seeds within each task
+gaussian_transition_ensemble,recursive,6,6,0.4576214726005446,0.9366092902695865,3.042422271344057,0.05620972451328878,task-balanced mean after averaging executed seeds within each task
+grud_world_model,one_step,6,18,0.34069169881470557,0.9170180943316676,2.1291313529286433,0.040133082423984424,task-balanced mean after averaging executed seeds within each task
+grud_world_model,recursive,6,18,0.4851091807752396,0.9037348523925758,2.872728472551545,0.023190097118238346,task-balanced mean after averaging executed seeds within each task
+transformer_world_model,one_step,6,18,0.33714268534182934,0.9173841813533966,2.1065860142975383,0.039927502590816434,task-balanced mean after averaging executed seeds within each task
+transformer_world_model,recursive,6,18,0.8386773506792391,0.7098125465151544,2.7843498048803093,0.16380458983480975,task-balanced mean after averaging executed seeds within each task

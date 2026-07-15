@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "benchmark_version": {"const": "KDD-RV-SUCCESSOR-RC1"},
+    "construction_receipt_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "features": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "mean": {"type": "number"},
+          "population_std": {"minimum": 0.000001, "type": "number"}
+        },
+        "required": ["mean", "population_std"],
+        "type": "object"
+      },
+      "minProperties": 33,
+      "type": "object"
+    },
+    "fit_role": {"const": "train"},
+    "rule": {"const": "per-feature mean and population standard deviation fit from observed train pre-action state cells only; non-finite or sub-1e-6 scales set to one"},
+    "source_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+    "split_contract_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "synthetic": {"type": "boolean"},
+    "task_id": {"enum": ["sepsis", "respiratory", "aki", "af_flutter", "heart_failure"]},
+    "task_version": {"minLength": 1, "type": "string"}
+  },
+  "oneOf": [
+    {"properties": {"synthetic": {"const": true}}, "required": ["synthetic"]},
+    {"properties": {"synthetic": {"const": false}}, "required": ["synthetic", "task_id", "task_version", "source_commit", "split_contract_sha256", "construction_receipt_sha256"]}
+  ],
+  "required": ["benchmark_version", "fit_role", "rule", "features", "synthetic"],
+  "title": "KDD-RV successor train-only normalization receipt",
+  "type": "object"
+}

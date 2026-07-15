@@ -1,0 +1,16 @@
+task,role,subjects,stays,eligible_sequences,eligible_transitions
+sepsis,train,2698,2737,2737,27366
+sepsis,validation,621,630,630,6317
+sepsis,sealed_test,616,629,629,6197
+respiratory,train,18420,21317,21317,181973
+respiratory,validation,4042,4724,4724,40257
+respiratory,sealed_test,3995,4634,4634,39712
+aki,train,13545,17540,17540,150713
+aki,validation,2961,3792,3792,32423
+aki,sealed_test,2948,3802,3802,32723
+af_flutter,train,2057,3419,3419,27089
+af_flutter,validation,477,766,766,6132
+af_flutter,sealed_test,452,788,788,6263
+heart_failure,train,1928,3250,3250,26298
+heart_failure,validation,437,739,739,6047
+heart_failure,sealed_test,434,737,737,5979

@@ -1,0 +1,22 @@
+{
+  "backend_source_commit": "64d76a34b7e14db364f6025889e82289d8bdd8c2",
+  "comparison_count": 23,
+  "date": "2026-07-14",
+  "fixture": {
+    "mode": "one_step",
+    "seed": 7,
+    "subjects": 4,
+    "task": "sepsis",
+    "transitions_per_subject": 3
+  },
+  "maximum_absolute_difference": 2.7755575615628914e-16,
+  "pass": true,
+  "scope": [
+    "normalized_rmse",
+    "mae",
+    "gaussian_metrics",
+    "paired_subject_cluster_bootstrap_summary"
+  ],
+  "scientific_result": false,
+  "tolerance": 1e-12
+}

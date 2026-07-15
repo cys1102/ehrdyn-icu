@@ -1,0 +1,10 @@
+gate,estimand,frozen_threshold
+coverage,interval coverage,>= 0.90
+rank,Spearman policy-rank recovery,>= 0.80
+pairwise,pairwise policy-order recovery,>= 0.80
+sign,behavior-relative improvement-sign recovery,>= 0.90
+false_improvement,false-improvement rate,<= 0.05
+ess,median effective sample size,">= max(100, 0.05 x logged episodes)"
+support,maximum unsupported target-policy mass,= 0
+precision,maximum paired true-return standard error,<= 0.03
+finite,finite-value check,all required values finite

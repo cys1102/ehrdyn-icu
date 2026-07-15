@@ -1,0 +1,6 @@
+{
+  "extends": "configs/kdd101_model_free_diagnostics_v4.json",
+  "base_config_sha256": "21ee32f4e0ede011d357679882b6d31af8596c86fadc6a5ad90a85c25e620287",
+  "version": "kdd101-model-free-diagnostics-v5-valid-td-core-retry",
+  "output_directory": "kdd_benchmark_discovery/results/kdd101_model_free_diagnostics_20260714_v5"
+}

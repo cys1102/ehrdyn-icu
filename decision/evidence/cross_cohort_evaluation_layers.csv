@@ -1,0 +1,7 @@
+cohort,ehr_world_model_components,retrospective_action_reward_surface,known_value_policy_rows,task_matched_tier2_ope_tuples_approved,retrospective_policy_value,evaluation_role
+sepsis,P/R/T,canonical K25 diagnostic,0,0,not executed,canonical reference and retrospective diagnostics
+respiratory,P/R/T,K25 policy diagnostic,816,0,not executed,cross-cohort known-value policy comparison
+shock,P/R/T,K25 policy diagnostic,816,0,not executed,cross-cohort known-value policy comparison
+af flutter,P/T,K25 transition only,0,0,not executed,world-model only
+aki,P/T,separate daily RRT-initiation K2 task,408,236,not executed; target-policy gates incomplete,task-matched known-value policy comparison
+heart failure,P/T,separate 6h loop-diuretic x vaso/inotrope K8 task,408,0,not executed; no approved task-matched tuple,task-matched known-value policy comparison

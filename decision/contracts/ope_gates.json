@@ -1,0 +1,13 @@
+{
+  "coverage_min": 0.9,
+  "spearman_rank_recovery_min": 0.8,
+  "pairwise_order_recovery_min": 0.8,
+  "behavior_relative_sign_recovery_min": 0.9,
+  "false_improvement_rate_max": 0.05,
+  "median_ess_min": "max(100, 0.05 * logged_episodes)",
+  "maximum_unsupported_target_mass": 0.0,
+  "maximum_paired_true_return_se": 0.03,
+  "finite_required_values": true,
+  "authorization_unit": "task_x_tier_x_regime_x_estimator_x_denominator_x_clipping_x_support_x_horizon",
+  "family_name_transport_allowed": false
+}

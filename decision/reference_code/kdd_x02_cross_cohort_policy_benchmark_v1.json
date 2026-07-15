@@ -1,0 +1,70 @@
+{
+  "experiment_id": "KDD-X02",
+  "authorized_tasks": ["respiratory", "shock"],
+  "task_authorization_source": "kdd_x01_cross_cohort_evaluability_20260714_205629",
+  "task_outcome_required": "cross_cohort_policy_extension",
+  "development_roles_only": true,
+  "existing_test_outcomes_accessed": false,
+  "real_ehr_policy_value_scoring": false,
+  "real_ehr_ope_disposition": "no_real_ehr_policy_value_estimator_approved",
+  "seeds": [3408, 3411, 3414],
+  "discount": 0.99,
+  "horizons": [1, 4, 8],
+  "model_free_core": [
+    "behavior_cloning",
+    "discrete_bcq",
+    "discrete_cql",
+    "soft_spibb",
+    "decision_transformer_adapter"
+  ],
+  "supported_controls": [
+    "empirical_behavior",
+    "random_supported",
+    "minimum_supported_action",
+    "maximum_supported_action",
+    "severity_rule"
+  ],
+  "world_model_core": [
+    "grud_world_model",
+    "gaussian_recurrent_ensemble",
+    "transformer_world_model",
+    "dreamer_v3_categorical_rssm"
+  ],
+  "integrated_method": "dreamer_v3_categorical_rssm_planner_adapter",
+  "planner_contract": {
+    "H1_exhaustive": {"candidate_count": 25, "iterations": 1},
+    "H4_categorical_CEM": {"candidate_count": 64, "elite_count": 8, "iterations": 3, "smoothing": 0.2},
+    "H8_categorical_CEM": {"candidate_count": 64, "elite_count": 8, "iterations": 3, "smoothing": 0.2},
+    "receding_horizon_first_action_only": true,
+    "support_mask_every_horizon": true,
+    "uncertainty_penalty": 0.1
+  },
+  "known_value_contract": {
+    "tier": "task_matched_tier2_known_injected_mechanism",
+    "response_regimes": ["null", "weak", "moderate", "delayed"],
+    "reward_sensitivities": ["primary_dense_plus_terminal", "terminal_only"],
+    "training_episodes": 128,
+    "validation_episodes": 64,
+    "evaluation_episodes": 128,
+    "common_random_numbers": true,
+    "environment_noise_sd": 0.06
+  },
+  "world_model_training": {
+    "max_epochs": 20,
+    "min_epochs": 6,
+    "patience": 4,
+    "minimum_relative_validation_improvement": 0.001,
+    "batch_size": 128,
+    "learning_rate": 0.0008,
+    "checkpoint_selection_role": "synthetic_validation_only"
+  },
+  "immutable_input_hashes": {
+    "x01_task_roles": "673a35a3c41e431204dd404a1fd77d67b6b708f6f48cc74a88ee55e64d9bc8f2",
+    "x01_action_contracts": "401d9337f5c242e9e2f05516a1097d946ccce5f729ae230cb60913282955bf0d",
+    "x01_reward_contracts": "259072800ab0710f0dc03776cefa5c95e66016461b78b3e93cc82073a3217ff9",
+    "kdd101_v5_artifact_hashes": "641404fb32c59fec120a528b6550022adecabf4b4ebebd00d5d82f707a5982a4",
+    "kdd098r_checkpoint_manifest": "a8228d675b41369dc6225167c0197414cefc7e07ed6323e018cd795f278169ae",
+    "kdd_e01_decision": "ab5cf62064e23895b952ef9cdc2f702a791b77006ac43f25c7d6d9e3ff7d61d5",
+    "kdd_e02_estimator_disposition": "431a584b338e5142499be27e0593e0d5b837ccd86ee6585fcd7a9b500672a5a0"
+  }
+}

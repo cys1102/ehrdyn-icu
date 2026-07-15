@@ -1,0 +1,10 @@
+check,status,value
+patient_or_subject_identifiers_exported,pass,False
+admission_or_stay_identifiers_exported,pass,False
+exact_clinical_timestamps_exported,pass,False
+membership_rows_exported,pass,False
+row_level_arrays_or_trajectories_exported,pass,False
+predictions_probabilities_or_logits_exported,pass,False
+models_tensors_or_checkpoints_exported,pass,False
+aggregate_only_extensions,pass,True
+test_performance_opened,pass,False

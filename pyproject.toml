@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ehrdyn-icu"
-version = "1.1.1"
+version = "1.2.0rc1"
 description = "Clean-room utilities for the EHRDyn-ICU multi-cohort benchmark contract"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = ["numpy>=1.26,<3"]
 
 [project.optional-dependencies]
-credentialed = ["numpy>=1.26", "pandas>=2.2"]
+credentialed = ["pandas>=2.2"]
 
 [project.scripts]
 ehrdyn-icu = "kdd2027_benchmark.cli:main"
@@ -22,3 +22,6 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"kdd2027_benchmark.rv" = ["contracts/*.csv"]

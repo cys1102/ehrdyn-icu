@@ -1,0 +1,3 @@
+tier,evaluated_contract_tuples,coverage_gate_passed,rank_gate_passed,pairwise_gate_passed,sign_gate_passed,false_improvement_gate_passed,ess_gate_passed,support_gate_passed,precision_gate_passed,finite_gate_passed,approved_exact_contract_passed
+tier1_exact_finite,3456,108,144,800,137,1204,279,1728,1728,3264,32
+tier2_ehr_calibrated_semisynthetic,3456,0,0,648,0,215,270,1728,1728,3264,0

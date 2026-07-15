@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "benchmark_version": {"const": "KDD-RV-SUCCESSOR-RC1"},
+    "contract_version": {"const": "KDD-RV-EVALUATION-CONTRACT-v1"},
+    "normalization_receipt_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "operator_attestation": {"const": "frozen_target_cell_contract_created_before_prediction_scoring"},
+    "role": {"enum": ["sealed_test", "synthetic"]},
+    "synthetic_fixture": {"type": "boolean"},
+    "task_modes": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "cell_set_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+          "cells_per_method": {"minimum": 1, "type": "integer"},
+          "feature_names": {"minItems": 33, "maxItems": 33, "type": "array", "uniqueItems": true},
+          "mode": {"enum": ["one_step", "conditional_recursive"]},
+          "task_id": {"enum": ["sepsis", "respiratory", "aki", "af_flutter", "heart_failure"]},
+          "task_version": {"minLength": 1, "type": "string"}
+        },
+        "required": ["task_id", "task_version", "mode", "cell_set_sha256", "cells_per_method", "feature_names"],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": ["contract_version", "benchmark_version", "synthetic_fixture", "role", "normalization_receipt_sha256", "task_modes", "operator_attestation"],
+  "title": "KDD-RV frozen target-cell evaluation contract",
+  "type": "object"
+}

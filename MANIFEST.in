@@ -1,0 +1,23 @@
+include *.md
+include BENCHMARK_VERSION
+include CITATION.cff
+include MANIFEST.sha256
+include RELEASE_PROVENANCE.csv
+include uv.lock
+recursive-include clinical_review *.csv *.md
+recursive-include configs *.json
+recursive-include contracts *.csv *.json
+recursive-include credentialed *.csv *.md *.py *.sql
+recursive-include decision *.csv *.json *.md *.pdf *.png *.tex *.bib *.py
+recursive-include dictionaries *.csv
+recursive-include evidence *.csv *.md
+recursive-include expected *.json
+recursive-include fixtures *.csv
+recursive-include schemas *.json
+recursive-include scripts *.py
+recursive-include submission *.json
+recursive-include successor *.csv *.json *.md
+recursive-include task_cards *.md
+recursive-include tests *.py
+global-exclude *.pyc
+prune **/__pycache__

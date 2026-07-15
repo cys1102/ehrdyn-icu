@@ -1,11 +1,26 @@
-# EHRDyn-ICU v1.1.1
+# EHRDyn-ICU: decision evaluation for EHR world models and offline RL
 
-EHRDyn-ICU is a frozen, multi-cohort benchmark contract for recorded ICU
-trajectory forecasting and offline-RL readiness diagnostics. The immutable
-scientific contract identifier is `KDD2027-E060-4H-v1.0.0`; v1.1 adds the
-public credentialed-construction path and paper-to-artifact manifests without
-changing the frozen scientific results. Version 1.1.1 adds action-cardinality
-parity checks and corrects overlap handling in the public construction path.
+The paper-facing anonymous release is in [`decision/`](decision/README.md).
+It provides the six-task contracts, four known-value policy extensions, all
+aggregate policy/OPE result rows, the anonymous manuscript, a release
+validator, and an unrestricted synthetic smoke test.
+
+```bash
+python -m pip install -e .
+ehrdyn-icu decision-validate --root .
+ehrdyn-icu decision-smoke --output /tmp/ehrdyn-decision-smoke.json
+python -m unittest tests.test_decision
+```
+
+Anonymous artifact: <https://anonymous.4open.science/r/ehrdyn-icu-65FB>
+
+## Preserved earlier lineages
+
+EHRDyn-ICU contains the historical KDD089 benchmark and an isolated local
+release candidate for the five-task KDD-RV successor. The historical contract
+identifier remains `KDD2027-E060-4H-v1.0.0+KDD089`; none of its configs,
+metrics, or compatibility commands is relabeled. The successor identifier is
+`KDD-RV-SUCCESSOR-RC1` and is not yet a public release.
 
 This repository contains software, task definitions, synthetic fixtures, and
 aggregate evidence. It does **not** contain MIMIC-IV rows, patient identifiers,
@@ -59,6 +74,51 @@ ehrdyn-icu verify-checksums --root .
 
 The historical `kdd2027` command remains available as a compatibility alias.
 
+## Successor Release-Candidate Quick Start
+
+The successor commands require NumPy and use only synthetic inputs unless an
+authorized user explicitly supplies restricted local files.
+
+```bash
+ehrdyn-icu rv-validate-config \
+  --config-dir successor/configs/tasks \
+  --contract-manifest successor/contracts/contract_manifest.json
+ehrdyn-icu rv-generate-fixture \
+  --output /tmp/rv_predictions.csv \
+  --normalization-output /tmp/rv_normalization.json \
+  --contract-output /tmp/rv_evaluation_contract.json
+ehrdyn-icu rv-evaluate-fixture \
+  --fixture /tmp/rv_predictions.csv \
+  --normalization /tmp/rv_normalization.json \
+  --evaluation-contract /tmp/rv_evaluation_contract.json \
+  --output /tmp/rv_metrics.json
+ehrdyn-icu rv-validate-submission \
+  --submission /tmp/rv_metrics.json \
+  --config-dir successor/configs/tasks
+ehrdyn-icu rv-verify-evidence \
+  --root . \
+  --manifest successor/evidence/evidence_manifest.csv
+```
+
+Restricted local evaluation accepts only `sealed_test` rows, uses the exact
+train-only normalization receipt, and aggregates paired subject-cluster
+inference without writing local keys. See
+[`successor/README.md`](successor/README.md) for the row and recursion contract.
+It also requires a benchmark-operator evaluation contract that binds the full
+target-cell set before prediction scoring; an identically truncated method
+subset is rejected.
+
+Source-tree and sdist installations include successor configs, schemas,
+aggregate evidence, and credentialed adapter documentation. The wheel is a
+code-only evaluator distribution plus its pinned source manifest; it does not
+carry the repository-relative evidence bundle. Release archives must be built,
+hashed, and scanned separately with `rv-audit-distributions`.
+
+```bash
+python -m build
+ehrdyn-icu rv-audit-distributions --dist-dir dist
+```
+
 ## Repository Contents
 
 - `configs/tasks/`: five primary and two extended compact paper contracts.
@@ -73,6 +133,14 @@ The historical `kdd2027` command remains available as a compatibility alias.
 - `task_cards/`: human-readable task summaries.
 - `schemas/` and `submission/`: leaderboard interfaces.
 - `tests/`: clean-room, privacy, checksum, and contract tests.
+- `successor/`: separate five-task RV configs, schemas, task cards, source
+  provenance, and aggregate-submission interface.
+- `decision/`: paper-facing six-task world-model and four-task known-value
+  decision-evaluation release, including complete aggregate evidence.
+- `src/kdd2027_benchmark/rv/`: installable successor split, recursive rollout,
+  evaluator, source verification, fixture, and submission code.
+- `src/kdd2027_benchmark/decision/`: portable decision-release validator,
+  known-value planner smoke test, and OPE formula checks.
 
 ## Credentialed Benchmark Execution
 
@@ -93,7 +161,11 @@ and [ETHICS_AND_MISUSE.md](ETHICS_AND_MISUSE.md).
 Unsupported uses include treatment recommendation, causal effect estimation,
 counterfactual benefit claims, clinical deployment, and autonomous decisions.
 
+The successor RC does not close independent credentialed reproduction,
+clinical adjudication, institutional review, subgroup/fairness audit,
+final-manuscript parity, public tagging, release, or DOI gates.
+
 ## Citation
 
-Citation metadata are in [CITATION.cff](CITATION.cff). Repository:
-<https://github.com/cys1102/ehrdyn-icu>.
+Citation metadata are in [CITATION.cff](CITATION.cff). Anonymous repository:
+<https://anonymous.4open.science/r/ehrdyn-icu-65FB>.

@@ -1,0 +1,7 @@
+cohort,component_contract,best_one_step_method,best_one_step_error,best_recursive_method,best_recursive_error,mean_factual_action_delta_rmse
+sepsis,P/R/T,Transformer,0.6685809222979159,Gaussian ensemble,0.9260909409577534,0.0014725733298512652
+respiratory,P/R/T,Transformer,0.6947431749270562,Gaussian ensemble,0.9722130935132034,0.00227584216586257
+shock,P/R/T,Transformer,0.7023592870900875,Gaussian ensemble,0.9995726666712844,0.00218992966241983
+af flutter,P/T,Transformer,0.6895298967001998,Gaussian ensemble,0.9005062791094365,0.0008153973799966199
+aki,P/T,Transformer,0.669540422521114,Gaussian ensemble,0.9353880740748493,0.0008367108004239
+heart failure,P/T,Transformer,0.670701668157243,Gaussian ensemble,1.0782110671379057,8.045956926628591e-05

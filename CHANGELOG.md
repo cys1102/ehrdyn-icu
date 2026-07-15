@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.2.0rc1 (local release candidate; unpublished)
+
+- Add an isolated five-task KDD-RV successor identity without changing the
+  historical KDD089 benchmark version.
+- Implement the exact SHA-256 subject-role split and frozen-source hash
+  verification against the RV01R/RV02R backend lineage.
+- Add train-normalized, observed-cell local evaluation with Gaussian
+  diagnostics and paired subject-cluster bootstrap inference.
+- Add a reference conditional-recursive state update, deterministic successor
+  fixtures, and a successor aggregate-submission validator.
+- Keep clinical review, independent credentialed reproduction, final-paper
+  parity, public tag/release, and DOI status explicitly pending.
+- Expand backend verification to repository identity, exact Git HEAD, 25
+  tracked source/dependency/receipt files, and byte hashes.
+- Add frozen target-cell evaluation contracts, cryptographic evaluator
+  receipts, fail-closed submission validation, and aggregate disclosure floors.
+- Disable unique-winner claim authorization for fixed-reference descriptive
+  sets and use finite-bootstrap add-one p-value correction.
+- Add built-distribution hashing/privacy audit and disclose frozen
+  task-table/backend discrepancies without relabeling the scientific rows.
+
 ## 1.1.1
 
 - Prorated medication amounts by event-window overlap and represented RRT/CRRT

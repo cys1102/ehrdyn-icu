@@ -1,0 +1,57 @@
+{
+  "backend_source": {
+    "commit": "64d76a34b7e14db364f6025889e82289d8bdd8c2",
+    "manifest_sha256": "fedb189a4871cac2218bd35dff2e61c0511204425cd0212c2e3dcb2d37db1247",
+    "repository": "https://github.com/cys1102/world-ehr.git"
+  },
+  "benchmark_version": "KDD-RV-SUCCESSOR-RC1",
+  "bootstrap": {
+    "holm_alpha": 0.05,
+    "practical_epsilons": [0.0, 0.01, 0.02],
+    "replicates": 1000,
+    "seed": 8813408,
+    "unit": "subject_cluster"
+  },
+  "claim_boundary": "Recorded-trajectory forecasting and benchmark-validity auditing only. Treatment, causal, counterfactual, policy-selection, clinical-utility, deployment, and autonomous-decision claims are blocked.",
+  "clinical_review_status": "pending_not_simulated",
+  "contract_status": "local_release_candidate_not_public",
+  "known_contract_code_discrepancies": [
+    "Action encodings are hard-coded and operability-checked on training counts; the frozen task-table wording that alternatives are selected on validation is not implemented.",
+    "The respiratory nominal train-quantile five-bin label realizes three supported classes after edge deduplication and excludes transitions without observed PEEP at evaluator materialization.",
+    "The frozen AKI row states chronic or pre-existing RRT exclusion, but the inspected construction path does not expose a separately verifiable exclusion receipt."
+  ],
+  "feature_names": ["heart_rate", "sbp", "mbp", "dbp", "respiratory_rate", "temperature_c", "spo2", "shock_index", "gcs_proxy", "fio2", "sirs_proxy", "lactate", "pao2", "paco2", "ph", "base_excess", "co2_bicarbonate", "pao2_fio2", "wbc", "platelet", "bun", "creatinine", "ptt", "pt", "inr", "ast", "alt", "total_bilirubin", "magnesium", "ionized_calcium", "calcium", "urine_output", "mechanical_ventilation"],
+  "history_bins": 6,
+  "model_families": ["persistence_locf", "previous_window_deterministic", "local_ridge_residual", "local_hgb_residual", "local_gru_residual", "clean_gaussian_transition"],
+  "modes": ["one_step", "conditional_recursive"],
+  "normalization_rule": "per-feature mean and population standard deviation fit from observed train pre-action state cells only; non-finite or sub-1e-6 scales set to one",
+  "recursive_contract": "start from first logged pre-action history; replace subsequent state values with prior predictions; retain logged observation masks, recencies, and actions; never use later observed values; reset only after a sequence or relative-index gap",
+  "researchforge_receipts": {
+    "rv00_task_table_sha256": "317a442aa8d50c955895ff8079765f0c45df38d820e4c5a6cbaabe8917c7da0a",
+    "rv01_config_sha256": "3d47505fed8ff11467846f15fc8b114a58ec39bfa6626b4b84613a9358ad0803",
+    "rv02_config_sha256": "e662afc96ff6003f4e9205af681f44868cdff58ec275ed51e701831f2f8a372c"
+  },
+  "role_contract": {
+    "ranges": {
+      "sealed_test": [8500, 10000],
+      "train": [0, 7000],
+      "validation": [7000, 8500]
+    },
+    "salt": "KDD-RV-SUBJECT-ROLE-v1|"
+  },
+  "seeds": [3408, 3411, 3414],
+  "task_row_hashes": {
+    "af_flutter": "2259a1da764d29b974d81812d65fabe92c1eb2e997e65b4e1f0b29def7bbe9d7",
+    "aki": "0170a8a799a5dc33eee8c11d7a338f3e6268347729b29225de9c072160873794",
+    "heart_failure": "cfe9ce69c3c65c9670817613aafb81d32c4ac34515d4a637019a99c9ce3e359a",
+    "respiratory": "21085b43c2bc7f7dca09fd39a02761e31eb3c09a7d00e04ff1aada17ffc56779",
+    "sepsis": "22c2cbd59010a17da0759a321fb02af0a768e3ac25516daeac80952c8aca7c64"
+  },
+  "task_versions": {
+    "af_flutter": "KDD-RV-AF-PRIOR-DX-RR-v1.0.0",
+    "aki": "KDD-RV-AKI-KDIGO-CR-RRT-v1.0.0",
+    "heart_failure": "KDD-RV-HF-PRIOR-DX-DECONG-v1.0.0",
+    "respiratory": "KDD-RV-RESP-SUPPORT-v1.0.0",
+    "sepsis": "KDD-RV-SEPSIS-SI-OD-v1.0.0"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Only evaluator-produced aggregate JSON with a complete cryptographic receipt is accepted. Arbitrary self-reported metric rows are rejected.",
+  "properties": {
+    "benchmark_version": {"const": "KDD-RV-SUCCESSOR-RC1"},
+    "claim_boundary": {"minLength": 1, "type": "string"},
+    "evaluation_receipt": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregate_payload_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "benchmark_version": {"const": "KDD-RV-SUCCESSOR-RC1"},
+        "complete_frozen_cell_contract": {"const": true},
+        "evaluation_contract_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "evaluator_version": {"const": "KDD-RV-SUCCESSOR-RC1"},
+        "normalization_receipt_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "prediction_file_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "receipt_version": {"const": "KDD-RV-EVALUATOR-RECEIPT-v1"},
+        "synthetic_fixture": {"type": "boolean"},
+        "task_modes": {"minItems": 1, "type": "array"}
+      },
+      "required": ["receipt_version", "benchmark_version", "evaluator_version", "evaluation_contract_sha256", "prediction_file_sha256", "normalization_receipt_sha256", "aggregate_payload_sha256", "task_modes", "complete_frozen_cell_contract", "synthetic_fixture"],
+      "type": "object"
+    },
+    "metrics": {"minItems": 1, "type": "array"},
+    "normalization_receipt_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "prediction_file_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "synthetic_fixture": {"type": "boolean"}
+  },
+  "required": ["benchmark_version", "synthetic_fixture", "prediction_file_sha256", "normalization_receipt_sha256", "metrics", "claim_boundary", "evaluation_receipt"],
+  "title": "KDD-RV evaluator-produced aggregate submission",
+  "type": "object"
+}

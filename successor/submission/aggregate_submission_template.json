@@ -1,0 +1,27 @@
+{
+  "benchmark_version": "KDD-RV-SUCCESSOR-RC1",
+  "claim_boundary_acknowledged": true,
+  "deprecated_self_reported_template_rejected_by_rv04c": true,
+  "rows": [
+    {
+      "evaluator_version": "KDD-RV-SUCCESSOR-RC1",
+      "implementation_fidelity": "adapted",
+      "metrics": {
+        "mae": 0.0,
+        "normalized_rmse": 0.0,
+        "observed_cells": 1,
+        "subject_clusters": 1
+      },
+      "mode": "one_step",
+      "model_id": "REPLACE_BEFORE_SUBMISSION",
+      "recursive_contract_acknowledged": false,
+      "scope": "recorded_trajectory_forecasting",
+      "seed_count": 1,
+      "source_commit": "0000000",
+      "task_id": "sepsis",
+      "task_version": "KDD-RV-SEPSIS-SI-OD-v1.0.0",
+      "training_budget": "REPLACE_BEFORE_SUBMISSION"
+    }
+  ],
+  "template_only_not_scientific_evidence": true
+}
