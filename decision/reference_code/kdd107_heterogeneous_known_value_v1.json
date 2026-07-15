@@ -1,0 +1,153 @@
+{
+  "experiment_id": "KDD107",
+  "config_version": "kdd107_heterogeneous_known_value_v1",
+  "development_known_value_only": true,
+  "raw_ehr_access": false,
+  "test_role_access": false,
+  "seeds": [3408, 3411, 3414, 3417, 3420],
+  "evaluation_seeds": [9401, 9402, 9403],
+  "stochastic_policy_seed_base": 19401,
+  "discount": 0.99,
+  "mechanisms": [
+    "null_response",
+    "monotone_historical_control",
+    "interior_optimum",
+    "state_dependent_optimum",
+    "heterogeneous_response",
+    "delayed_tradeoff"
+  ],
+  "mechanism_parameters": {
+    "null_response": {"transition_strength": 0.0, "immediate_reward_strength": 0.0},
+    "monotone_historical_control": {"transition_strength": 0.055, "immediate_reward_strength": 0.0},
+    "interior_optimum": {"transition_strength": 0.065, "target_position": 0.0},
+    "state_dependent_optimum": {"transition_strength": 0.075, "target_low": -0.75, "target_high": 0.75},
+    "heterogeneous_response": {"minimum_strength": 0.035, "additional_extreme_strength": 0.045, "direction_change_fraction": 0.5},
+    "delayed_tradeoff": {"transition_strength": -0.2, "early_immediate_reward_strength": 0.02, "early_dense_reward_suppressed": true}
+  },
+  "task_profiles": {
+    "respiratory": {
+      "action_count": 25,
+      "supported_action_indices": [1, 3, 4, 6, 8, 9, 16, 18, 19, 21, 23, 24],
+      "horizon": 11,
+      "interval_hours": 4,
+      "state_count": 13,
+      "aggregate_missingness_rate": 0.006316,
+      "censoring_probability": 0.012846,
+      "reward_scale": 1.0,
+      "terminal_handling": "absorbing_terminal_state"
+    },
+    "shock": {
+      "action_count": 25,
+      "supported_action_indices": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
+      "horizon": 11,
+      "interval_hours": 4,
+      "state_count": 13,
+      "aggregate_missingness_rate": 0.029259,
+      "censoring_probability": 0.009772,
+      "reward_scale": 1.0,
+      "terminal_handling": "absorbing_terminal_state"
+    },
+    "aki_rrt": {
+      "action_count": 2,
+      "supported_action_indices": [0, 1],
+      "horizon": 3,
+      "interval_hours": 24,
+      "state_count": 9,
+      "aggregate_missingness_rate": 0.9792514239218877,
+      "censoring_probability": 0.05,
+      "reward_scale": 0.7,
+      "terminal_handling": "absorbing_initiation_or_terminal_state"
+    },
+    "heart_failure": {
+      "action_count": 8,
+      "supported_action_indices": [0, 1, 2, 3, 4, 5, 6, 7],
+      "horizon": 12,
+      "interval_hours": 6,
+      "state_count": 15,
+      "aggregate_missingness_rate": 0.1512671704730492,
+      "censoring_probability": 0.018,
+      "reward_scale": 0.8,
+      "terminal_handling": "absorbing_terminal_state"
+    }
+  },
+  "model_free_methods": [
+    "behavior_cloning",
+    "discrete_bcq",
+    "discrete_cql",
+    "soft_spibb",
+    "decision_transformer_adapter"
+  ],
+  "controls": [
+    "empirical_behavior",
+    "random_supported",
+    "minimum_supported_action",
+    "maximum_supported_action",
+    "severity_rule"
+  ],
+  "world_models": [
+    "grud_world_model",
+    "transformer_world_model",
+    "dreamer_v3_categorical_rssm",
+    "gaussian_recurrent_ensemble"
+  ],
+  "fidelity_labels": {
+    "behavior_cloning": "independent_reimplementation",
+    "discrete_bcq": "independent_reimplementation",
+    "discrete_cql": "independent_reimplementation",
+    "soft_spibb": "conceptual_adapter",
+    "decision_transformer_adapter": "official_contract_adapter",
+    "grud_world_model": "official_contract_adapter",
+    "transformer_world_model": "official_contract_adapter",
+    "dreamer_v3_categorical_rssm": "official_contract_adapter",
+    "gaussian_recurrent_ensemble": "official_contract_adapter"
+  },
+  "planner_contract": {
+    "horizons": [1, 4, 8],
+    "variants": ["support_constrained", "support_and_uncertainty_penalized"],
+    "cem_iterations": 3,
+    "cem_candidates": 64,
+    "cem_elites": 8,
+    "cem_smoothing": 0.2,
+    "uncertainty_penalty": 0.1,
+    "support_mask_every_step": true,
+    "receding_horizon_first_action_only": true,
+    "matched_query_budgets": true
+  },
+  "training_contract": {
+    "episodes": 192,
+    "world_model_max_epochs": 20,
+    "world_model_min_epochs": 6,
+    "world_model_patience": 4,
+    "minimum_relative_validation_improvement": 0.001,
+    "batch_size": 128,
+    "learning_rate": 0.0008,
+    "checkpoint_selection_role": "synthetic_validation_only"
+  },
+  "evaluation_contract": {
+    "episodes_per_evaluation_seed": 512,
+    "paired_true_return_se_max": 0.03,
+    "exact_mc_absolute_floor": 0.03,
+    "exact_mc_standard_error_multiplier": 3.0,
+    "null_tolerance": 1e-12,
+    "negative_regret_tolerance": 1e-12,
+    "unsupported_mass_max": 0.0
+  },
+  "immutable_input_hashes": {
+    "kdd106_immutable_config": "24cada801ae5ffef3241460c1acba29e0bd6e3c34795294e5da941bfaecb1709",
+    "kdd106_output_schema_manifest": "8c8b4cd953c650010e45077235939fed8fb150f8978b6688ef4b2424f5ec1cf1",
+    "kdd106r_administrative_revision": "6997a9662e4c1256dac2d7506951748c0b55c37f9415679177cc35d6b238a178",
+    "kdd_e01_evaluator": "fcb5e5263d5f19238f329c1966ab16d60515101a628d5ce40f0e5c628f5dd966",
+    "kdd_x02_training_and_planning": "23917461c6b08bed6efa925899afc204727c6ea4cb3ed39aeddae027b2429114",
+    "kdd100r_world_model_training": "ab60a71079b26b0904cd4d6b056f565878ae8e159e7cff51a9b889715f483b24"
+  },
+  "implementation_hashes": {
+    "runner": "bba544a8fb7dc14163a8293c93927d8da9b18fa1f0916867a130a632cb6418f3",
+    "focused_tests": "2ff9d464e89df8941f5effa2d0e6f5b1aee934a7283bb2691df3e9a9758376e1"
+  },
+  "allowed_decisions": [
+    "complete_discriminative_known_value_extension",
+    "complete_negative_no_method_differentiation",
+    "stop_evaluator_or_oracle_gate_failed",
+    "stop_planner_implementation_gate_failed"
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "experiment_id": "KDD-OPE-RD01",
+  "contract_version": "repeated_dataset_ope_v1",
+  "claim_boundary": "Exact finite known-construction OPE calibration only; no retrospective EHR policy-value authorization, treatment benefit, causal effect, clinical utility, deployment, or policy-superiority claim.",
+  "source_environment_contract": "KDD-ADAPT01 adaptive_known_value_v1",
+  "response_regimes": [
+    "null_response",
+    "adaptive_composite"
+  ],
+  "historical_monotone_disposition": "preserved_as_prior_monotone_control_planning_smoke_test_not_reconstructed_because_the_ADAPT01_runner_does_not_materialize_a_numerical_monotone_environment",
+  "logged_dataset_replicates": {
+    "respiratory": 200,
+    "shock": 200,
+    "aki_rrt": 500,
+    "heart_failure": 200
+  },
+  "logged_episodes_per_dataset": 192,
+  "target_policies": [
+    "empirical_behavior",
+    "random_supported",
+    "minimum_supported_action",
+    "maximum_supported_action",
+    "severity_rule",
+    "exact_dynamic_programming_oracle"
+  ],
+  "task_horizons": {
+    "respiratory": [1, 4, 8],
+    "shock": [1, 4, 8],
+    "aki_rrt": [1, 2, 3],
+    "heart_failure": [1, 4, 8]
+  },
+  "estimators": [
+    "IS",
+    "WIS",
+    "PDIS",
+    "WPDIS",
+    "CWPDIS",
+    "DR",
+    "WDR",
+    "FQE",
+    "support_restricted_WPDIS"
+  ],
+  "denominators": [
+    "exact_behavior",
+    "misspecified_behavior",
+    "paper_lstm_h16",
+    "crossfit_stronger"
+  ],
+  "clipping": [
+    "none",
+    20.0
+  ],
+  "support_contract": "masked",
+  "interval": {
+    "method": "episode_percentile_bootstrap",
+    "confidence_level": 0.95,
+    "bootstrap_replicates": 500,
+    "bootstrap_seed_namespace": [8401, 8402, 8403]
+  },
+  "coverage_precision_interval": {
+    "method": "wilson_binomial",
+    "confidence_level": 0.95
+  },
+  "seed_namespaces": {
+    "logged_dataset_rule": "88010000 + task_index*1000000 + regime_index*100000 + dataset_index",
+    "behavior_model_fixed": 16401,
+    "bootstrap_fixed": [8401, 8402, 8403]
+  },
+  "authorization_gates": {
+    "minimum_empirical_coverage": 0.9,
+    "minimum_spearman_rank_recovery": 0.8,
+    "minimum_pairwise_order_recovery": 0.8,
+    "minimum_behavior_relative_sign_recovery": 0.9,
+    "maximum_false_improvement_probability": 0.05,
+    "minimum_median_ess": 100,
+    "minimum_median_ess_fraction": 0.05,
+    "maximum_unsupported_action_mass": 0.0,
+    "require_all_finite": true
+  },
+  "authorization_boundary": "Passing exact known-value tuples calibrates an estimator/task-regime map but does not authorize retrospective real-EHR OPE without separate trained-policy and overlap gates.",
+  "compute_rationale": "B=500 is feasible only for the K2, at-most-three-decision AKI profile. K25 and K8 profiles use the mandatory B=200 minimum because every replicate refits four denominator contracts and nuisance models across the unchanged estimator, clipping, horizon, and fixed-policy grid.",
+  "immutable_source_hashes": {
+    "adapt01_config": "d5d74ca54bd5ba20a166da966d038f73f5d4f55e7f12be895687c2412144c771",
+    "adapt01_runner": "b227db1d1e9baaa98466b53b3f4fa2a93d5def72a58facdb60154f6b5817951b",
+    "adapt01_environment_contract": "52a17652a06309958c18660919700ad16692c0581a1c47203d483ea9e3f0181f",
+    "e01_evaluator": "fcb5e5263d5f19238f329c1966ab16d60515101a628d5ce40f0e5c628f5dd966",
+    "e02_runner": "0cba032a93599037a0663b4aa1e193325b13db6f8cc911a8a949deb6a7b3bad9",
+    "historical_fixed_dataset_coverage": "b2fd4b1fa544e236a92a94e53475eda7baf1c0b04f20b1f833afa726acbd066c"
+  }
+}

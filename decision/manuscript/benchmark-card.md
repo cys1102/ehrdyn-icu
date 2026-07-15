@@ -27,9 +27,10 @@ Transition accuracy is a validity layer, not the benchmark endpoint. Retrospecti
 - EHR surface: subject-disjoint development train/validation roles.
 - Retrospective action semantics: recorded four-hour exposure/setting abstraction; not guaranteed assignable at interval start.
 - Confirmatory status: no genuinely untouched role remains.
-- Primary known-value surface: four adaptive exact-finite environments with state-dependent optima and exact dynamic-programming values.
-- Evaluator sensitivities: historical monotone exact/semi-synthetic environments retained for OPE and implementation stress tests.
-- Real-EHR OPE: not executed for comparison; AKI has task-matched semi-synthetic candidates but incomplete policy-specific gates.
+- Primary known-value surface: 24 exact-finite task--mechanism environments, including 16 prespecified interior-optimum, state-dependent, heterogeneous-response, and delayed-trade-off cells.
+- Evaluator sensitivities: null-response, historical monotone, and the earlier composite-adaptive family.
+- Repeated-dataset OPE: 2,200 independent logged datasets; 40/1,728 known-value tuple approvals, all AKI null-response sanity cells; adaptive response 0/864.
+- Real-EHR OPE: not executed for comparison; no adaptive repeated-dataset contract and policy-specific EHR gate both pass.
 - Independent credentialed reconstruction: pending aggregate-result regeneration from a clean clone; not external validation.
 
 ## Tasks
@@ -52,8 +53,8 @@ Transition accuracy is a validity layer, not the benchmark endpoint. Retrospecti
 - Rollout: logged-action recursive error and horizon degradation.
 - Reward and termination: prediction/propagation error, Brier score, ECE, calibration, survival sanity.
 - Uncertainty: NLL/CRPS, coverage, interval score, width, and risk–coverage.
-- Policy: exact adaptive return/regret, behavior-normalized exact regret, support violations, divergence, collapse, model-exploitation gap, and planner disagreement.
-- OPE: exact estimator-contract accuracy, policy-set interval inclusion, rank/sign recovery, false improvement, and ESS.
+- Policy: exact heterogeneous-mechanism return/regret, fixed-control-relative return, support violations, divergence, collapse, model-exploitation gap, and planner disagreement.
+- OPE: repeated-dataset empirical coverage with Wilson precision intervals, rank/order/sign recovery, false-improvement probability, ESS, support, and finiteness. Fixed-dataset interval inclusion is diagnostic-only.
 
 ## Machine-readable audit surfaces
 
@@ -61,8 +62,8 @@ Transition accuracy is a validity layer, not the benchmark endpoint. Retrospecti
 - Complete six-method task-balanced table plus all 36 cohort--method rows; winner-only leader tables are secondary views.
 - Fixed primary factual-action estimand and per-row episode-bootstrap interval counts.
 - Task-balanced one-step and recursive uncertainty summary.
-- All 680 adaptive non-oracle method--seed rows with exact return/regret, plus 2,448 historical monotone sensitivity rows.
-- All 16,128 reference and task-matched OPE tuple metrics, gate dispositions, and approved identities.
+- All 4,080 heterogeneous policy--seed rows and 2,880 world-model--planner rows, plus earlier adaptive and monotone sensitivities.
+- All 10,368 repeated-dataset policy coverage rows and 1,728 revised OPE tuple dispositions; historical fixed-dataset diagnostics remain separately labeled.
 
 ## Intended use
 

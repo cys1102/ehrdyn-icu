@@ -14,17 +14,19 @@ older lineages is relabeled as a decision-benchmark result.
   cohort-by-transition-method matrix;
 - an AI-Clinician-aligned K25 sepsis scaffold, labeled as an alignment
   surface rather than an exact reproduction;
-- four adaptive exact-finite policy environments (respiratory, shock,
-  AKI--RRT, and heart failure), each with exact dynamic-programming truth;
+- 24 heterogeneous exact-finite task--mechanism environments over respiratory,
+  shock, AKI--RRT, and heart failure, each with dynamic-programming truth;
 - the complete layer-specific inventory of six transition methods, five
   uncertainty-capable methods, 34 policy/planner labels, and nine OPE
   estimators;
 - a cross-layer baseline atlas and cohort-specific uncertainty leader table;
-- all 700 adaptive true-return and exact-regret rows, all 480 world-model
-  exploitation-gap rows, and all 136 task-by-method summaries;
+- all 4,080 heterogeneous policy--seed rows, all 2,880 world-model--planner
+  rows, all exploitation-gap rows, and the earlier adaptive sensitivity;
 - all 2,448 historical monotone policy rows, retained as evaluator
   smoke/sensitivity evidence rather than the primary policy benchmark;
-- all 16,128 reference and task-matched OPE tuple metrics and dispositions;
+- 10,368 repeated-dataset coverage rows and 1,728 revised OPE dispositions,
+  plus all 16,128 historical reference/task-matched diagnostic tuples;
+- the 16-row EHR-to-known-value model-family bridge and all contract mappings;
 - a source-verified representative literature landscape;
 - the anonymous manuscript source and compiled PDF;
 - a portable contract/evidence validator; and
@@ -69,12 +71,13 @@ The release keeps four layers distinct:
 
 1. EHR P/R/T-component prediction and uncertainty on development roles;
 2. retrospective action support, collapse, and observability diagnostics;
-3. exact policy returns in adaptive constructed known-value environments;
-4. exact OPE tuple authorization within those environments.
+3. exact policy returns in heterogeneous constructed known-value environments;
+4. repeated-dataset OPE calibration and authorization within known-value
+   environments.
 
-The older monotone known-value family is a fifth, explicitly secondary
-evaluator-sensitivity layer. It is not used to claim that an extreme-action
-control is a meaningful policy winner.
+The older adaptive-composite and monotone families are explicitly secondary
+construction/evaluator sensitivities. They are not used to claim a universal
+policy winner.
 
 No task completes the trained-target-policy and post-training overlap gates
 needed for retrospective EHR policy-value scoring. The release therefore does

@@ -64,6 +64,18 @@ python -m kdd_benchmark_discovery.run_kdd_x02_cross_cohort_policy_benchmark \
 python -m kdd_benchmark_discovery.run_kdd_adapt01_adaptive_known_value \
   --config configs/kdd_adapt01_adaptive_known_value_v1.json \
   --output kdd_benchmark_discovery/results/reproduction_adaptive_known_value
+
+python -m kdd_benchmark_discovery.run_kdd107_heterogeneous_known_value \
+  --config configs/kdd107_heterogeneous_known_value_v1.json \
+  --output kdd_benchmark_discovery/results/reproduction_heterogeneous_known_value
+
+python -m kdd_benchmark_discovery.run_kdd_ope_rd01_repeated_dataset \
+  --config configs/kdd_ope_rd01_repeated_dataset_v1.json \
+  --output kdd_benchmark_discovery/results/reproduction_repeated_dataset_ope
+
+python -m kdd_benchmark_discovery.run_kdd_bridge01_ehr_known_value \
+  --config configs/kdd_bridge01_ehr_known_value_v1.json \
+  --output kdd_benchmark_discovery/results/reproduction_ehr_known_value_bridge
 ```
 
 ## Validation and release boundary

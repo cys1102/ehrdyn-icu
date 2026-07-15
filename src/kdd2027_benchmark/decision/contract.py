@@ -19,12 +19,25 @@ EXPECTED_ROWS = {
     "decision/evidence/adaptive_policy_true_returns_all_rows.csv": 700,
     "decision/evidence/adaptive_policy_regret_all_rows.csv": 700,
     "decision/evidence/adaptive_exploitation_gap_all_rows.csv": 480,
+    "decision/evidence/heterogeneous_policy_true_returns_all_rows.csv": 4080,
+    "decision/evidence/heterogeneous_world_model_planner_all_rows.csv": 2880,
+    "decision/evidence/heterogeneous_model_exploitation_all_rows.csv": 2880,
+    "decision/evidence/heterogeneous_all_method_seed_means.csv": 544,
+    "decision/evidence/heterogeneous_cell_discrimination.csv": 16,
     "decision/evidence/known_value_cross_task_summary.csv": 4,
     "decision/evidence/known_value_reference_full_matrix.csv": 1632,
     "decision/evidence/known_value_task_extension_full_matrix.csv": 816,
     "decision/evidence/world_model_recursive_horizon_metrics.csv": 924,
     "decision/evidence/ope_reference_all_tuple_metrics.csv": 6912,
     "decision/evidence/ope_task_matched_all_tuple_metrics.csv": 9216,
+    "decision/evidence/repeated_dataset_ope_coverage.csv": 10368,
+    "decision/evidence/repeated_dataset_ope_rank_and_sign.csv": 1728,
+    "decision/evidence/repeated_dataset_ope_authorization.csv": 1728,
+    "decision/evidence/repeated_dataset_ope_gate_summary.csv": 2,
+    "decision/evidence/policy_set_interval_inclusion_diagnostic_only.csv": 6912,
+    "decision/evidence/ehr_to_known_value_contract_matrix.csv": 80,
+    "decision/evidence/cross_surface_model_family_rows.csv": 16,
+    "decision/evidence/ehr_known_value_bridge_coefficients.csv": 8,
 }
 
 REQUIRED_REFERENCE_SOURCES = {
@@ -37,6 +50,9 @@ REQUIRED_REFERENCE_SOURCES = {
     "run_kdd098r_world_models.py",
     "run_kdd101_model_free_diagnostics.py",
     "run_kdd_adapt01_adaptive_known_value.py",
+    "run_kdd107_heterogeneous_known_value.py",
+    "run_kdd_ope_rd01_repeated_dataset.py",
+    "run_kdd_bridge01_ehr_known_value.py",
     "run_kdd_x02_cross_cohort_policy_benchmark.py",
     "run_kdd_x08_task_matched_evaluator.py",
     "run_kdd_x09_promoted_cohort_policy_benchmark.py",
@@ -126,6 +142,21 @@ def validate_decision_release(root: Path) -> dict[str, object]:
     if any(_truth(row["negative_regret"]) for row in adaptive_regret):
         raise ReleaseContractError("Adaptive exact-oracle evaluation contains negative regret")
 
+    heterogeneous = _csv_rows(root / "decision/evidence/heterogeneous_policy_true_returns_all_rows.csv")
+    heterogeneous_planners = _csv_rows(root / "decision/evidence/heterogeneous_world_model_planner_all_rows.csv")
+    heterogeneous_cells = _csv_rows(root / "decision/evidence/heterogeneous_cell_discrimination.csv")
+    if len({(row["task"], row["mechanism"]) for row in heterogeneous}) != 24:
+        raise ReleaseContractError("Heterogeneous policy inventory must cover 24 task-mechanism environments")
+    if any(float(row["exact_regret"]) < -1e-12 for row in heterogeneous):
+        raise ReleaseContractError("Heterogeneous exact-oracle evaluation contains material negative regret")
+    if any(not _truth(row["exact_mc_agreement_pass"]) or not _truth(row["support_pass"]) for row in heterogeneous):
+        raise ReleaseContractError("Heterogeneous policy evaluator or support gate failed")
+    if len(heterogeneous_planners) != 2880:
+        raise ReleaseContractError("Heterogeneous world-model planner inventory is incomplete")
+    discrimination_passes = sum(_truth(row["learned_beats_both_fixed_extremes"]) for row in heterogeneous_cells)
+    if discrimination_passes != 11:
+        raise ReleaseContractError("Heterogeneous fixed-control discrimination count drifted")
+
     reference = _csv_rows(root / "decision/evidence/ope_reference_all_tuple_metrics.csv")
     task_matched = _csv_rows(root / "decision/evidence/ope_task_matched_all_tuple_metrics.csv")
     reference_approved = sum(_truth(row["approved_exact_contract"]) for row in reference)
@@ -147,6 +178,22 @@ def validate_decision_release(root: Path) -> dict[str, object]:
     if (reference_approved, reference_tier2_approved, aki_tier2_approved, hf_approved) != (32, 0, 236, 0):
         raise ReleaseContractError("OPE authorization counts do not match the paper contract")
 
+    repeated = _csv_rows(root / "decision/evidence/repeated_dataset_ope_authorization.csv")
+    repeated_adaptive_approved = sum(
+        _truth(row["approved_known_value_tuple"])
+        for row in repeated
+        if row["response_regime"] == "adaptive_composite"
+    )
+    repeated_null_approved = sum(
+        _truth(row["approved_known_value_tuple"])
+        for row in repeated
+        if row["response_regime"] == "null_response"
+    )
+    if (repeated_adaptive_approved, repeated_null_approved) != (0, 40):
+        raise ReleaseContractError("Repeated-dataset OPE authorization counts drifted")
+    if any(_truth(row["retrospective_ehr_ope_authorized"]) for row in repeated):
+        raise ReleaseContractError("Repeated-dataset calibration authorized retrospective EHR OPE")
+
     return {
         "benchmark_id": task_contract["benchmark_id"],
         "manifest_files_verified": len(manifest),
@@ -156,8 +203,14 @@ def validate_decision_release(root: Path) -> dict[str, object]:
         "complete_transition_rows": len(complete_models),
         "adaptive_policy_summary_rows": len(adaptive_summary),
         "adaptive_policy_seed_rows": len(adaptive_regret),
-        "known_value_policy_rows": 2448,
-        "ope_tuple_rows": 16128,
+        "heterogeneous_policy_seed_rows": len(heterogeneous),
+        "heterogeneous_planner_rows": len(heterogeneous_planners),
+        "heterogeneous_discriminative_cells": discrimination_passes,
+        "historical_known_value_policy_rows": 2448,
+        "historical_ope_tuple_rows": 16128,
+        "repeated_dataset_ope_tuples": len(repeated),
+        "repeated_dataset_adaptive_approved": repeated_adaptive_approved,
+        "repeated_dataset_null_approved": repeated_null_approved,
         "reference_exact_approved": reference_approved,
         "aki_task_matched_tier2_approved": aki_tier2_approved,
         "retrospective_ehr_policy_value": "not_executed",

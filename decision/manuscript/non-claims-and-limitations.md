@@ -15,6 +15,7 @@ confidence: high
 - Known-value true return comes from constructed mechanisms and does not validate a causal action-response model for EHR data.
 - Factual action-information differences are predictive associations.
 - Sepsis is an AI-Clinician-aligned K25 scaffold with local parameterization, not an exact cohort/reward reproduction.
+- The evaluated strict sepsis development subset has 3,440 episodes; the 27,236-episode K25 predecessor uses a different window-overlap construction and is scale context only.
 - The anchor-relative 90-day sepsis outcome is unavailable under the repaired contract.
 - The reward functions are frozen computational objectives and sensitivity choices.
 - Respiratory and shock known-value rewards are task specific; sepsis SOFA/lactate weights are not transferred.
@@ -22,5 +23,6 @@ confidence: high
 - No external-site or methodological-generalization result is available.
 - Model-free adapters retain their fidelity labels and are not official exact implementations.
 - Prediction accuracy does not establish counterfactual fidelity or retrospective policy improvement.
-- The adaptive exact-finite results evaluate known constructed mechanisms; historical monotone environments are evaluator sensitivities only.
+- The heterogeneous exact-finite results evaluate known constructed mechanisms; the frozen 11/16 cell statistic is a maximum over the complete learned policy--seed cell and is not seed-aware superiority inference.
+- Repeated-dataset OPE currently covers null and composite-adaptive regimes, not the four new heterogeneous mechanisms; no adaptive tuple passes.
 - Independent credentialed reconstruction remains pending and is a clean-clone aggregate reproducibility check, not external validation.

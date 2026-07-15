@@ -10,7 +10,7 @@ confidence: high
 
 # Final manuscript package
 
-This directory is the canonical reader-facing manuscript package. It combines the frozen six-task P/R/T component synthesis, adaptive exact-finite policy benchmark, historical monotone sensitivities, and task-matched OPE audits through 2026-07-15. Internal experiment identifiers are excluded from `manuscript.tex` and retained in `provenance-manifest.csv` and `number-audit.csv`.
+This directory is the canonical reader-facing manuscript package. It combines the frozen six-task P/R/T component synthesis, heterogeneous exact-finite policy benchmark, historical adaptive/monotone sensitivities, repeated-dataset OPE audit, and EHR-to-known-value diagnostic bridge through 2026-07-15. Internal experiment identifiers are excluded from `manuscript.tex` and retained in `provenance-manifest.csv` and `number-audit.csv`.
 
 Contents:
 
@@ -18,7 +18,7 @@ Contents:
 - `benchmark-card.md`: scope, tasks, roles, metrics, and use boundaries.
 - `contracts.md`: cohort, feature, action, reward, timing, and split contracts.
 - `estimator-planner-cards.md`: planner, policy, probability, and OPE contracts.
-- `tables/` and `figures/`: sanitized aggregate publication surfaces, including all 36 cohort--transition-method rows, all 680 adaptive non-oracle method--seed rows, all 2,448 historical monotone sensitivity rows, and all reference/task-matched OPE tuple metrics and dispositions.
+- `tables/` and `figures/`: sanitized aggregate publication surfaces, including all 36 cohort--transition-method rows, all 4,080 heterogeneous policy--seed rows, all 2,880 heterogeneous world-model--planner rows, historical adaptive/monotone sensitivities, 10,368 repeated-coverage rows, 1,728 revised OPE dispositions, and bridge coefficients.
 - `number-audit.csv`: every reported manuscript number with source, estimator, split, and uncertainty method.
 - `provenance-manifest.csv`: internal source IDs, immutable commits, and hashes.
 - `reproducibility.md`, `environment-manifest.md`, and `credentialed-reconstruction.md`: rebuild instructions and data-access boundary.

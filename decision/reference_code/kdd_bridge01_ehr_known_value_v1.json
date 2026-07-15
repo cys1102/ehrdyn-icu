@@ -1,0 +1,88 @@
+{
+  "experiment_id": "KDD-BRIDGE01",
+  "contract_version": "ehr_known_value_diagnostic_bridge_v1",
+  "analysis_label": "exploratory_diagnostic_consistency_not_causal_or_independent_generalization",
+  "claim_boundary": "Development-only aggregate EHR forecasting diagnostics are descriptively compared with exact finite known-construction policy diagnostics. This is not causal evidence, independent generalization, treatment benefit, clinical utility, deployment readiness, or real-EHR policy superiority.",
+  "ehr_surface": "KDD098R development-only factual logged-action world-model validation",
+  "known_value_surface": "KDD-ADAPT01 exact adaptive finite benchmark with independently retrained architectures",
+  "shared_training_seeds": [3408, 3411, 3414],
+  "known_value_training_seeds": [3408, 3411, 3414],
+  "ehr_derived_ensemble_seed_label": "3408;3411;3414",
+  "shared_model_family_map": {
+    "grud_world_model": "grud_world_model",
+    "transformer_world_model": "transformer_world_model",
+    "dreamer_v3_categorical_rssm": "dreamer_v3_categorical_rssm",
+    "gaussian_transition_ensemble": "gaussian_recurrent_ensemble"
+  },
+  "task_map": {
+    "respiratory": {
+      "known_value_task": "respiratory",
+      "contract_alignment": "aligned_action_dimension_and_decision_horizon",
+      "primary_bridge_eligible": true
+    },
+    "shock": {
+      "known_value_task": "shock",
+      "contract_alignment": "aligned_action_dimension_and_decision_horizon",
+      "primary_bridge_eligible": true
+    },
+    "aki": {
+      "known_value_task": "aki_rrt",
+      "contract_alignment": "intentional_task_difference_historical_K4_transition_view_vs_daily_RRT_K2",
+      "primary_bridge_eligible": false
+    },
+    "heart_failure": {
+      "known_value_task": "heart_failure",
+      "contract_alignment": "intentional_action_difference_historical_binary_context_vs_6h_dose_context_K8",
+      "primary_bridge_eligible": false
+    }
+  },
+  "metric_contract": {
+    "ehr_recursive_error": "mean normalized observed-cell RMSE across all logged-action recursive horizons and shared EHR seeds",
+    "known_value_policy_regret": "mean exact regret across H1/H4/H8, support-constrained and uncertainty-penalized variants, and three independently retrained shared seeds",
+    "known_value_model_exploitation": "mean absolute learned-model predicted-value minus exact true-value gap across the same planner rows",
+    "ehr_uncertainty_calibration": "mean recursive mean absolute coverage error across shared EHR seeds",
+    "planner_stability": "mean across planner/variant contracts of the standard deviation of exact true value over three independently retrained shared seeds; unavailable for the single derived ensemble surface",
+    "ehr_factual_action_information": "mean matched-shuffle comparator-minus-observed RMSE on reward-relevant features across shared EHR seeds",
+    "known_value_policy_discrimination": "mean across known-value seeds of the within-family range of exact true values over planner/horizon/variant rows",
+    "rank_concordance": "Spearman correlation between within-task family rank by lower EHR recursive RMSE and lower known-value mean exact regret"
+  },
+  "correlation_units": [
+    "task_model_family_all_four_task_profiles",
+    "task_model_family_aligned_respiratory_and_shock_only"
+  ],
+  "multiplicity": "none_exploratory_no_confirmatory_p_values_or_winner_claims",
+  "weight_reuse": "prohibited_and_not_used",
+  "known_value_retraining_receipt": "KDD-BRIDGE01 retrains the KDD098R hidden/latent capacities and the frozen 40-epoch, conditional uniform 80-epoch validation-selection protocol separately in every known-value task and shared seed. No EHR-trained weights are reused.",
+  "ensemble_mapping_receipt": "The EHR Gaussian transition ensemble and bridge Gaussian recurrent ensemble are each one separately derived three-member surface labeled 3408;3411;3414. Neither is treated as three independent ensemble repetitions.",
+  "known_value_training": {
+    "training_episodes": 128,
+    "validation_episodes": 64,
+    "max_epochs": 40,
+    "min_epochs": 8,
+    "patience": 6,
+    "minimum_relative_validation_improvement": 0.001,
+    "single_uniform_extension_epochs": 80,
+    "extension_trigger": "more_than_half_seeds_hit_40_and_last_epoch_improves_relative_to_previous_by_at_least_0.001",
+    "batch_size": 128,
+    "hidden_dim": 48,
+    "latent_dim": 16,
+    "learning_rate": 0.002,
+    "weight_decay": 0.0001,
+    "gradient_clip_norm": 5.0,
+    "validation_composite": "0.7_RMSE_plus_0.3_MAE",
+    "selection_role": "independent_synthetic_validation_only",
+    "fit_role": "independent_synthetic_train_only"
+  },
+  "immutable_source_hashes": {
+    "ehr_recursive_rollout": "9d64a9b5f110362cf07ce9f18d8f16d0c9217994c6c1ee42129109d821471e95",
+    "ehr_uncertainty": "903ff29683a595648d9dcf3b7ec0b85f58c034d28f3018ac47e980739b19d651",
+    "ehr_action_information": "40bd2c8cf25eaebe44748aef3165bcce9f7fed827587ba2dbafc6edd51d6bc5f",
+    "ehr_world_model_registry": "fe1a57397ddc8460457f90cf131199be5f702cc4b57bff53d23111c96e463a65",
+    "adaptive_environment_contract": "52a17652a06309958c18660919700ad16692c0581a1c47203d483ea9e3f0181f",
+    "adapt01_config": "d5d74ca54bd5ba20a166da966d038f73f5d4f55e7f12be895687c2412144c771",
+    "adapt01_runner": "b227db1d1e9baaa98466b53b3f4fa2a93d5def72a58facdb60154f6b5817951b",
+    "kdd098r_config": "db78557715df53a176fb0ae591634a260216f5403b7793abe9f01a9c2a782e6b",
+    "kdd098_model_factory": "90de08ddabfd96f898e0818605dd7b8a69b87473e243fb64a8f9a19095e52ca8",
+    "kdd098r_selection_implementation": "8a604b1e1e72a364f46f6592a4e875acf128468883c9b69e04bd618e64ef7a2a"
+  }
+}

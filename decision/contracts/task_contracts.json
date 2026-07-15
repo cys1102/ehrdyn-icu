@@ -1,5 +1,5 @@
 {
-  "benchmark_id": "EHRDYN-ICU-DECISION-RC2",
+  "benchmark_id": "EHRDYN-ICU-DECISION-RC3",
   "ehr_model_scope": "P/R/T world-model components; no generative observation-process head",
   "ehr_world_model_tasks": [
     {
@@ -51,8 +51,8 @@
       "interval_hours": 4,
       "action_count": 25,
       "decision_horizon": 11,
-      "response_regimes": ["adaptive_composite"],
-      "historical_sensitivity_regimes": ["null_response", "weak", "moderate", "delayed"],
+      "response_regimes": ["interior_optimum", "state_dependent_optimum", "heterogeneous_response", "delayed_tradeoff"],
+      "sensitivity_regimes": ["adaptive_composite", "null_response", "monotone_historical_control", "weak", "moderate", "delayed"],
       "policy_truth": "exact_dynamic_programming"
     },
     {
@@ -60,8 +60,8 @@
       "interval_hours": 4,
       "action_count": 25,
       "decision_horizon": 11,
-      "response_regimes": ["adaptive_composite"],
-      "historical_sensitivity_regimes": ["null_response", "weak", "moderate", "delayed"],
+      "response_regimes": ["interior_optimum", "state_dependent_optimum", "heterogeneous_response", "delayed_tradeoff"],
+      "sensitivity_regimes": ["adaptive_composite", "null_response", "monotone_historical_control", "weak", "moderate", "delayed"],
       "policy_truth": "exact_dynamic_programming"
     },
     {
@@ -70,8 +70,8 @@
       "action_count": 2,
       "decision_horizon": 3,
       "action_semantics": "wait_vs_initiate_rrt_absorbing",
-      "response_regimes": ["adaptive_composite"],
-      "historical_sensitivity_regimes": ["null_response", "weak", "moderate", "delayed"],
+      "response_regimes": ["interior_optimum", "state_dependent_optimum", "heterogeneous_response", "delayed_tradeoff"],
+      "sensitivity_regimes": ["adaptive_composite", "null_response", "monotone_historical_control", "weak", "moderate", "delayed"],
       "policy_truth": "exact_dynamic_programming"
     },
     {
@@ -80,8 +80,8 @@
       "action_count": 8,
       "decision_horizon": 12,
       "action_semantics": "loop_diuretic_quartile_x_vaso_inotrope_indicator",
-      "response_regimes": ["adaptive_composite"],
-      "historical_sensitivity_regimes": ["null_response", "weak", "moderate", "delayed"],
+      "response_regimes": ["interior_optimum", "state_dependent_optimum", "heterogeneous_response", "delayed_tradeoff"],
+      "sensitivity_regimes": ["adaptive_composite", "null_response", "monotone_historical_control", "weak", "moderate", "delayed"],
       "policy_truth": "exact_dynamic_programming"
     }
   ],

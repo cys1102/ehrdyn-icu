@@ -34,6 +34,8 @@ FIGURE_ALLOWLIST = {
     "adaptive_all_policy_regret_heatmap.png",
     "cohort_evaluability_roles.pdf",
     "cohort_evaluability_roles.png",
+    "heterogeneous_all_policy_fixed_control_heatmap.pdf",
+    "heterogeneous_all_policy_fixed_control_heatmap.png",
     "known_value_all_policy_sensitivity_heatmap.pdf",
     "known_value_all_policy_sensitivity_heatmap.png",
     "known_value_method_groups.pdf",
@@ -43,6 +45,7 @@ FIGURE_ALLOWLIST = {
 }
 
 TABLE_ALLOWLIST = {
+    "action_information_policy_discrimination.csv",
     "adaptive_environment_contract.csv",
     "adaptive_exploitation_gap_all_rows.csv",
     "adaptive_exploitation_summary.csv",
@@ -59,8 +62,17 @@ TABLE_ALLOWLIST = {
     "cohort_uncertainty_leaders.csv",
     "complete_model_performance_by_cohort.csv",
     "complete_model_performance_task_balanced.csv",
+    "cross_surface_model_family_rows.csv",
+    "cross_surface_rank_stability.csv",
     "cross_cohort_evaluation_layers.csv",
+    "ehr_known_value_bridge_coefficients.csv",
+    "ehr_to_known_value_contract_matrix.csv",
     "factual_action_information_primary.csv",
+    "heterogeneous_all_method_seed_means.csv",
+    "heterogeneous_cell_discrimination.csv",
+    "heterogeneous_model_exploitation_all_rows.csv",
+    "heterogeneous_policy_true_returns_all_rows.csv",
+    "heterogeneous_world_model_planner_all_rows.csv",
     "known_value_all_policy_sensitivity.csv",
     "known_value_balanced_core.csv",
     "known_value_cross_task_summary.csv",
@@ -76,13 +88,20 @@ TABLE_ALLOWLIST = {
     "ope_reference_all_tuple_metrics.csv",
     "ope_task_matched_all_tuple_metrics.csv",
     "ope_validation_and_disposition.csv",
+    "policy_set_interval_inclusion_diagnostic_only.csv",
+    "prediction_policy_consistency.csv",
     "promoted_task_roles.csv",
     "related_work_landscape.csv",
     "retrospective_policy_diagnostics.csv",
+    "repeated_dataset_ope_authorization.csv",
+    "repeated_dataset_ope_coverage.csv",
+    "repeated_dataset_ope_gate_summary.csv",
+    "repeated_dataset_ope_rank_and_sign.csv",
     "sepsis_reference_fidelity.csv",
     "task_extension_rank_stability.csv",
     "task_extension_world_model_planner_matrix.csv",
     "task_matched_ope_authorization.csv",
+    "uncertainty_planning_consistency.csv",
     "world_model_fidelity_summary.csv",
     "world_model_planner_bridge.csv",
     "world_model_recursive_horizon_metrics.csv",
@@ -105,6 +124,8 @@ SOURCE_CODE_ALLOWLIST = (
     "kdd_benchmark_discovery/kdd069_model_types.py",
     "kdd_benchmark_discovery/kdd069_sequence_models.py",
     "kdd_benchmark_discovery/kdd069_rssm_models.py",
+    "kdd_benchmark_discovery/kdd098_training.py",
+    "kdd_benchmark_discovery/kdd098r_training.py",
     "kdd_benchmark_discovery/kdd_e01_evaluator.py",
     "kdd_benchmark_discovery/run_kdd_e02_known_value_full.py",
     "kdd_benchmark_discovery/run_kdd100_complete_known_value.py",
@@ -113,6 +134,9 @@ SOURCE_CODE_ALLOWLIST = (
     "kdd_benchmark_discovery/run_kdd098r_world_models.py",
     "kdd_benchmark_discovery/run_kdd101_model_free_diagnostics.py",
     "kdd_benchmark_discovery/run_kdd_adapt01_adaptive_known_value.py",
+    "kdd_benchmark_discovery/run_kdd107_heterogeneous_known_value.py",
+    "kdd_benchmark_discovery/run_kdd_ope_rd01_repeated_dataset.py",
+    "kdd_benchmark_discovery/run_kdd_bridge01_ehr_known_value.py",
     "kdd_benchmark_discovery/run_kdd_x02_cross_cohort_policy_benchmark.py",
     "kdd_benchmark_discovery/run_kdd_x08_task_matched_evaluator.py",
     "kdd_benchmark_discovery/run_kdd_x09_promoted_cohort_policy_benchmark.py",
@@ -120,9 +144,15 @@ SOURCE_CODE_ALLOWLIST = (
     "configs/kdd098r_world_model.json",
     "configs/kdd101_model_free_diagnostics_v5.json",
     "configs/kdd_adapt01_adaptive_known_value_v1.json",
+    "configs/kdd107_heterogeneous_known_value_v1.json",
+    "configs/kdd_ope_rd01_repeated_dataset_v1.json",
+    "configs/kdd_bridge01_ehr_known_value_v1.json",
     "configs/kdd_x02_cross_cohort_policy_benchmark_v1.json",
     "configs/kdd_x08_task_matched_evaluator_v1.json",
     "configs/kdd_x09_promoted_cohort_policy_benchmark_v1.json",
+    "tests/test_kdd107_heterogeneous_known_value.py",
+    "tests/test_kdd_ope_rd01.py",
+    "tests/test_kdd_bridge01.py",
 )
 
 DOCUMENT_TEXT_REPLACEMENTS = {
@@ -145,6 +175,10 @@ SOURCE_TEXT_REPLACEMENTS = {
     "kdd_benchmark_discovery/run_kdd101_model_free_diagnostics.py": {
         'Path("/' + 'data/physionet.org/files/mimiciv/3.1")':
             'Path("<authorized-mimiciv-root>")',
+    },
+    "kdd_benchmark_discovery/run_kdd107_heterogeneous_known_value.py": {
+        'RESEARCHFORGE = Path("/' + 'home/cys1102/yunsung/researchforge")':
+            'RESEARCHFORGE = Path("<researchforge-root>")',
     },
 }
 

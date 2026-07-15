@@ -16,8 +16,9 @@ ehrdyn-icu scan-release --root .
 ehrdyn-icu verify-checksums --root .
 ```
 
-The executed adaptive respiratory/shock/AKI/HF benchmark, historical
-sensitivity benchmark, full OPE grid, P/R/T-component training, model-free
+The executed heterogeneous respiratory/shock/AKI/HF benchmark, repeated-dataset
+OPE calibration, diagnostic EHR-to-known-value bridge, earlier adaptive and
+historical sensitivity benchmarks, P/R/T-component training, model-free
 diagnostics, and AI-Clinician-aligned sepsis materialization runner/configuration
 snapshots are under `reference_code/` with hashes in
 `reference_code/source_manifest.csv`. They are provided for exact source

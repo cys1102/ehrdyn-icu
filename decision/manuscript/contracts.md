@@ -45,6 +45,7 @@ confidence: high
 - Action: training-derived fluid quintile × vasopressor quintile, K=25; zero plus four positive-dose quantiles per dimension.
 - Reward tracks: locally parameterized SOFA/lactate shaping; terminal-only sensitivity; lactate-only diagnostic `-tanh(lactate[t+1]-lactate[t])`; treatment-isolated physiology composite; historical sensitivities.
 - Critical gaps: numerical coefficients are local parameterization; full SOFA can mechanically encode vasopressor exposure; anchor-relative 90-day terminal outcome is unavailable; the contract is not an exact paper reproduction.
+- Scale: 3,440 strict development train+validation episodes are evaluated here. A broader 27,236-episode K25 predecessor is retained for a conditional scale-reconciliation/rerun decision and is not pooled with the strict subset.
 
 ## Respiratory support
 

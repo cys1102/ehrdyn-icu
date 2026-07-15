@@ -1,5 +1,19 @@
 # Changelog
 
+## EHRDYN-ICU-DECISION-RC3 (paper-facing decision release)
+
+- Replace the monotone primary policy surface with 24 heterogeneous exact-finite
+  task--mechanism environments and release all 4,080 policy--seed and 2,880
+  world-model--planner rows.
+- Add repeated-dataset OPE calibration over 2,200 independent logged datasets;
+  no adaptive-response or retrospective EHR scoring contract is authorized.
+- Add the aggregate EHR-to-known-value diagnostic bridge and retain its mixed,
+  exploratory interpretation boundary.
+- Reconcile strict development episode counts with broader predecessor
+  lineages, including the 27,236-episode K25 sepsis construction.
+- Publish the revised eight-page manuscript, all-method heatmap, source
+  snapshots, row-count validation, and checksums.
+
 ## EHRDYN-ICU-DECISION-RC2 (paper-facing decision release)
 
 - Narrow the manuscript and release scope to EHR P/R/T world-model components

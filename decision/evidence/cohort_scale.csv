@@ -1,7 +1,7 @@
-eligible_subjects,materialized_episodes,materialized_transitions,action_dimension,train_supported_action_classes,count_scope,episode_unit,cohort
-3391,3440,34245,25,22,subject-disjoint development train plus validation,materialized ICU stay,sepsis
-18709,21679,125246,25,12,subject-disjoint development train plus validation,materialized ICU stay,respiratory
-37015,49495,390341,25,25,subject-disjoint development train plus validation,materialized ICU stay,shock
-2551,4276,33836,25,16,subject-disjoint development train plus validation,materialized ICU stay,af flutter
-16380,21083,181311,4,4,subject-disjoint development train plus validation,materialized ICU stay,aki
-2378,3986,32198,2,2,subject-disjoint development train plus validation,materialized ICU stay,heart failure
+eligible_subjects,materialized_episodes,materialized_transitions,action_dimension,train_supported_action_classes,prior_full_lineage_episodes,strict_all_role_episodes,prior_lineage_comparability,count_scope,episode_unit,cohort
+3391,3440,34245,25,22,27236.0,3996.0,K25 predecessor; broader window-overlap cohort,subject-disjoint development train plus validation,materialized ICU stay,sepsis
+18709,21679,125246,25,12,16389.0,30675.0,not available,subject-disjoint development train plus validation,materialized ICU stay,respiratory
+37015,49495,390341,25,25,,,not available,subject-disjoint development train plus validation,materialized ICU stay,shock
+2551,4276,33836,25,16,14580.0,4973.0,different prior construction; context only,subject-disjoint development train plus validation,materialized ICU stay,af flutter
+16380,21083,181311,4,4,16453.0,25134.0,not available,subject-disjoint development train plus validation,materialized ICU stay,aki
+2378,3986,32198,2,2,32552.0,4726.0,different prior construction; context only,subject-disjoint development train plus validation,materialized ICU stay,heart failure

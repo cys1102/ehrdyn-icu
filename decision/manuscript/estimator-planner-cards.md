@@ -70,30 +70,28 @@ Each denominator is evaluated separately for NLL, calibration/ECE, action-wise f
 - FQE.
 - Prespecified support-restricted variants.
 
-Approval applies only to the exact tuple:
+Repeated-dataset approval applies only to the exact tuple:
 
 `estimator × denominator × clipping × support rule × horizon × task regime`.
 
-The reference evaluator checks H1, H2, H4, H8, H12, and H17 separately. Task-matched evaluators use the horizons defined by their decision contracts (AKI H1/H2/H3; heart failure H1/H2/H4/H8/H12). Approval requires every gate below:
+Each task uses its frozen decision horizons. For every task--regime cell, the evaluator generates 200 independent logged datasets for respiratory, shock, and heart failure and 500 for AKI--RRT; behavior denominators and nuisance models are refit within each dataset. Approval requires every gate below:
 
-- policy-set interval inclusion rate within a fixed logged-data realization at least `0.90` (not repeated-dataset frequentist coverage);
+- minimum policy-specific empirical coverage across independent logged datasets at least `0.90`; a 95% Wilson interval is reported for precision;
 - Spearman rank recovery at least `0.80`;
 - pairwise policy-order recovery at least `0.80`;
 - behavior-relative improvement-sign recovery at least `0.90`;
 - false-improvement rate at most `0.05`;
 - median ESS at least `max(100, 0.05 * logged episodes)`;
 - maximum unsupported target-policy mass equal to zero;
-- maximum paired true-return standard error at most `0.03`;
 - all required values finite.
 
-Exact finite-environment approval does not transport automatically to aggregate-calibrated semi-synthetic or retrospective EHR evaluation.
+The former policy-set interval inclusion rate within one fixed logged-data realization is retained as diagnostic-only. Known-value approval does not transport automatically to retrospective EHR evaluation.
 
 ## Current disposition
 
-- Exact finite known-value environments: 32 of 3,456 tuples approved for that synthetic scope. All are moderate-regime, horizon-one, masked-support contracts; their full identities are in `ope_approved_exact_tuples.csv` (under `tables/` in the reader package and `decision/evidence/` in the anonymous release).
-- Shared reference semi-synthetic environment: 0 of 3,456 tuples approved.
-- AKI task-matched evaluator: 228 of 1,728 exact-finite and 236 of 1,728 semi-synthetic tuples approved.
-- Heart-failure task-matched evaluator: 0 of 2,880 exact-finite and 0 of 2,880 semi-synthetic tuples approved.
+- Repeated-dataset known-value grid: 40 of 1,728 tuples approved.
+- Adaptive response: 0 of 864 tuples approved.
+- Null response: 40 of 864 tuples approved, all in AKI--RRT sanity cells.
 - Retrospective EHR policy value: not executed and unavailable.
 
-Complete achieved metrics and dispositions are in `ope_reference_all_tuple_metrics.csv` and `ope_task_matched_all_tuple_metrics.csv` (under `tables/` in the reader package and `decision/evidence/` in the anonymous release). No tuple is transferred by estimator family name alone.
+Complete repeated-dataset metrics and dispositions are in `repeated_dataset_ope_coverage.csv`, `repeated_dataset_ope_rank_and_sign.csv`, and `repeated_dataset_ope_authorization.csv`. Historical fixed-dataset surfaces remain available with diagnostic-only labels. No tuple is transferred by estimator family name alone.

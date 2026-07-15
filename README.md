@@ -2,9 +2,9 @@
 
 The paper-facing anonymous release is in [`decision/`](decision/README.md).
 It provides six EHR P/R/T-component contracts, the complete 36-row transition
-matrix, four adaptive exact-finite policy environments, every aggregate
-policy/OPE result row, the anonymous manuscript, a release validator, and an
-unrestricted synthetic smoke test.
+matrix, 24 heterogeneous exact-finite task--mechanism environments, every
+aggregate policy/OPE result row, the anonymous manuscript, a release validator,
+and an unrestricted synthetic smoke test.
 
 ```bash
 python -m pip install -e .

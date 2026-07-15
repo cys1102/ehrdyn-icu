@@ -34,17 +34,34 @@ python \
 
 The reproduction directory is additive and must not overwrite the frozen source.
 
-## Rebuild the primary adaptive exact-finite policy benchmark
+## Rebuild the primary heterogeneous exact-finite policy benchmark
 
 ```bash
 cd ../world-ehr
 python \
-  -m kdd_benchmark_discovery.run_kdd_adapt01_adaptive_known_value \
-  --config configs/kdd_adapt01_adaptive_known_value_v1.json \
-  --output kdd_benchmark_discovery/results/reproduction_adaptive_known_value
+  -m kdd_benchmark_discovery.run_kdd107_heterogeneous_known_value \
+  --config configs/kdd107_heterogeneous_known_value_v1.json \
+  --output kdd_benchmark_discovery/results/reproduction_heterogeneous_known_value
 ```
 
-This stage uses known constructed mechanisms and does not require patient-level EHR rows. It regenerates the 700 method/oracle seed rows from which the 680 non-oracle rows in the main policy figure are selected.
+This stage uses known constructed mechanisms and does not require patient-level EHR rows. It regenerates all 4,080 policy--seed rows and 2,880 world-model--planner rows used by the main policy result.
+
+## Rebuild repeated-dataset OPE and the diagnostic bridge
+
+```bash
+cd ../world-ehr
+python \
+  -m kdd_benchmark_discovery.run_kdd_ope_rd01_repeated_dataset \
+  --config configs/kdd_ope_rd01_repeated_dataset_v1.json \
+  --output kdd_benchmark_discovery/results/reproduction_repeated_dataset_ope
+
+python \
+  -m kdd_benchmark_discovery.run_kdd_bridge01_ehr_known_value \
+  --config configs/kdd_bridge01_ehr_known_value_v1.json \
+  --output kdd_benchmark_discovery/results/reproduction_ehr_known_value_bridge
+```
+
+The OPE stage regenerates independent logged datasets and refits behavior/nuisance surfaces inside each dataset. The bridge consumes aggregate EHR summaries and independently retrains known-value architectures; it does not reuse EHR weights.
 
 ## Compile the manuscript
 
@@ -67,6 +84,6 @@ git diff --check
 rg -n '\\bKDD(?:-|[0-9])' writing/kdd-benchmark-final/manuscript.tex
 ```
 
-The last command must return no match. Internal experiment IDs remain only in provenance artifacts. The builder regenerates task scale, full known-value matrices, and reference/task-matched OPE tuple surfaces from the immutable sources listed in `provenance-manifest.csv`.
+The last command must return no match. Internal experiment IDs remain only in provenance artifacts. The builder regenerates task scale, full known-value matrices, repeated-dataset OPE surfaces, and bridge tables from the immutable sources listed in `provenance-manifest.csv`.
 
 For an unrestricted artifact smoke test that does not require MIMIC-IV, follow the quick start at <https://anonymous.4open.science/r/ehrdyn-icu-65FB>.
