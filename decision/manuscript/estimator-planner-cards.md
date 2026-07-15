@@ -74,7 +74,7 @@ Repeated-dataset approval applies only to the exact tuple:
 
 `estimator × denominator × clipping × support rule × horizon × task regime`.
 
-Each task uses its frozen decision horizons. For every task--regime cell, the evaluator generates 200 independent logged datasets for respiratory, shock, and heart failure and 500 for AKI--RRT; behavior denominators and nuisance models are refit within each dataset. Approval requires every gate below:
+Each task uses its frozen decision horizons. In the current primary view, the evaluator generates 200 independent logged datasets for respiratory and shock and 500 for AKI--RRT per task--regime cell; heart failure is withheld pending its large-lineage rerun. Behavior denominators and nuisance models are refit within each dataset. Approval requires every gate below:
 
 - minimum policy-specific empirical coverage across independent logged datasets at least `0.90`; a 95% Wilson interval is reported for precision;
 - Spearman rank recovery at least `0.80`;
@@ -89,9 +89,9 @@ The former policy-set interval inclusion rate within one fixed logged-data reali
 
 ## Current disposition
 
-- Repeated-dataset known-value grid: 40 of 1,728 tuples approved.
-- Adaptive response: 0 of 864 tuples approved.
-- Null response: 40 of 864 tuples approved, all in AKI--RRT sanity cells.
+- Repeated-dataset known-value grid: 40 of 1,296 current tuples approved.
+- Adaptive response: 0 of 648 tuples approved.
+- Null response: 40 of 648 tuples approved, all in AKI--RRT sanity cells.
 - Retrospective EHR policy value: not executed and unavailable.
 
-Complete repeated-dataset metrics and dispositions are in `repeated_dataset_ope_coverage.csv`, `repeated_dataset_ope_rank_and_sign.csv`, and `repeated_dataset_ope_authorization.csv`. Historical fixed-dataset surfaces remain available with diagnostic-only labels. No tuple is transferred by estimator family name alone.
+Current repeated-dataset metrics and dispositions are in the corresponding `current_scale_qualified_repeated_dataset_ope_*.csv` files. Full prior ledgers remain available with historical/superseded labels. No tuple is transferred by estimator family name alone.

@@ -45,7 +45,7 @@ confidence: high
 - Action: training-derived fluid quintile × vasopressor quintile, K=25; zero plus four positive-dose quantiles per dimension.
 - Reward tracks: locally parameterized SOFA/lactate shaping; terminal-only sensitivity; lactate-only diagnostic `-tanh(lactate[t+1]-lactate[t])`; treatment-isolated physiology composite; historical sensitivities.
 - Critical gaps: numerical coefficients are local parameterization; full SOFA can mechanically encode vasopressor exposure; anchor-relative 90-day terminal outcome is unavailable; the contract is not an exact paper reproduction.
-- Scale: 3,440 strict development train+validation episodes are evaluated here. A broader 27,236-episode K25 predecessor is retained for a conditional scale-reconciliation/rerun decision and is not pooled with the strict subset.
+- Frozen scale target: 22,437 subjects and 27,236 episodes. The earlier 3,440-episode strict construction is superseded; no performance metric is transferred between constructions. Full P/R/T, uncertainty, action-information, policy-support, and applicable OPE diagnostics must be rerun before sepsis re-enters primary synthesis.
 
 ## Respiratory support
 
@@ -68,6 +68,7 @@ confidence: high
 - Action: rate-control-5 × rhythm-control-5 transition view.
 - Reward: a four-hour rate-control proxy was materialized, but strict action--reward ordering remains unresolved.
 - Role: world-model only.
+- Frozen scale target: 11,820 subjects and 14,580 episodes; large-lineage P/T and uncertainty rerun required.
 
 ## Acute kidney injury
 
@@ -84,3 +85,4 @@ confidence: high
 - Separate policy-task action: six-hour loop-diuretic quartile × vaso/inotrope indicator (`K=8`), maximum 12 decisions.
 - Policy-task objective: observed post-action urine-output proxy; creatinine, MAP, and terminal surfaces remain separate.
 - Role: P/T world-model surface plus task-matched known-value policy comparison; no retrospective EHR policy value.
+- Frozen scale target: 27,611 subjects and 32,552 episodes; all affected component and constructed-profile diagnostics must be rerun.

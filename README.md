@@ -1,10 +1,12 @@
 # EHRDyn-ICU: multi-cohort decision evaluation for EHR model components and offline RL
 
 The paper-facing anonymous release is in [`decision/`](decision/README.md).
-It provides six EHR P/R/T-component contracts, the complete 36-row transition
-matrix, 24 heterogeneous exact-finite task--mechanism environments, every
-aggregate policy/OPE result row, the anonymous manuscript, a release validator,
-and an unrestricted synthetic smoke test.
+It provides six scale-qualified EHR P/R/T-component targets, an 18-row current
+transition matrix for the three lineages with complete reevaluation, 18
+explicitly superseded transition rows awaiting large-lineage reruns, 18 current
+exact-finite task--mechanism environments, every current aggregate policy/OPE
+result row, the anonymous manuscript, a release validator, and an unrestricted
+synthetic smoke test.
 
 ```bash
 python -m pip install -e .

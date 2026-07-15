@@ -23,14 +23,18 @@
 | Portable planner/CRN smoke | `src/kdd2027_benchmark/decision/known_value.py` | executable clean-room implementation |
 | IS/WIS/PDIS/WPDIS formulas | `src/kdd2027_benchmark/decision/ope.py` | executable clean-room implementation |
 | Evidence and contract validation | `src/kdd2027_benchmark/decision/contract.py` | executable release validator |
+| Final cohort scale and eligibility | `decision/evidence/primary_cohort_scale_eligibility.csv` | six frozen targets with subject count, episode count, 10k gate, and reevaluation status |
 | Cross-layer baseline inventory and point-leader atlas | `decision/evidence/baseline_method_inventory.csv` and `baseline_surface_atlas.csv` | complete aggregate method identities and layer-specific outcomes |
+| All-layer manuscript atlas | `decision/figures/benchmark_all_layer_atlas.pdf` and `.png` | transition, uncertainty, model-free/control, and P/R/T-model--planner panels with all included labels |
 | Cohort-level transition and uncertainty leaders | `decision/evidence/all_baseline_transition_leaders.csv` and `cohort_uncertainty_leaders.csv` | source-derived six-cohort summaries |
-| All transition methods on all cohorts | `decision/evidence/complete_model_performance_by_cohort.csv` | complete 36-row reusable result matrix, including non-leading methods |
+| Current scale-qualified transition comparison | `decision/evidence/current_scale_qualified_model_performance_by_cohort.csv` and `current_scale_qualified_model_performance_task_balanced.csv` | complete 18-row cohort-by-method matrix and six-row task-balanced summary for the three lineages with current reevaluation |
+| Historical transition ledger | `decision/evidence/complete_model_performance_by_cohort.csv` | 36-row reusable ledger; sepsis, AF/flutter, and heart-failure rows are superseded pending large-lineage reruns |
 | All adaptive policy labels | `decision/evidence/adaptive_policy_performance_all_methods.csv`, `adaptive_policy_true_returns_all_rows.csv`, and `adaptive_policy_regret_all_rows.csv` | all task-by-method summaries and all 700 seed rows |
 | Adaptive model exploitation | `decision/evidence/adaptive_exploitation_gap_all_rows.csv` | all 480 planner-seed rows |
-| All heterogeneous policy labels | `decision/evidence/heterogeneous_policy_true_returns_all_rows.csv` and `heterogeneous_all_method_seed_means.csv` | all 4,080 policy-seed rows and complete 34-label summaries |
-| Heterogeneous world-model planning | `decision/evidence/heterogeneous_world_model_planner_all_rows.csv` and `heterogeneous_model_exploitation_all_rows.csv` | all 2,880 planner-seed and exploitation rows |
-| Repeated-dataset OPE | `decision/evidence/repeated_dataset_ope_coverage.csv` and `repeated_dataset_ope_authorization.csv` | all 10,368 coverage rows and 1,728 frozen contract dispositions |
+| Current heterogeneous policy labels | `decision/evidence/current_scale_qualified_policy_true_returns_all_rows.csv` | 3,060 policy-seed rows for respiratory, shock, and AKI |
+| Current world-model planning | `decision/evidence/current_scale_qualified_world_model_planner_all_rows.csv` and `current_scale_qualified_model_exploitation_all_rows.csv` | 2,160 planner-seed and exploitation rows for current lineages |
+| Current repeated-dataset OPE | `decision/evidence/current_scale_qualified_repeated_dataset_ope_coverage.csv` and `current_scale_qualified_repeated_dataset_ope_authorization.csv` | 7,776 coverage rows and 1,296 frozen contract dispositions for current lineages |
+| Historical full policy/OPE ledgers | `decision/evidence/heterogeneous_policy_true_returns_all_rows.csv`, `heterogeneous_world_model_planner_all_rows.csv`, and `repeated_dataset_ope_*.csv` | retained for provenance; heart-failure rows are excluded from current synthesis pending rerun |
 | EHR-to-known-value bridge | `decision/evidence/cross_surface_model_family_rows.csv` and `ehr_known_value_bridge_coefficients.csv` | complete model-family rows and descriptive bridge coefficients |
 | Representative prior-study landscape | `decision/evidence/related_work_landscape.csv` | source-verified motivation table; not a systematic review |
 | Complete paper result rows | `decision/evidence/` | hash-verified aggregate evidence |

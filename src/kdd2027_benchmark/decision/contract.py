@@ -11,8 +11,11 @@ from ..errors import ReleaseContractError
 EXPECTED_ROWS = {
     "decision/evidence/related_work_landscape.csv": 8,
     "decision/evidence/cohort_scale.csv": 6,
+    "decision/evidence/primary_cohort_scale_eligibility.csv": 6,
     "decision/evidence/complete_model_performance_by_cohort.csv": 36,
     "decision/evidence/complete_model_performance_task_balanced.csv": 6,
+    "decision/evidence/current_scale_qualified_model_performance_by_cohort.csv": 18,
+    "decision/evidence/current_scale_qualified_model_performance_task_balanced.csv": 6,
     "decision/evidence/cross_cohort_evaluation_layers.csv": 6,
     "decision/evidence/adaptive_environment_contract.csv": 4,
     "decision/evidence/adaptive_policy_performance_all_methods.csv": 136,
@@ -24,6 +27,10 @@ EXPECTED_ROWS = {
     "decision/evidence/heterogeneous_model_exploitation_all_rows.csv": 2880,
     "decision/evidence/heterogeneous_all_method_seed_means.csv": 544,
     "decision/evidence/heterogeneous_cell_discrimination.csv": 16,
+    "decision/evidence/current_scale_qualified_policy_true_returns_all_rows.csv": 3060,
+    "decision/evidence/current_scale_qualified_world_model_planner_all_rows.csv": 2160,
+    "decision/evidence/current_scale_qualified_model_exploitation_all_rows.csv": 2160,
+    "decision/evidence/current_scale_qualified_cell_discrimination.csv": 12,
     "decision/evidence/known_value_cross_task_summary.csv": 4,
     "decision/evidence/known_value_reference_full_matrix.csv": 1632,
     "decision/evidence/known_value_task_extension_full_matrix.csv": 816,
@@ -34,6 +41,10 @@ EXPECTED_ROWS = {
     "decision/evidence/repeated_dataset_ope_rank_and_sign.csv": 1728,
     "decision/evidence/repeated_dataset_ope_authorization.csv": 1728,
     "decision/evidence/repeated_dataset_ope_gate_summary.csv": 2,
+    "decision/evidence/current_scale_qualified_repeated_dataset_ope_coverage.csv": 7776,
+    "decision/evidence/current_scale_qualified_repeated_dataset_ope_rank_and_sign.csv": 1296,
+    "decision/evidence/current_scale_qualified_repeated_dataset_ope_authorization.csv": 1296,
+    "decision/evidence/current_scale_qualified_repeated_dataset_ope_gate_summary.csv": 2,
     "decision/evidence/policy_set_interval_inclusion_diagnostic_only.csv": 6912,
     "decision/evidence/ehr_to_known_value_contract_matrix.csv": 80,
     "decision/evidence/cross_surface_model_family_rows.csv": 16,
@@ -133,6 +144,45 @@ def validate_decision_release(root: Path) -> dict[str, object]:
     if any(sum(candidate["cohort"] == row["cohort"] for candidate in complete_models) != 6 for row in complete_models):
         raise ReleaseContractError("Each cohort must expose all six transition methods")
 
+    primary_scale = _csv_rows(root / "decision/evidence/primary_cohort_scale_eligibility.csv")
+    expected_primary_cohorts = {
+        "sepsis",
+        "respiratory",
+        "shock",
+        "af flutter",
+        "aki",
+        "heart failure",
+    }
+    if {row["cohort"] for row in primary_scale} != expected_primary_cohorts:
+        raise ReleaseContractError("Final cohort-scale inventory drifted")
+    if any(
+        int(row["primary_subjects"]) < 10_000
+        or int(row["primary_episodes"]) < 10_000
+        or row["scale_gate"] != "pass_ge10000_subjects_and_episodes"
+        for row in primary_scale
+    ):
+        raise ReleaseContractError("A final cohort target violates the frozen 10k scale gate")
+    current_primary_cohorts = {
+        row["cohort"]
+        for row in primary_scale
+        if _truth(row["current_primary_result_available"])
+    }
+    if current_primary_cohorts != {"respiratory", "shock", "aki"}:
+        raise ReleaseContractError("Current large-lineage result availability drifted")
+
+    current_models = _csv_rows(
+        root / "decision/evidence/current_scale_qualified_model_performance_by_cohort.csv"
+    )
+    if {row["cohort"] for row in current_models} != current_primary_cohorts:
+        raise ReleaseContractError("Current transition matrix includes a pending lineage")
+    if any(
+        sum(candidate["cohort"] == row["cohort"] for candidate in current_models) != 6
+        for row in current_models
+    ):
+        raise ReleaseContractError("Each current cohort must expose all six transition methods")
+    if any(row["evidence_status"] != "current_scale_qualified_result" for row in current_models):
+        raise ReleaseContractError("Current transition evidence status drifted")
+
     adaptive_summary = _csv_rows(root / "decision/evidence/adaptive_policy_performance_all_methods.csv")
     if len({row["task"] for row in adaptive_summary}) != 4:
         raise ReleaseContractError("Adaptive policy summary must cover four tasks")
@@ -156,6 +206,30 @@ def validate_decision_release(root: Path) -> dict[str, object]:
     discrimination_passes = sum(_truth(row["learned_beats_both_fixed_extremes"]) for row in heterogeneous_cells)
     if discrimination_passes != 11:
         raise ReleaseContractError("Heterogeneous fixed-control discrimination count drifted")
+
+    current_policy = _csv_rows(
+        root / "decision/evidence/current_scale_qualified_policy_true_returns_all_rows.csv"
+    )
+    current_planners = _csv_rows(
+        root / "decision/evidence/current_scale_qualified_world_model_planner_all_rows.csv"
+    )
+    current_cells = _csv_rows(
+        root / "decision/evidence/current_scale_qualified_cell_discrimination.csv"
+    )
+    current_policy_tasks = {"respiratory", "shock", "aki_rrt"}
+    if {row["task"] for row in current_policy} != current_policy_tasks:
+        raise ReleaseContractError("Current policy ledger includes a pending lineage")
+    if {row["task"] for row in current_planners} != current_policy_tasks:
+        raise ReleaseContractError("Current planner ledger includes a pending lineage")
+    if any(float(row["exact_regret"]) < -1e-12 for row in current_policy):
+        raise ReleaseContractError("Current exact-oracle evaluation contains material negative regret")
+    if any(not _truth(row["exact_mc_agreement_pass"]) or not _truth(row["support_pass"]) for row in current_policy):
+        raise ReleaseContractError("Current policy evaluator or support gate failed")
+    current_discrimination_passes = sum(
+        _truth(row["learned_beats_both_fixed_extremes"]) for row in current_cells
+    )
+    if current_discrimination_passes != 8:
+        raise ReleaseContractError("Current fixed-control discrimination count drifted")
 
     reference = _csv_rows(root / "decision/evidence/ope_reference_all_tuple_metrics.csv")
     task_matched = _csv_rows(root / "decision/evidence/ope_task_matched_all_tuple_metrics.csv")
@@ -194,6 +268,27 @@ def validate_decision_release(root: Path) -> dict[str, object]:
     if any(_truth(row["retrospective_ehr_ope_authorized"]) for row in repeated):
         raise ReleaseContractError("Repeated-dataset calibration authorized retrospective EHR OPE")
 
+    current_repeated = _csv_rows(
+        root
+        / "decision/evidence/current_scale_qualified_repeated_dataset_ope_authorization.csv"
+    )
+    if {row["task"] for row in current_repeated} != current_policy_tasks:
+        raise ReleaseContractError("Current repeated-dataset OPE includes a pending lineage")
+    current_repeated_adaptive_approved = sum(
+        _truth(row["approved_known_value_tuple"])
+        for row in current_repeated
+        if row["response_regime"] == "adaptive_composite"
+    )
+    current_repeated_null_approved = sum(
+        _truth(row["approved_known_value_tuple"])
+        for row in current_repeated
+        if row["response_regime"] == "null_response"
+    )
+    if (current_repeated_adaptive_approved, current_repeated_null_approved) != (0, 40):
+        raise ReleaseContractError("Current repeated-dataset OPE authorization counts drifted")
+    if any(_truth(row["retrospective_ehr_ope_authorized"]) for row in current_repeated):
+        raise ReleaseContractError("Current repeated-dataset calibration authorized retrospective EHR OPE")
+
     return {
         "benchmark_id": task_contract["benchmark_id"],
         "manifest_files_verified": len(manifest),
@@ -201,14 +296,21 @@ def validate_decision_release(root: Path) -> dict[str, object]:
         "ehr_world_model_tasks": 6,
         "known_value_policy_tasks": 4,
         "complete_transition_rows": len(complete_models),
+        "current_transition_rows": len(current_models),
+        "scale_qualified_cohorts": len(primary_scale),
+        "current_numeric_cohorts": len(current_primary_cohorts),
         "adaptive_policy_summary_rows": len(adaptive_summary),
         "adaptive_policy_seed_rows": len(adaptive_regret),
         "heterogeneous_policy_seed_rows": len(heterogeneous),
         "heterogeneous_planner_rows": len(heterogeneous_planners),
         "heterogeneous_discriminative_cells": discrimination_passes,
+        "current_policy_seed_rows": len(current_policy),
+        "current_planner_rows": len(current_planners),
+        "current_discriminative_cells": current_discrimination_passes,
         "historical_known_value_policy_rows": 2448,
         "historical_ope_tuple_rows": 16128,
         "repeated_dataset_ope_tuples": len(repeated),
+        "current_repeated_dataset_ope_tuples": len(current_repeated),
         "repeated_dataset_adaptive_approved": repeated_adaptive_approved,
         "repeated_dataset_null_approved": repeated_null_approved,
         "reference_exact_approved": reference_approved,

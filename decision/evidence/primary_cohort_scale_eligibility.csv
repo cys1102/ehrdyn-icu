@@ -1,0 +1,7 @@
+cohort,primary_subjects,primary_episodes,current_primary_result_available,primary_result_status,scale_gate
+sepsis,22437,27236,False,rerun required; small-lineage result superseded,pass_ge10000_subjects_and_episodes
+respiratory,18709,21679,True,current scale-qualified result available,pass_ge10000_subjects_and_episodes
+shock,37015,49495,True,current scale-qualified result available,pass_ge10000_subjects_and_episodes
+af flutter,11820,14580,False,rerun required; small-lineage result superseded,pass_ge10000_subjects_and_episodes
+aki,16380,21083,True,current scale-qualified result available,pass_ge10000_subjects_and_episodes
+heart failure,27611,32552,False,rerun required; small-lineage result superseded,pass_ge10000_subjects_and_episodes

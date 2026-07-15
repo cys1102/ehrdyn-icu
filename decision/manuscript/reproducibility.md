@@ -44,7 +44,7 @@ python \
   --output kdd_benchmark_discovery/results/reproduction_heterogeneous_known_value
 ```
 
-This stage uses known constructed mechanisms and does not require patient-level EHR rows. It regenerates all 4,080 policy--seed rows and 2,880 world-model--planner rows used by the main policy result.
+This stage uses known constructed mechanisms and does not require patient-level EHR rows. It regenerates the full prior 4,080 policy--seed and 2,880 component-model--planner ledgers. The manuscript builder then applies the frozen scale status and exports 3,060/2,160 rows for the current primary view; heart-failure rows remain historical until its large-lineage rerun finishes.
 
 ## Rebuild repeated-dataset OPE and the diagnostic bridge
 

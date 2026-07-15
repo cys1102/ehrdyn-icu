@@ -27,18 +27,21 @@ Transition accuracy is a validity layer, not the benchmark endpoint. Retrospecti
 - EHR surface: subject-disjoint development train/validation roles.
 - Retrospective action semantics: recorded four-hour exposure/setting abstraction; not guaranteed assignable at interval start.
 - Confirmatory status: no genuinely untouched role remains.
-- Primary known-value surface: 24 exact-finite task--mechanism environments, including 16 prespecified interior-optimum, state-dependent, heterogeneous-response, and delayed-trade-off cells.
+- Frozen cohort-scale gate: at least 10,000 subjects and 10,000 ICU-stay episodes; all six final target lineages pass.
+- Current primary known-value surface: 18 exact-finite task--mechanism environments, including 12 prespecified interior-optimum, state-dependent, heterogeneous-response, and delayed-trade-off cells. Heart-failure results are withheld until its large-lineage rerun.
 - Evaluator sensitivities: null-response, historical monotone, and the earlier composite-adaptive family.
-- Repeated-dataset OPE: 2,200 independent logged datasets; 40/1,728 known-value tuple approvals, all AKI null-response sanity cells; adaptive response 0/864.
+- Repeated-dataset OPE: 1,800 independent logged datasets; 40/1,296 current known-value tuple approvals, all AKI null-response sanity cells; adaptive response 0/648.
 - Real-EHR OPE: not executed for comparison; no adaptive repeated-dataset contract and policy-specific EHR gate both pass.
 - Independent credentialed reconstruction: pending aggregate-result regeneration from a clean clone; not external validation.
 
 ## Tasks
 
 - Reference scaffold: AI-Clinician-aligned sepsis, four-hour fluid-5 × vasopressor-5 action, K=25; not an exact cohort/reward reproduction.
+- Frozen sepsis target: 22,437 subjects and 27,236 episodes; its prior 3,440-episode result is superseded and not primary evidence.
 - Known-value policy extensions: respiratory support, shock, severe-AKI RRT initiation, and heart failure.
 - World-model-only extension: AF/flutter.
 - AKI and heart failure retain their original P/T transition surfaces and use separate K2/K8 decision contracts for policy evaluation.
+- AF/flutter and heart-failure targets contain 11,820/14,580 and 27,611/32,552 subjects/episodes, respectively; both require complete large-lineage reruns.
 
 ## Model and policy coverage
 
@@ -59,11 +62,11 @@ Transition accuracy is a validity layer, not the benchmark endpoint. Retrospecti
 ## Machine-readable audit surfaces
 
 - Complete layer-specific inventory: six transition methods, five uncertainty-capable methods, 34 policy/planner labels, and nine OPE estimators.
-- Complete six-method task-balanced table plus all 36 cohort--method rows; winner-only leader tables are secondary views.
+- Complete current six-method task-balanced table plus all 18 primary method--cohort rows; the 18 superseded small-lineage rows are historical only.
 - Fixed primary factual-action estimand and per-row episode-bootstrap interval counts.
 - Task-balanced one-step and recursive uncertainty summary.
-- All 4,080 heterogeneous policy--seed rows and 2,880 world-model--planner rows, plus earlier adaptive and monotone sensitivities.
-- All 10,368 repeated-dataset policy coverage rows and 1,728 revised OPE tuple dispositions; historical fixed-dataset diagnostics remain separately labeled.
+- All 3,060 current heterogeneous policy--seed rows and 2,160 component-model--planner rows, plus separately labeled superseded/historical sensitivities.
+- All 7,776 current repeated-dataset policy coverage rows and 1,296 revised OPE tuple dispositions; historical fixed-dataset diagnostics remain separately labeled.
 
 ## Intended use
 

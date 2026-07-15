@@ -10,22 +10,30 @@ older lineages is relabeled as a decision-benchmark result.
 
 ## What is released
 
-- six EHR P/R/T-component task contracts and the complete 36-row
-  cohort-by-transition-method matrix;
+- six final cohort targets that each exceed 10,000 subjects and 10,000
+  episodes, with subjects and episodes recorded in
+  `evidence/primary_cohort_scale_eligibility.csv`;
+- an 18-row current transition matrix for respiratory, shock, and AKI across
+  all six transition methods; the 18 sepsis, AF/flutter, and heart-failure rows
+  from smaller constructions remain available but are labeled superseded and
+  excluded from current synthesis;
 - an AI-Clinician-aligned K25 sepsis scaffold, labeled as an alignment
   surface rather than an exact reproduction;
-- 24 heterogeneous exact-finite task--mechanism environments over respiratory,
-  shock, AKI--RRT, and heart failure, each with dynamic-programming truth;
+- 18 current heterogeneous exact-finite task--mechanism environments over
+  respiratory, shock, and AKI--RRT, each with dynamic-programming truth;
 - the complete layer-specific inventory of six transition methods, five
   uncertainty-capable methods, 34 policy/planner labels, and nine OPE
   estimators;
 - a cross-layer baseline atlas and cohort-specific uncertainty leader table;
-- all 4,080 heterogeneous policy--seed rows, all 2,880 world-model--planner
-  rows, all exploitation-gap rows, and the earlier adaptive sensitivity;
+- 3,060 current heterogeneous policy--seed rows, 2,160 current
+  world-model--planner rows, all corresponding exploitation-gap rows, and the
+  earlier adaptive sensitivity; the larger historical ledgers remain packaged
+  but heart-failure rows are not current evidence;
 - all 2,448 historical monotone policy rows, retained as evaluator
   smoke/sensitivity evidence rather than the primary policy benchmark;
-- 10,368 repeated-dataset coverage rows and 1,728 revised OPE dispositions,
-  plus all 16,128 historical reference/task-matched diagnostic tuples;
+- 7,776 current repeated-dataset coverage rows and 1,296 current OPE
+  dispositions, plus separately labeled historical full and reference/task-
+  matched diagnostic ledgers;
 - the 16-row EHR-to-known-value model-family bridge and all contract mappings;
 - a source-verified representative literature landscape;
 - the anonymous manuscript source and compiled PDF;
@@ -43,6 +51,13 @@ machine-local default paths with explicit portable placeholders.
 
 No MIMIC-IV rows, identifiers, split membership, exact timestamps,
 trajectories, row-level predictions, or checkpoints are included.
+
+The frozen final targets are sepsis 22,437 subjects/27,236 episodes,
+respiratory 18,709/21,679, shock 37,015/49,495, AF/flutter 11,820/14,580,
+AKI 16,380/21,083, and heart failure 27,611/32,552. Sepsis, AF/flutter, and
+heart failure require complete large-lineage reevaluation before their numeric
+results can re-enter the primary manuscript; metrics from the smaller
+constructions are not transferred.
 
 ## Clean-room quick start
 

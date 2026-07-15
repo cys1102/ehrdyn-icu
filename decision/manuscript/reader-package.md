@@ -10,7 +10,7 @@ confidence: high
 
 # Final manuscript package
 
-This directory is the canonical reader-facing manuscript package. It combines the frozen six-task P/R/T component synthesis, heterogeneous exact-finite policy benchmark, historical adaptive/monotone sensitivities, repeated-dataset OPE audit, and EHR-to-known-value diagnostic bridge through 2026-07-15. Internal experiment identifiers are excluded from `manuscript.tex` and retained in `provenance-manifest.csv` and `number-audit.csv`.
+This directory is the reader-facing manuscript package. It freezes six cohort targets above 10,000 subjects and 10,000 episodes, reports the complete current P/R/T component synthesis for the three unchanged lineages, and marks sepsis, AF/flutter, and heart-failure small-lineage results as superseded pending full reruns. It also contains the current exact-finite policy benchmark, historical sensitivities, repeated-dataset OPE audit, and EHR-to-known-value diagnostic bridge through 2026-07-15. Internal experiment identifiers are excluded from `manuscript.tex` and retained in `provenance-manifest.csv` and `number-audit.csv`.
 
 Contents:
 
@@ -18,7 +18,7 @@ Contents:
 - `benchmark-card.md`: scope, tasks, roles, metrics, and use boundaries.
 - `contracts.md`: cohort, feature, action, reward, timing, and split contracts.
 - `estimator-planner-cards.md`: planner, policy, probability, and OPE contracts.
-- `tables/` and `figures/`: sanitized aggregate publication surfaces, including all 36 cohort--transition-method rows, all 4,080 heterogeneous policy--seed rows, all 2,880 heterogeneous world-model--planner rows, historical adaptive/monotone sensitivities, 10,368 repeated-coverage rows, 1,728 revised OPE dispositions, and bridge coefficients.
+- `tables/` and `figures/`: sanitized aggregate publication surfaces. Files prefixed `current_scale_qualified_` contain the primary three-cohort view: all 18 transition method--cohort rows, 3,060 heterogeneous policy--seed rows, 2,160 component-model--planner rows, 7,776 repeated-coverage rows, and 1,296 revised OPE dispositions. The complete prior six-task ledger remains available with superseded rows explicitly separated.
 - `number-audit.csv`: every reported manuscript number with source, estimator, split, and uncertainty method.
 - `provenance-manifest.csv`: internal source IDs, immutable commits, and hashes.
 - `reproducibility.md`, `environment-manifest.md`, and `credentialed-reconstruction.md`: rebuild instructions and data-access boundary.
