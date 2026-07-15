@@ -27,8 +27,12 @@ ALLOWLIST = {
     "figures/cohort_evaluability_roles.pdf": "decision/figures/cohort_evaluability_roles.pdf",
     "figures/cohort_evaluability_roles.png": "decision/figures/cohort_evaluability_roles.png",
     "tables/cohort_scale.csv": "decision/evidence/cohort_scale.csv",
+    "tables/baseline_method_inventory.csv": "decision/evidence/baseline_method_inventory.csv",
+    "tables/baseline_surface_atlas.csv": "decision/evidence/baseline_surface_atlas.csv",
+    "tables/all_baseline_transition_leaders.csv": "decision/evidence/all_baseline_transition_leaders.csv",
     "tables/cross_cohort_evaluation_layers.csv": "decision/evidence/cross_cohort_evaluation_layers.csv",
     "tables/factual_action_information_primary.csv": "decision/evidence/factual_action_information_primary.csv",
+    "tables/cohort_uncertainty_leaders.csv": "decision/evidence/cohort_uncertainty_leaders.csv",
     "tables/world_model_fidelity_summary.csv": "decision/evidence/world_model_fidelity_summary.csv",
     "tables/world_model_uncertainty_summary.csv": "decision/evidence/world_model_uncertainty_summary.csv",
     "tables/world_model_recursive_horizon_metrics.csv": "decision/evidence/world_model_recursive_horizon_metrics.csv",
@@ -113,7 +117,9 @@ def main() -> None:
     manifest = ROOT / "decision/evidence/manifest.csv"
     manifest.parent.mkdir(parents=True, exist_ok=True)
     with manifest.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(manifest_rows[0]))
+        writer = csv.DictWriter(
+            handle, fieldnames=list(manifest_rows[0]), lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(manifest_rows)
 
@@ -141,7 +147,9 @@ def main() -> None:
         )
     source_manifest = ROOT / "decision/reference_code/source_manifest.csv"
     with source_manifest.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(source_rows[0]))
+        writer = csv.DictWriter(
+            handle, fieldnames=list(source_rows[0]), lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(source_rows)
 

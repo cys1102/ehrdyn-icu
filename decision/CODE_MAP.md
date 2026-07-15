@@ -16,6 +16,8 @@
 | Portable planner/CRN smoke | `src/kdd2027_benchmark/decision/known_value.py` | executable clean-room implementation |
 | IS/WIS/PDIS/WPDIS formulas | `src/kdd2027_benchmark/decision/ope.py` | executable clean-room implementation |
 | Evidence and contract validation | `src/kdd2027_benchmark/decision/contract.py` | executable release validator |
+| Cross-layer baseline inventory and point-leader atlas | `decision/evidence/baseline_method_inventory.csv` and `baseline_surface_atlas.csv` | complete aggregate method identities and layer-specific outcomes |
+| Cohort-level transition and uncertainty leaders | `decision/evidence/all_baseline_transition_leaders.csv` and `cohort_uncertainty_leaders.csv` | source-derived six-cohort summaries |
 | Complete paper result rows | `decision/evidence/` | hash-verified aggregate evidence |
 
 The byte-identical source hashes are recorded in

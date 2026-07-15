@@ -56,6 +56,8 @@ Transition accuracy is a validity layer, not the benchmark endpoint. Retrospecti
 
 ## Machine-readable audit surfaces
 
+- Complete layer-specific inventory: six transition methods, five uncertainty-capable methods, 34 policy/planner labels, and nine OPE estimators.
+- Cross-layer baseline atlas plus cohort-specific one-step, final-horizon, CRPS, MACE, and recursive-coverage leaders.
 - Fixed primary factual-action estimand and per-row episode-bootstrap interval counts.
 - Task-balanced one-step and recursive uncertainty summary.
 - All 2,448 known-value policy rows with paired Monte Carlo SE.

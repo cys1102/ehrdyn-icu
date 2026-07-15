@@ -13,6 +13,10 @@ older lineages is relabeled as a decision-benchmark result.
 - six EHR world-model task contracts;
 - four known-value policy-evaluation extensions (respiratory, shock,
   AKI--RRT, and heart failure);
+- the complete layer-specific inventory of six transition methods, five
+  uncertainty-capable methods, 34 policy/planner labels, and nine OPE
+  estimators;
+- a cross-layer baseline atlas and cohort-specific uncertainty leader table;
 - all 2,448 aggregate known-value policy rows used by the paper;
 - all 16,128 reference and task-matched OPE tuple metrics and dispositions;
 - the anonymous manuscript source and compiled PDF;

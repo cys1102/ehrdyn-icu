@@ -1,27 +1,28 @@
 manuscript_token,reported_value,manuscript_location,source_artifact,source_filter,estimator_or_metric,split_or_surface,uncertainty_method
 sepsis_subjects,3391,task scale table,cohort_scale.csv,cohort=sepsis,eligible subject count,subject-disjoint development train plus validation,not applicable
-sepsis_transitions,34245,task scale table,cohort_scale.csv,cohort=sepsis,materialized transition count,subject-disjoint development train plus validation,not applicable
+sepsis_known_value_scenarios,0,task scale table,cohort_scale.csv,cohort=sepsis,unique known-value response-regime x reward-variant contracts; methods and seeds excluded,known-value environments,not applicable
 sepsis_supported_actions,22,task scale table,cohort_scale.csv,cohort=sepsis,train-supported action-class count,development train,frozen support rule
 respiratory_subjects,18709,task scale table,cohort_scale.csv,cohort=respiratory,eligible subject count,development task materialization,not applicable
-respiratory_transitions,125246,task scale table,cohort_scale.csv,cohort=respiratory,materialized transition count,development task materialization,not applicable
+respiratory_known_value_scenarios,8,task scale table,cohort_scale.csv,cohort=respiratory,unique known-value response-regime x reward-variant contracts; methods and seeds excluded,known-value environments,not applicable
 respiratory_supported_actions,12,task scale table,cohort_scale.csv,cohort=respiratory,train-supported action-class count,development train,frozen support rule
 shock_subjects,37015,task scale table,cohort_scale.csv,cohort=shock,eligible subject count,development task materialization,not applicable
-shock_transitions,390341,task scale table,cohort_scale.csv,cohort=shock,materialized transition count,development task materialization,not applicable
+shock_known_value_scenarios,8,task scale table,cohort_scale.csv,cohort=shock,unique known-value response-regime x reward-variant contracts; methods and seeds excluded,known-value environments,not applicable
 shock_supported_actions,25,task scale table,cohort_scale.csv,cohort=shock,train-supported action-class count,development train,frozen support rule
 af_flutter_subjects,2551,task scale table,cohort_scale.csv,cohort=af flutter,eligible subject count,development task materialization,not applicable
-af_flutter_transitions,33836,task scale table,cohort_scale.csv,cohort=af flutter,materialized transition count,development task materialization,not applicable
+af_flutter_known_value_scenarios,0,task scale table,cohort_scale.csv,cohort=af flutter,unique known-value response-regime x reward-variant contracts; methods and seeds excluded,known-value environments,not applicable
 af_flutter_supported_actions,16,task scale table,cohort_scale.csv,cohort=af flutter,train-supported action-class count,development train,frozen support rule
 aki_subjects,16380,task scale table,cohort_scale.csv,cohort=aki,eligible subject count,development task materialization,not applicable
-aki_transitions,181311,task scale table,cohort_scale.csv,cohort=aki,materialized transition count,development task materialization,not applicable
+aki_known_value_scenarios,4,task scale table,cohort_scale.csv,cohort=aki,unique known-value response-regime x reward-variant contracts; methods and seeds excluded,known-value environments,not applicable
 aki_supported_actions,4,task scale table,cohort_scale.csv,cohort=aki,train-supported action-class count,development train,frozen support rule
 heart_failure_subjects,2378,task scale table,cohort_scale.csv,cohort=heart failure,eligible subject count,development task materialization,not applicable
-heart_failure_transitions,32198,task scale table,cohort_scale.csv,cohort=heart failure,materialized transition count,development task materialization,not applicable
+heart_failure_known_value_scenarios,4,task scale table,cohort_scale.csv,cohort=heart failure,unique known-value response-regime x reward-variant contracts; methods and seeds excluded,known-value environments,not applicable
 heart_failure_supported_actions,2,task scale table,cohort_scale.csv,cohort=heart failure,train-supported action-class count,development train,frozen support rule
 respiratory_action_dimension,25,task scale table,cohort_scale.csv,cohort=respiratory,frozen action dimension,development task contract,not applicable
 shock_action_dimension,25,task scale table,cohort_scale.csv,cohort=shock,frozen action dimension,development task contract,not applicable
 af_flutter_action_dimension,25,task scale table,cohort_scale.csv,cohort=af flutter,frozen action dimension,development task contract,not applicable
 tasks_total,6,abstract; contributions; results,cohort_policy_evaluability_axes.csv,all rows,row count,development roles,not applicable
 known_value_policy_extension_tasks,4,task contracts; cross-cohort evaluability,cross_cohort_evaluation_layers.csv,known_value_policy_rows>0,row count,known-value environments,not applicable
+known_value_scenarios_total,24,task table; baseline atlas,cohort_scale.csv,all rows,sum of unique response-regime x reward-variant contracts; methods and seeds excluded,known-value environments,not applicable
 world_model_only_tasks,1,task contracts; cross-cohort evaluability,cross_cohort_evaluation_layers.csv,evaluation_role=world-model only,row count,development roles,not applicable
 decision_interval_hours,4,methods; sepsis reference,sepsis_reference_fidelity_table.csv,dimension=decision_interval,frozen contract parameter,development roles,not applicable
 action_interval_hours,4,methods,sepsis_reference_fidelity_table.csv,dimension=action_interval,frozen contract parameter,development roles,not applicable
@@ -36,9 +37,13 @@ planner_horizons,1/4/8,abstract; planner methods,claim_evidence_matrix.csv,claim
 cem_iterations,3,planner methods,claim_evidence_matrix.csv,claim=planner_factorial; linked evaluator receipt,categorical CEM iterations,known-value environments,not applicable
 cem_candidate_sequences,64,planner methods,claim_evidence_matrix.csv,claim=planner_factorial; linked evaluator receipt,fixed candidate count,known-value environments,not applicable
 world_model_families,4,abstract; results,world_model_planner_bridge_table.csv,distinct method,distinct count,development validation,three-seed aggregate; no synthesis CI
+transition_methods_full_inventory,6,abstract; baseline atlas,baseline_method_inventory.csv,evaluation_layer=transition,distinct transition method count,development validation,executed-seed means within task and method
+probabilistic_methods_full_inventory,5,baseline atlas; cohort uncertainty,baseline_method_inventory.csv,evaluation_layer=uncertainty,distinct probabilistic method count,development validation,executed-seed means within task and method
 world_model_bridge_rows,24,results,world_model_planner_bridge_table.csv,all rows,row count,development validation,three-seed aggregate; no synthesis CI
 transformer_best_one_step,6/6,world-model results,world_model_planner_bridge_table.csv,minimum one-step error within each cohort,cohort win count,development validation,three-seed aggregate; no synthesis CI
-ensemble_best_recursive,6/6,world-model results,world_model_planner_bridge_table.csv,minimum recursive error within each cohort,cohort win count,development validation,three-seed aggregate; no synthesis CI
+ensemble_best_recursive_core_world_models,6/6,world-model results,world_model_planner_bridge_table.csv,minimum final-horizon recursive error among four core world models within each cohort,cohort win count,development validation,three-seed aggregate; no synthesis CI
+ensemble_best_recursive_full_inventory,5/6,abstract; baseline atlas,all_baseline_transition_leaders.csv,evaluation_mode=final_recursive_horizon; leader=Gaussian ensemble,cohort win count across six transition methods,development validation,executed-seed means within task and method
+persistence_best_recursive_full_inventory,1/6,abstract; baseline atlas,all_baseline_transition_leaders.csv,evaluation_mode=final_recursive_horizon; leader=Persistence/LOCF,cohort win count across six transition methods,development validation,executed-seed means within task and method
 one_step_error_min,0.669,results,world_model_planner_bridge_table.csv,all rows,minimum normalized observed-cell RMSE rounded to 3 decimals,development validation,three-seed aggregate; no synthesis CI
 one_step_error_max,0.773,results,world_model_planner_bridge_table.csv,all rows,maximum normalized observed-cell RMSE rounded to 3 decimals,development validation,three-seed aggregate; no synthesis CI
 rollout_error_min,0.901,results,world_model_planner_bridge_table.csv,all rows,minimum normalized recursive RMSE rounded to 3 decimals,development validation,three-seed aggregate; no synthesis CI
@@ -47,6 +52,7 @@ action_delta_min,0.0001,results,factual_action_information_primary.csv,all cohor
 action_delta_max,0.0023,results,factual_action_information_primary.csv,all cohorts; fixed primary estimand,maximum cohort mean matched-shuffle minus observed-action RMSE,development validation,episode-cluster intervals retained per model-seed row
 termination_baseline_advantage,18/18,results,retrospective_policy_diagnostics.csv,diagnostic_family=termination_baseline,Brier comparison count,development roles,not applicable
 known_value_policy_labels,34,known-value results,known_value_model_based_vs_model_free.csv,respiratory and shock retained labels,distinct policy/planner labels per cohort,known-value environment,policy-level paired uncertainty retained in source
+known_value_policy_rows_full_inventory,2448,baseline atlas; reproducibility,known_value_reference_full_matrix.csv plus known_value_task_extension_full_matrix.csv,all rows,method-seed-scenario row count,known-value environments,policy-level paired uncertainty retained in source
 respiratory_model_based_rows,24,known-value results,known_value_model_based_vs_model_free.csv,moderate + primary reward + world_model_planner,fixed method-row count,known-value environment,policy-level paired uncertainty retained in source
 respiratory_model_free_rows,5,known-value results,known_value_model_based_vs_model_free.csv,moderate + primary reward + model_free,fixed method-row count,known-value environment,policy-level paired uncertainty retained in source
 respiratory_max_supported_delta,0.0673,abstract; known-value results,known_value_model_based_vs_model_free.csv,respiratory + moderate + primary reward + maximum_supported_action,mean behavior-relative true return,known-value environment,mean across three paired evaluation seeds
@@ -61,6 +67,9 @@ tier1_approved,32,abstract; OPE results,ope_validation_and_disposition.csv,tier=
 tier2_approved,0/3456,abstract; OPE results,ope_validation_and_disposition.csv,tier starts tier2,approved/evaluated exact tuples,EHR-calibrated semi-synthetic,frozen pass/fail gates
 aki_task_matched_tier2_approved,236/1728,abstract; OPE results; cross-cohort evaluability,task_matched_ope_authorization.csv,task=aki_rrt,approved/evaluated exact tuples,AKI task-matched semi-synthetic,frozen pass/fail gates
 heart_failure_task_matched_tier2_approved,0/2880,abstract; OPE results; cross-cohort evaluability,task_matched_ope_authorization.csv,task=heart_failure,approved/evaluated exact tuples,heart-failure task-matched semi-synthetic,frozen pass/fail gates
+ope_estimators_full_inventory,9,baseline atlas; OPE methods,baseline_method_inventory.csv,evaluation_layer=ope,distinct estimator count,known-value environments,frozen estimator contracts
+ope_tuple_rows_full_inventory,16128,baseline atlas; reproducibility,ope_reference_all_tuple_metrics.csv plus ope_task_matched_all_tuple_metrics.csv,all rows,known-value estimator-contract tuple row count,known-value environments,frozen tuple-level gates
+aki_task_matched_tier1_approved,228/1728,baseline atlas; OPE results,ope_task_matched_all_tuple_metrics.csv,task=aki_rrt; tier=tier1_exact_finite,approved/evaluated exact tuples,AKI exact finite,frozen pass/fail gates
 retrospective_ope_approved,0,abstract; OPE results,ope_validation_and_disposition.csv,tier=retrospective_real_EHR,approved exact tuples,development EHR roles,non-execution
 respiratory_exploitation_rows,72,prediction-to-policy results,retrospective_policy_diagnostics.csv,diagnostic_family=known_value_model_exploitation; cohort=respiratory,world-model-planner row count,known-value environment,not applicable
 shock_exploitation_rows,72,prediction-to-policy results,retrospective_policy_diagnostics.csv,diagnostic_family=known_value_model_exploitation; cohort=shock,world-model-planner row count,known-value environment,not applicable
@@ -109,6 +118,36 @@ transformer_world_model_recursive_coverage90,0.7098,world-model uncertainty resu
 transformer_world_model_recursive_width90,2.7843,world-model uncertainty results,world_model_uncertainty_summary.csv,method=transformer_world_model; evaluation_mode=recursive,task-balanced mean width90,development validation,"average executed seeds within task, then average six tasks"
 transformer_world_model_recursive_crps,0.8387,world-model uncertainty results,world_model_uncertainty_summary.csv,method=transformer_world_model; evaluation_mode=recursive,task-balanced mean crps,development validation,"average executed seeds within task, then average six tasks"
 transformer_world_model_recursive_mean_absolute_coverage_error,0.1638,world-model uncertainty results,world_model_uncertainty_summary.csv,method=transformer_world_model; evaluation_mode=recursive,task-balanced mean mean_absolute_coverage_error,development validation,"average executed seeds within task, then average six tasks"
+sepsis_one_step_crps,0.3335,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=sepsis,Gaussian ensemble,development validation,mean across executed seeds within cohort and method
+sepsis_recursive_crps,0.4519,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=sepsis,Gaussian ensemble,development validation,mean across executed seeds within cohort and method
+sepsis_recursive_mace,0.0163,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=sepsis,GRU-D,development validation,mean across executed seeds within cohort and method
+sepsis_recursive_coverage90_min,0.6230,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=sepsis,minimum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+sepsis_recursive_coverage90_max,0.9408,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=sepsis,maximum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+respiratory_one_step_crps,0.3444,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=respiratory,Transformer,development validation,mean across executed seeds within cohort and method
+respiratory_recursive_crps,0.4580,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=respiratory,Gaussian ensemble,development validation,mean across executed seeds within cohort and method
+respiratory_recursive_mace,0.0304,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=respiratory,GRU-D,development validation,mean across executed seeds within cohort and method
+respiratory_recursive_coverage90_min,0.7683,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=respiratory,minimum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+respiratory_recursive_coverage90_max,0.9346,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=respiratory,maximum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+shock_one_step_crps,0.3474,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=shock,Transformer,development validation,mean across executed seeds within cohort and method
+shock_recursive_crps,0.4698,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=shock,Gaussian ensemble,development validation,mean across executed seeds within cohort and method
+shock_recursive_mace,0.0154,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=shock,GRU-D,development validation,mean across executed seeds within cohort and method
+shock_recursive_coverage90_min,0.7654,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=shock,minimum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+shock_recursive_coverage90_max,0.9260,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=shock,maximum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+af_flutter_one_step_crps,0.3400,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=af flutter,Transformer,development validation,mean across executed seeds within cohort and method
+af_flutter_recursive_crps,0.4579,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=af flutter,Gaussian ensemble,development validation,mean across executed seeds within cohort and method
+af_flutter_recursive_mace,0.0289,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=af flutter,GRU-D,development validation,mean across executed seeds within cohort and method
+af_flutter_recursive_coverage90_min,0.7163,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=af flutter,minimum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+af_flutter_recursive_coverage90_max,0.9411,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=af flutter,maximum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+aki_one_step_crps,0.3269,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=aki,Transformer,development validation,mean across executed seeds within cohort and method
+aki_recursive_crps,0.4583,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=aki,Gaussian ensemble,development validation,mean across executed seeds within cohort and method
+aki_recursive_mace,0.0227,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=aki,GRU-D,development validation,mean across executed seeds within cohort and method
+aki_recursive_coverage90_min,0.7283,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=aki,minimum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+aki_recursive_coverage90_max,0.9428,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=aki,maximum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+heart_failure_one_step_crps,0.3300,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=heart failure,Transformer,development validation,mean across executed seeds within cohort and method
+heart_failure_recursive_crps,0.4497,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=heart failure,Gaussian ensemble,development validation,mean across executed seeds within cohort and method
+heart_failure_recursive_mace,0.0254,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=heart failure,GRU-D,development validation,mean across executed seeds within cohort and method
+heart_failure_recursive_coverage90_min,0.6571,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=heart failure,minimum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
+heart_failure_recursive_coverage90_max,0.9343,cohort uncertainty table,cohort_uncertainty_leaders.csv,cohort=heart failure,maximum across five probabilistic methods,development validation,mean across executed seeds within cohort and method
 respiratory_maximum_supported_action_moderate_primary_delta,0.0673,known-value policy results,known_value_balanced_core.csv,task=respiratory; method=maximum_supported_action,mean behavior-relative true-return difference,moderate primary known-value environment,three common-random-number paired evaluation seeds; mean paired SE reported separately
 respiratory_behavior_cloning_moderate_primary_delta,0.0018,known-value policy results,known_value_balanced_core.csv,task=respiratory; method=behavior_cloning,mean behavior-relative true-return difference,moderate primary known-value environment,three common-random-number paired evaluation seeds; mean paired SE reported separately
 respiratory_decision_transformer_adapter_moderate_primary_delta,0.0004,known-value policy results,known_value_balanced_core.csv,task=respiratory; method=decision_transformer_adapter,mean behavior-relative true-return difference,moderate primary known-value environment,three common-random-number paired evaluation seeds; mean paired SE reported separately

@@ -1,0 +1,55 @@
+evaluation_layer,method_group,method,display_method,inventory_unit
+transition,world_model,dreamer_v3_categorical_rssm,categorical RSSM,method identity within evaluation layer; repeated architectures across layers are intentional
+transition,world_model,gaussian_transition_ensemble,Gaussian ensemble,method identity within evaluation layer; repeated architectures across layers are intentional
+transition,world_model,grud_world_model,GRU-D,method identity within evaluation layer; repeated architectures across layers are intentional
+transition,control,hgb_residual,HGB residual,method identity within evaluation layer; repeated architectures across layers are intentional
+transition,control,persistence_locf,Persistence/LOCF,method identity within evaluation layer; repeated architectures across layers are intentional
+transition,world_model,transformer_world_model,Transformer,method identity within evaluation layer; repeated architectures across layers are intentional
+uncertainty,world_model,dreamer_v3_categorical_rssm,categorical RSSM,method identity within evaluation layer; repeated architectures across layers are intentional
+uncertainty,world_model,gaussian_transition_ensemble,Gaussian ensemble,method identity within evaluation layer; repeated architectures across layers are intentional
+uncertainty,world_model,grud_world_model,GRU-D,method identity within evaluation layer; repeated architectures across layers are intentional
+uncertainty,control,hgb_residual,HGB residual,method identity within evaluation layer; repeated architectures across layers are intentional
+uncertainty,world_model,transformer_world_model,Transformer,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,model_free,behavior_cloning,behavior cloning,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,model_free,discrete_bcq,discrete bcq,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,model_free,discrete_cql,discrete cql,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,model_free,soft_spibb,soft spibb,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,model_free,decision_transformer_adapter,decision transformer adapter,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,control,empirical_behavior,empirical behavior,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,control,random_supported,random supported,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,control,minimum_supported_action,minimum supported action,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,control,maximum_supported_action,maximum supported action,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,control,severity_rule,severity rule,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,grud_world_model__H1_exhaustive__support_constrained,grud world model  H1 exhaustive  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,grud_world_model__H1_exhaustive__support_and_uncertainty_penalized,grud world model  H1 exhaustive  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,grud_world_model__H4_categorical_CEM__support_constrained,grud world model  H4 categorical CEM  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,grud_world_model__H4_categorical_CEM__support_and_uncertainty_penalized,grud world model  H4 categorical CEM  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,grud_world_model__H8_categorical_CEM__support_constrained,grud world model  H8 categorical CEM  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,grud_world_model__H8_categorical_CEM__support_and_uncertainty_penalized,grud world model  H8 categorical CEM  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,transformer_world_model__H1_exhaustive__support_constrained,transformer world model  H1 exhaustive  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,transformer_world_model__H1_exhaustive__support_and_uncertainty_penalized,transformer world model  H1 exhaustive  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,transformer_world_model__H4_categorical_CEM__support_constrained,transformer world model  H4 categorical CEM  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,transformer_world_model__H4_categorical_CEM__support_and_uncertainty_penalized,transformer world model  H4 categorical CEM  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,transformer_world_model__H8_categorical_CEM__support_constrained,transformer world model  H8 categorical CEM  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,transformer_world_model__H8_categorical_CEM__support_and_uncertainty_penalized,transformer world model  H8 categorical CEM  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,dreamer_v3_categorical_rssm__H1_exhaustive__support_constrained,dreamer v3 categorical rssm  H1 exhaustive  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,dreamer_v3_categorical_rssm__H1_exhaustive__support_and_uncertainty_penalized,dreamer v3 categorical rssm  H1 exhaustive  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,dreamer_v3_categorical_rssm__H4_categorical_CEM__support_constrained,dreamer v3 categorical rssm  H4 categorical CEM  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,dreamer_v3_categorical_rssm__H4_categorical_CEM__support_and_uncertainty_penalized,dreamer v3 categorical rssm  H4 categorical CEM  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,dreamer_v3_categorical_rssm__H8_categorical_CEM__support_constrained,dreamer v3 categorical rssm  H8 categorical CEM  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,dreamer_v3_categorical_rssm__H8_categorical_CEM__support_and_uncertainty_penalized,dreamer v3 categorical rssm  H8 categorical CEM  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,gaussian_recurrent_ensemble__H1_exhaustive__support_constrained,gaussian recurrent ensemble  H1 exhaustive  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,gaussian_recurrent_ensemble__H1_exhaustive__support_and_uncertainty_penalized,gaussian recurrent ensemble  H1 exhaustive  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,gaussian_recurrent_ensemble__H4_categorical_CEM__support_constrained,gaussian recurrent ensemble  H4 categorical CEM  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,gaussian_recurrent_ensemble__H4_categorical_CEM__support_and_uncertainty_penalized,gaussian recurrent ensemble  H4 categorical CEM  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,gaussian_recurrent_ensemble__H8_categorical_CEM__support_constrained,gaussian recurrent ensemble  H8 categorical CEM  support constrained,method identity within evaluation layer; repeated architectures across layers are intentional
+known_value_policy,world_model_planner,gaussian_recurrent_ensemble__H8_categorical_CEM__support_and_uncertainty_penalized,gaussian recurrent ensemble  H8 categorical CEM  support and uncertainty penalized,method identity within evaluation layer; repeated architectures across layers are intentional
+ope,estimator,CWPDIS,CWPDIS,method identity within evaluation layer; repeated architectures across layers are intentional
+ope,estimator,DR,DR,method identity within evaluation layer; repeated architectures across layers are intentional
+ope,estimator,FQE,FQE,method identity within evaluation layer; repeated architectures across layers are intentional
+ope,estimator,IS,IS,method identity within evaluation layer; repeated architectures across layers are intentional
+ope,estimator,PDIS,PDIS,method identity within evaluation layer; repeated architectures across layers are intentional
+ope,estimator,WDR,WDR,method identity within evaluation layer; repeated architectures across layers are intentional
+ope,estimator,WIS,WIS,method identity within evaluation layer; repeated architectures across layers are intentional
+ope,estimator,WPDIS,WPDIS,method identity within evaluation layer; repeated architectures across layers are intentional
+ope,estimator,support_restricted_WPDIS,support restricted WPDIS,method identity within evaluation layer; repeated architectures across layers are intentional

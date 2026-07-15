@@ -25,7 +25,7 @@
 \begin{document}
 
 \begin{abstract}
-Electronic health record (EHR) world models are increasingly connected to offline reinforcement learning (RL), yet comparisons can be driven by incompatible tasks, action support, rewards, or evaluator assumptions rather than algorithmic differences. We introduce a development benchmark that standardizes these layers across six ICU task constructions and connects four world-model families, one-, four-, and eight-step planners, five model-free offline-RL methods, fixed controls, known-value truth, and off-policy evaluation (OPE). The Transformer has the lowest one-step error on all six tasks, whereas the Gaussian ensemble has the lowest recursive error on all six; probabilistic rankings also change under recursion. Known-value policy comparison covers respiratory, shock, AKI--RRT, and heart-failure extensions. In moderate regimes, fixed extreme-action controls lead all four tasks---maximum supported action for respiratory, shock, and heart failure, but minimum supported action for AKI---while world-model planners are tied or narrowly separated. OPE authorization is task-specific: a shared aggregate-calibrated evaluator approves 0 of 3,456 tuples, an AKI-matched evaluator approves 236 of 1,728, and a heart-failure-matched evaluator approves 0 of 2,880. Even the AKI tuples do not authorize retrospective scoring because trained target-policy and post-training overlap gates are incomplete. We report no retrospective EHR policy value or winner. The contribution is an executable technical scaffold and failure decomposition from forecasting through policy-evaluation authorization.
+Electronic health record (EHR) world models are increasingly connected to offline reinforcement learning (RL), yet comparisons can be driven by incompatible tasks, action support, rewards, or evaluator assumptions rather than algorithmic differences. We introduce a development benchmark that standardizes these layers across six ICU task constructions and evaluates six transition methods, five uncertainty-capable methods, 34 fixed policy/planner labels, and nine off-policy evaluation (OPE) estimators. No method is a global winner: the Transformer has the lowest one-step error on all six tasks, whereas final-horizon error is led by the Gaussian ensemble on five and persistence/LOCF on one; recursive CRPS is led by the ensemble on all six, while recursive calibration error is led by GRU-D on all six. Known-value policy comparison covers respiratory, shock, AKI--RRT, and heart-failure extensions. In moderate regimes, fixed extreme-action controls lead all four tasks---maximum supported action for respiratory, shock, and heart failure, but minimum supported action for AKI---while world-model planners are tied or narrowly separated. OPE authorization is task-specific: a shared aggregate-calibrated evaluator approves 0 of 3,456 tuples, an AKI-matched evaluator approves 236 of 1,728, and a heart-failure-matched evaluator approves 0 of 2,880. Even the AKI tuples do not authorize retrospective scoring because trained target-policy and post-training overlap gates are incomplete. We report no retrospective EHR policy value or winner. The contribution is an executable technical scaffold and failure decomposition from forecasting through policy-evaluation authorization.
 \end{abstract}
 
 \keywords{electronic health records, world models, offline reinforcement learning, benchmark, off-policy evaluation, uncertainty}
@@ -70,6 +70,8 @@ x_t=[v_t,m_t,\delta_t,c,a_{t-1}],\qquad y_t=v_{t+1},
 \end{equation}
 where $v_t$ is the pre-action value vector, $m_t$ its observation mask, $\delta_t$ feature-wise recency, $c$ static/pre-anchor context, and $a_{t-1}$ the previous action abstraction. Current action, post-action measurements, future masks, post-outcome fields, and whole-stay diagnosis proxies are prohibited from $x_t$. The logged action $a_t$ summarizes recorded exposure or settings over $[t,t+4\mathrm{h})$; $y_t$ begins at $t+4\mathrm{h}$. Every evaluated bin remains inside one ICU stay.
 
+Throughout, $K=|\mathcal A|$ denotes the number of discrete action classes, not the number of observed transitions or treatment dimensions.
+
 The interval label is deliberately called a \emph{recorded-exposure action}: it can include adaptation during the interval and is not asserted to be fully assignable at its start. It is valid for logged-action-conditioned forecasting and retrospective policy-behavior diagnostics. In the known-value environments, by contrast, $a_t$ is an assignable intervention in the constructed transition kernel. This distinction prevents the real-EHR label from inheriting the stronger semantics of the simulator action.
 
 Imputation, normalization, action cutpoints, support masks, feature selection, behavior denominators, hyperparameters, and checkpoints are fitted or selected on development train/validation roles only. The roles are subject disjoint, but historical use of the available evaluation roles precludes calling any role a new confirmatory holdout. No row is used to claim a confirmatory best method.
@@ -82,7 +84,7 @@ The matched feature/reward/denominator comparison did not support choosing a pre
 
 \subsection{Task-specific extensions}
 
-Table~\ref{tab:tasks} summarizes extension roles and aggregate scale. Counts are task-specific development materializations and should not be summed because subjects may satisfy more than one cohort definition. Respiratory uses observed PEEP quintile $\times$ observed FiO$_2$ quintile ($K=25$); a row is excluded when either setting is unavailable rather than mapped to no action. Its primary dense benchmark reward is
+Table~\ref{tab:tasks} summarizes extension roles and aggregate scale. Subject counts are task-specific development materializations and should not be summed because one subject may satisfy more than one cohort definition. A known-value scenario is one unique response-regime $\times$ reward-variant environment contract; method identities and random seeds are excluded from this count. Respiratory uses observed PEEP quintile $\times$ observed FiO$_2$ quintile ($K=25$); a row is excluded when either setting is unavailable rather than mapped to no action. Its primary dense benchmark reward is
 \begin{equation}
 \begin{aligned}
 r^{\mathrm{resp}}_t={}&\mathbb{1}[94\!\leq\!\mathrm{SpO}_{2,t+1}\!\leq\!98]
@@ -102,19 +104,19 @@ All are frozen post-action benchmark objectives rather than transferred sepsis s
 
 \begin{table*}[t]
 \centering
-\caption{Development task scale and evaluation layers. Transition counts and supported actions refer to the six EHR world-model tasks. AKI and heart failure use separate K2 and K8 decision-task extensions for known-value evaluation. No row has retrospective EHR policy value.}
+\caption{Development task scale and evaluation layers. ``Supported/$K$'' gives train-supported EHR action classes over the total discrete action space. Known-value scenarios count unique response-regime $\times$ reward-variant contracts, excluding methods and seeds. AKI and heart failure additionally use the explicitly named decision extensions below. No row has retrospective EHR policy value.}
 \label{tab:tasks}
 \scriptsize
-\begin{tabularx}{\textwidth}{lrrlXX}
+\begin{tabularx}{\textwidth}{lrrXXX}
 \toprule
-Cohort & Subjects & Transitions & Supported action & Benchmark role & Reward / value status \\
+Cohort & Subjects & KV scenarios & Action contract & Benchmark role & Reward / value status \\
 \midrule
-Sepsis & 3,391 & 34,245 & 22/25 fluid--vasopressor & Canonical reference & P/R/T plus support/collapse diagnostics \\
-Respiratory support & 18,709 & 125,246 & 12/25 PEEP--FiO$_2$ & Policy comparison & P/R/T plus known-value matrix \\
-Shock & 37,015 & 390,341 & 25/25 fluid--vasopressor & Policy comparison & P/R/T plus known-value matrix \\
-AF/flutter & 2,551 & 33,836 & 16/25 rate--rhythm & World-model only & P/T; action--reward ordering unresolved \\
-AKI & 16,380 & 181,311 & 4/4 compact context & WM + K2 extension & P/T plus task-matched known-value matrix \\
-Heart failure & 2,378 & 32,198 & 2/2 compact context & WM + K8 extension & P/T plus task-matched known-value matrix \\
+Sepsis & 3,391 & 0 & 22/25 fluid--vasopressor & Canonical reference & P/R/T plus support/collapse diagnostics \\
+Respiratory support & 18,709 & 8 & 12/25 PEEP--FiO$_2$ & Policy comparison & P/R/T plus known-value matrix \\
+Shock & 37,015 & 8 & 25/25 fluid--vasopressor & Policy comparison & P/R/T plus known-value matrix \\
+AF/flutter & 2,551 & 0 & 16/25 rate--rhythm & World-model only & P/T; action--reward ordering unresolved \\
+AKI & 16,380 & 4 & WM: 4/4 compact; decision: 2 wait/RRT & Decision extension & P/T plus task-matched known-value matrix \\
+Heart failure & 2,378 & 4 & WM: 2/2 compact; decision: 8 diuretic $\times$ vaso/inotrope & Decision extension & P/T plus task-matched known-value matrix \\
 \bottomrule
 \end{tabularx}
 \end{table*}
@@ -129,7 +131,7 @@ The evaluated component is
 \end{equation}
 not a complete generator of the future observation process. The core includes recurrent/GRU-D, causal Transformer, categorical recurrent state-space, and Gaussian recurrent ensemble models; persistence and histogram gradient boosting are sanity controls. Neural runs use seeds 3408/3411/3414, hidden dimension 48, latent dimension 16 where applicable, batch size 512, learning rate 0.002, and weight decay $10^{-4}$. Checkpoints minimize $0.7\,\mathrm{RMSE}+0.3\,\mathrm{MAE}$ on development validation after train-only fitting, with 8 minimum and 40 maximum epochs, patience 6, and one uniform 80-epoch extension when the frozen convergence trigger fires. The Gaussian ensemble combines the three recurrent members and is one derived row per task.
 
-One-step RMSE/MAE uses only observed target cells after train-fitted normalization. Recursive rollout starts from the first validation state, feeds each predicted value back, marks generated future values as unobserved, increments recency, and follows the logged action sequence for eleven four-hour steps. At each horizon, error is scored against cells observed at that step in the recorded target mask. The scalar recursive error is the unweighted mean of the 11 horizon-specific normalized observed-cell RMSE rows and available executed-seed rows for a method--cohort pair; all 924 horizon rows are released. Thus recursion tests value-state compounding under a fixed missingness convention; it does not claim to generate future measurement decisions. Reward heads are deterministic mappings from predicted state when available. Termination is evaluated natively, after train-only recalibration, and against a train empirical-hazard baseline.
+One-step RMSE/MAE uses only observed target cells after train-fitted normalization. Recursive rollout starts from the first validation state, feeds each predicted value back, marks generated future values as unobserved, increments recency, and follows the logged action sequence for eleven four-hour steps. At each horizon, error is scored against cells observed at that step in the recorded target mask. The scalar recursive error is the normalized observed-cell RMSE at the final executed horizon (step 11, 44 hours), averaged across available executed-seed rows for a method--cohort pair; all 924 horizon-resolved rows are released. Thus recursion tests value-state compounding under a fixed missingness convention; it does not claim to generate future measurement decisions. Reward heads are deterministic mappings from predicted state when available. Termination is evaluated natively, after train-only recalibration, and against a train empirical-hazard baseline.
 
 Uncertainty reporting includes Gaussian NLL/CRPS, coverage at 50, 80, 90, and 95\%, interval width and score, and risk--coverage. Factual action information uses one fixed primary estimand throughout: shuffled-action minus observed-action RMSE on reward-relevant targets within matched strata, averaged over the four core model families and executed seeds. Each model--seed contrast also carries a 500-replicate materialized-episode bootstrap interval. It is a predictive-information diagnostic.
 
@@ -153,47 +155,51 @@ The OPE matrix tests trajectory IS and WIS; per-decision IS, WPDIS, and CWPDIS; 
 
 \subsection{RQ1: World-model fidelity}
 
-All four world-model families provide P and T on all six cohorts; R is available for sepsis, respiratory support, and shock. Across the 24 method--cohort bridge rows, normalized one-step error ranges from 0.669 to 0.773 and recursive error from 0.901 to 3.268. Table~\ref{tab:fidelity} shows a systematic rank reversal: the Transformer is lowest one step in all six cohorts, while the Gaussian ensemble is lowest recursively in all six. Selecting by one-step error would therefore choose a different family from recursive rollout on every task. The comparison is descriptive: neural methods have three seeds, whereas the derived ensemble has one task-level row, and no subject-cluster leader interval is available.
+The full transition inventory comprises persistence/LOCF and HGB controls plus four world-model families. The Transformer has the lowest one-step RMSE on all six cohorts. At the final recursive horizon, the Gaussian ensemble leads five cohorts, while persistence/LOCF leads heart failure; when restricted to the four learned world-model families, the ensemble leads all six. Across the 24 core world-model--cohort bridge rows, normalized one-step error ranges from 0.669 to 0.773 and final-horizon error from 0.901 to 3.268. Thus the one-step selection reverses on every task. These are descriptive point leaders: neural methods have three seeds, the derived ensemble has one task-level row, and no subject-cluster leader interval is available.
 
-Under the reconciled primary action-information estimand, cohort means range from 0.0001 to 0.0023 (Table~\ref{tab:fidelity}). Episode-cluster intervals exclude zero in all 10 model--seed rows for respiratory, shock, and AKI; 2/10 for AF/flutter; and 0/10 for sepsis and heart failure. Statistical separation can coexist with negligible magnitude and does not repair a missing repeated-action contract. The empirical-hazard termination baseline has lower Brier score than native and recalibrated learned heads in all 18 comparable canonical-sepsis rows, so learned termination is a sensitivity rather than an unqualified planning component.
+Table~\ref{tab:baseline-atlas} consolidates every executed comparison layer. It shows a stronger conclusion than a single aggregate leaderboard: some methods dominate one frozen metric, but the identity of the leader changes across point prediction, probabilistic recursion, policy comparison, and evaluator authorization. The complete 54-row layer-specific method inventory and every granular result row are released.
 
 \begin{table*}[t]
 \centering
-\caption{World-model fidelity on development validation. Errors are normalized observed-cell RMSE. $\Delta_a$ is the fixed reward-relevant matched-shuffle minus observed-action RMSE mean; ``CI rows'' counts model--seed episode-bootstrap intervals excluding zero out of 10.}
-\label{tab:fidelity}
-\small
-\begin{tabular}{lclclc}
+\caption{End-to-end baseline and method atlas. CRPS and mean absolute coverage error (MACE) are minimized. A scenario is one response-regime $\times$ reward-variant contract; rows also vary method and seed. Point leaders are descriptive within a frozen layer and do not define a global cross-layer winner.}
+\label{tab:baseline-atlas}
+\scriptsize
+\begin{tabularx}{\textwidth}{llXXX}
 \toprule
-Cohort & Components & Best one-step & Error & Best recursive & Error / $\Delta_a$ / CI rows \\
+Layer & Metric & Evaluated inventory & Scope & Point-leader pattern \\
 \midrule
-Sepsis & P/R/T & Transformer & 0.669 & Gaussian ensemble & 0.926 / 0.0015 / 0 \\
-Respiratory support & P/R/T & Transformer & 0.695 & Gaussian ensemble & 0.972 / 0.0023 / 10 \\
-Shock & P/R/T & Transformer & 0.702 & Gaussian ensemble & 1.000 / 0.0022 / 10 \\
-AF/flutter & P/T & Transformer & 0.690 & Gaussian ensemble & 0.901 / 0.0008 / 2 \\
-AKI & P/T & Transformer & 0.670 & Gaussian ensemble & 0.935 / 0.0008 / 10 \\
-Heart failure & P/T & Transformer & 0.671 & Gaussian ensemble & 1.078 / 0.0001 / 0 \\
+Transition & One-step RMSE & LOCF, HGB, GRU-D, Transformer, RSSM, ensemble (6) & 6 EHR cohorts & Transformer 6/6 \\
+Transition & Final-horizon RMSE & Same six methods & 6 cohorts; step 11 (44 h) & Ensemble 5/6; LOCF 1/6 \\
+Uncertainty & One-step CRPS / MACE & HGB plus four probabilistic WMs (5); LOCF unavailable & 6 EHR cohorts & CRPS: Transformer 5/6, ensemble 1/6; MACE: Transformer 4/6, GRU-D 2/6 \\
+Uncertainty & Recursive CRPS / MACE & Same five probabilistic methods & 6 EHR cohorts & CRPS: ensemble 6/6; MACE: GRU-D 6/6 \\
+Policy & Paired true $\Delta_b$ & 5 controls + 5 model-free + 24 WM--planner labels (34) & 24 scenarios; 2,448 rows & Maximum-supported control 3/4; minimum-supported control 1/4 \\
+OPE & All-nine authorization & IS, WIS, PDIS, WPDIS, CWPDIS, DR, WDR, FQE, support-restricted WPDIS (9) & 16,128 contract tuples & 32/3,456 shared exact; 228/1,728 AKI exact; 236/1,728 AKI semi; 0/9,216 other; 0 EHR \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table*}
 
-Table~\ref{tab:uncertainty} shows that uncertainty rankings also depend on recursion. One-step 90\% coverage is 0.914--0.922 across the four core families. Recursively, the Transformer drops to 0.710 with CRPS 0.839, while the ensemble reaches 0.937 coverage with wider intervals (3.042). GRU-D has the smallest recursive absolute coverage error (0.023). Hence neither one-step point error nor one-step calibration identifies recursive probabilistic behavior.
+Under the fixed action-information estimand, cohort means range from 0.0001 to 0.0023 (Table~\ref{tab:uncertainty}). Episode-cluster intervals exclude zero in all 10 model--seed rows for respiratory, shock, and AKI; 2/10 for AF/flutter; and 0/10 for sepsis and heart failure. Statistical separation can coexist with negligible magnitude and does not repair a missing repeated-action contract. The empirical-hazard termination baseline has lower Brier score than native and recalibrated learned heads in all 18 comparable canonical-sepsis rows, so learned termination is a sensitivity rather than an unqualified planning component.
 
-\begin{table}[t]
+Uncertainty is also cohort- and metric-dependent. Across HGB and the four probabilistic world models, the one-step CRPS leader is the Transformer in five cohorts and the ensemble in sepsis. Under recursive rollout, the ensemble has the lowest CRPS in all six, whereas GRU-D has the lowest MACE in all six. The recursive 90\% coverage range is especially broad in sepsis (0.623--0.941) and heart failure (0.657--0.934). Hence neither one-step point error nor one-step uncertainty identifies recursive sharpness and calibration jointly.
+
+\begin{table*}[t]
 \centering
-\caption{Task-balanced uncertainty summary after averaging seeds within each of six tasks. Cov90 is 90\% coverage; Width90, CRPS, and MACE are recursive.}
+\caption{Cohort-specific uncertainty after averaging executed seeds within method and cohort. Parentheses give the minimized score. Cov90 is the range across five probabilistic methods. $\Delta_a$ is matched-shuffle minus observed-action RMSE on reward-relevant targets and is predictive, not causal.}
 \label{tab:uncertainty}
 \scriptsize
-\begin{tabular}{lrrrrr}
+\begin{tabularx}{\textwidth}{lrXXXX}
 \toprule
-Method & Cov90$_1$ & Cov90$_R$ & Width90$_R$ & CRPS$_R$ & MACE$_R$ \\
+Cohort & $\Delta_a$ & Lowest one-step CRPS & Lowest recursive CRPS & Lowest recursive MACE & Recursive Cov90 range \\
 \midrule
-GRU-D & 0.917 & 0.904 & 2.873 & 0.485 & 0.023 \\
-Transformer & 0.917 & 0.710 & 2.784 & 0.839 & 0.164 \\
-Gaussian ensemble & 0.922 & 0.937 & 3.042 & 0.458 & 0.056 \\
-Categorical RSSM & 0.914 & 0.795 & 2.267 & 0.527 & 0.088 \\
+Sepsis & 0.0015 & Ensemble (0.334) & Ensemble (0.452) & GRU-D (0.016) & [0.623, 0.941] \\
+Respiratory support & 0.0023 & Transformer (0.344) & Ensemble (0.458) & GRU-D (0.030) & [0.768, 0.935] \\
+Shock & 0.0022 & Transformer (0.347) & Ensemble (0.470) & GRU-D (0.015) & [0.765, 0.926] \\
+AF/flutter & 0.0008 & Transformer (0.340) & Ensemble (0.458) & GRU-D (0.029) & [0.716, 0.941] \\
+AKI & 0.0008 & Transformer (0.327) & Ensemble (0.458) & GRU-D (0.023) & [0.728, 0.943] \\
+Heart failure & 0.0001 & Transformer (0.330) & Ensemble (0.450) & GRU-D (0.025) & [0.657, 0.934] \\
 \bottomrule
-\end{tabular}
-\end{table}
+\end{tabularx}
+\end{table*}
 
 \subsection{RQ2: Known-value policy performance}
 
@@ -268,13 +274,13 @@ The common scaffold produces time-ordered transition tasks in all six cohorts, b
 
 Prediction quality is neither ignored nor treated as policy performance. The machine-readable bridge links one-step and recursive errors, reward error, termination calibration, factual action information, support error, model-exploitation gap, known-value return, and retrospective scoring status for every core world model. Four patterns are important.
 
-First, one-step rankings do not persist under recursive rollout: the Transformer-to-ensemble reversal occurs in all six cohorts. Second, the uncertainty table shows that point and probabilistic recursion can fail differently. Third, mean absolute learned-model-versus-true-return gaps are 1.079 across 72 respiratory planner rows and 2.344 across 72 shock rows, so simulated value cannot substitute for known truth. Finally, an extreme-action control leads every moderate known-value task, but the preferred extreme flips for AKI; together with H4 ties or narrow planner ranges, this shows that a positive planner return does not establish useful world-model discrimination. Exploratory prediction--policy correlations share environments and learned models and are not treated as independent evidence.
+First, one-step rankings do not persist under recursive rollout: the Transformer-to-ensemble reversal occurs in five cohorts and Transformer-to-LOCF in heart failure; among the four learned world models, the Transformer-to-ensemble reversal occurs in all six. Second, cohort-level uncertainty shows that recursive CRPS and recursive calibration select different methods. Third, mean absolute learned-model-versus-true-return gaps are 1.079 across 72 respiratory planner rows and 2.344 across 72 shock rows, so simulated value cannot substitute for known truth. Finally, an extreme-action control leads every moderate known-value task, but the preferred extreme flips for AKI; together with H4 ties or narrow planner ranges, this shows that a positive planner return does not establish useful world-model discrimination. Exploratory prediction--policy correlations share environments and learned models and are not treated as independent evidence.
 
 The resulting benchmark logic is compositional: a row may remain valid for P/R/T forecasting while failing planning discrimination, and a policy may remain valid for support/collapse analysis while failing value authorization. This prevents an upper-layer failure from erasing lower-layer evidence or a lower-layer success from silently authorizing a higher-layer claim.
 
 \section{Reproducibility and Access}
 
-The reader package includes a benchmark card; task, feature, action, reward, planner, model, and estimator cards; sanitized policy-level and tuple-level result tables; a number-to-source audit; immutable source hashes; environment manifest; build commands; and credentialed reconstruction instructions. It exposes all 2,448 known-value policy rows, all 16,128 OPE tuple metric/disposition rows, gate thresholds, and task-balanced uncertainty summaries rather than only headline aggregates. Code, contracts, synthetic fixtures, aggregate evidence, and clean-room commands are provided in the anonymous artifact at \url{https://anonymous.4open.science/r/ehrdyn-icu-65FB}. The source data are MIMIC-IV v3.1 \cite{johnson2023mimic}; access remains governed by PhysioNet credentialing and its data-use agreement. Raw EHR rows, identifiers, exact timestamps, trajectories, role-membership files, row-level predictions, tensors, and checkpoints are not redistributed.
+The reader package includes a benchmark card; task, feature, action, reward, planner, model, and estimator cards; sanitized policy-level and tuple-level result tables; a number-to-source audit; immutable source hashes; environment manifest; build commands; and credentialed reconstruction instructions. It exposes the 54 layer-specific method identities, all 2,448 known-value policy rows, all 16,128 OPE tuple metric/disposition rows, horizon-resolved transition results, cohort-specific uncertainty leaders, and gate thresholds rather than only headline aggregates. Code, contracts, synthetic fixtures, aggregate evidence, and clean-room commands are provided in the anonymous artifact at \url{https://anonymous.4open.science/r/ehrdyn-icu-65FB}. The source data are MIMIC-IV v3.1 \cite{johnson2023mimic}; access remains governed by PhysioNet credentialing and its data-use agreement. Raw EHR rows, identifiers, exact timestamps, trajectories, role-membership files, row-level predictions, tensors, and checkpoints are not redistributed.
 
 Authorized users rebuild task arrays locally, fit all data-dependent transforms on development training roles, run development validation, execute pure and aggregate-calibrated known-value evaluation, and regenerate the aggregate synthesis and PDF. Unrestricted users can validate the packaged contracts and aggregate hashes and run the known-value smoke test without MIMIC-IV. Independent credentialed numerical reconstruction remains pending and is not conflated with synthetic clean-room execution.
 
@@ -306,10 +312,14 @@ The aggregate release is intentionally row-granular without exposing patient row
 \toprule
 File & Unit and purpose & Rows \\
 \midrule
-\texttt{cohort\_scale.csv} & Task-level subject, transition, action-dimension, and support counts & 6 \\
+\texttt{cohort\_scale.csv} & Task-level subject, transition, action, support, and known-value scenario counts & 6 \\
+\texttt{baseline\_method\_inventory.csv} & Complete layer-specific transition, uncertainty, policy, and OPE method inventory & 54 \\
+\texttt{baseline\_surface\_atlas.csv} & Cross-layer inventory, scope, and point-leader patterns used in Table~\ref{tab:baseline-atlas} & 6 \\
+\texttt{all\_baseline\_transition\_leaders.csv} & Cohort-specific one-step and final-horizon leaders across all six transition methods & 12 \\
 \texttt{factual\_action\_information\_primary.csv} & Fixed primary action-information estimand and interval counts & 6 \\
 \texttt{world\_model\_planner\_bridge.csv} & World model $\times$ cohort P/R/T, prediction, uncertainty, action, and known-value bridge & 24 \\
-\texttt{world\_model\_uncertainty\_summary.csv} & Task-balanced one-step/recursive probabilistic metrics & 8 \\
+\texttt{cohort\_uncertainty\_leaders.csv} & Cohort-level CRPS, MACE, and recursive coverage ranges across five probabilistic methods & 6 \\
+\texttt{world\_model\_uncertainty\_summary.csv} & Task-balanced core-world-model probabilistic metrics & 8 \\
 \texttt{world\_model\_recursive\_horizon\_metrics.csv} & Horizon-resolved logged-action recursive RMSE/MAE and observed-cell counts & 924 \\
 \texttt{known\_value\_policy\_level.csv} & Every fixed policy/planner row in the moderate primary regime & 68 \\
 \texttt{known\_value\_reference\_full\_matrix.csv} & Respiratory/shock method $\times$ seed $\times$ response $\times$ reward rows & 1,632 \\

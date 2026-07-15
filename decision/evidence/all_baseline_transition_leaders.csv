@@ -1,0 +1,13 @@
+cohort,evaluation_mode,leader,rmse,methods_evaluated
+af flutter,one_step,Transformer,0.6895298967001998,6
+aki,one_step,Transformer,0.669540422521114,6
+heart failure,one_step,Transformer,0.670701668157243,6
+respiratory,one_step,Transformer,0.6947431749270562,6
+sepsis,one_step,Transformer,0.6685809222979159,6
+shock,one_step,Transformer,0.7023592870900875,6
+af flutter,final_recursive_horizon,Gaussian ensemble,0.9005062791094365,6
+aki,final_recursive_horizon,Gaussian ensemble,0.9353880740748493,6
+heart failure,final_recursive_horizon,Persistence/LOCF,1.0627238749300665,6
+respiratory,final_recursive_horizon,Gaussian ensemble,0.9722130935132034,6
+sepsis,final_recursive_horizon,Gaussian ensemble,0.9260909409577534,6
+shock,final_recursive_horizon,Gaussian ensemble,0.9995726666712844,6

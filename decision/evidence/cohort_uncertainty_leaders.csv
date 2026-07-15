@@ -1,0 +1,7 @@
+cohort,one_step_crps_leader,one_step_crps,recursive_crps_leader,recursive_crps,recursive_mace_leader,recursive_mace,recursive_coverage90_min,recursive_coverage90_max,probabilistic_methods_evaluated,aggregation
+sepsis,Gaussian ensemble,0.3335418189324702,Gaussian ensemble,0.4518638931482556,GRU-D,0.016334786322830534,0.6230464727821888,0.9408164199254055,5,mean across executed seeds within cohort and method
+respiratory,Transformer,0.3443577943006595,Gaussian ensemble,0.4580490810478537,GRU-D,0.0303834922926372,0.7683283453491923,0.9345922643926404,5,mean across executed seeds within cohort and method
+shock,Transformer,0.34740649916706506,Gaussian ensemble,0.469799962567706,GRU-D,0.0153984710325714,0.7654343874878416,0.926034969971574,5,mean across executed seeds within cohort and method
+af flutter,Transformer,0.34000317046112705,Gaussian ensemble,0.4579455306161868,GRU-D,0.0289267186278281,0.7162614440734902,0.941096893500304,5,mean across executed seeds within cohort and method
+aki,Transformer,0.32692783779373347,Gaussian ensemble,0.4583236861054839,GRU-D,0.0227186439083005,0.7282684386921178,0.9427718300071662,5,mean across executed seeds within cohort and method
+heart failure,Transformer,0.33003390167313323,Gaussian ensemble,0.4497466821177815,GRU-D,0.025378470525262334,0.6570597407433266,0.9343433638204288,5,mean across executed seeds within cohort and method
