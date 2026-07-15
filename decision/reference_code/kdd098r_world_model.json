@@ -1,0 +1,71 @@
+{
+  "experiment_id": "KDD098R",
+  "version": "kdd098r-convergence-planning-components-v1",
+  "evidence_role": "development_train_validation_only",
+  "output_directory": "results/kdd098r_convergence_planning_components_20260714_v1",
+  "checkpoint_directory": "checkpoints/kdd098r_convergence_planning_components_20260714_v1",
+  "seeds": [3408, 3411, 3414],
+  "authorized_tasks": ["sepsis", "respiratory", "af_flutter", "shock", "aki", "heart_failure"],
+  "trained_world_model_families": ["grud_world_model", "transformer_world_model", "dreamer_v3_categorical_rssm"],
+  "derived_world_model_families": ["gaussian_transition_ensemble"],
+  "sanity_controls": ["persistence_locf", "hgb_residual"],
+  "training_budget": {
+    "max_epochs": 40,
+    "min_epochs": 8,
+    "patience": 6,
+    "minimum_relative_validation_improvement": 0.001,
+    "single_uniform_extension_epochs": 80,
+    "extension_trigger": "more_than_half_seeds_hit_40_and_last_epoch_improves_relative_to_previous_by_at_least_0.001",
+    "batch_size": 512,
+    "hidden_dim": 48,
+    "latent_dim": 16,
+    "learning_rate": 0.002,
+    "weight_decay": 0.0001,
+    "max_train_episodes_per_task": 8000,
+    "hgb_max_train_rows": 20000,
+    "hgb_max_iter": 20,
+    "hgb_max_leaf_nodes": 15,
+    "gradient_clip_norm": 5.0,
+    "device": "cpu"
+  },
+  "selection_contract": {
+    "fit_role": "train_only",
+    "selection_role": "validation_only",
+    "validation_composite": "0.7_normalized_observed_cell_RMSE_plus_0.3_normalized_observed_cell_MAE",
+    "direction": "minimize",
+    "tie_break": "earliest_epoch",
+    "extension_scope": "all_three_seeds_within_task_family"
+  },
+  "calibration_contract": {
+    "fit_role": "deterministic_10_percent_train_only_calibration_subset",
+    "evaluation_role": "validation_only",
+    "report_native_and_recalibrated_separately": true
+  },
+  "reward_contract": {
+    "sepsis": ["sepsis_lactate_delta_component"],
+    "respiratory": ["resp_meddreamer_spo2_mbp", "resp_spo2_target_component"],
+    "shock": ["shock_next_mbp_component", "shock_lactate_delta_component"],
+    "af_flutter": [], "aki": [], "heart_failure": []
+  },
+  "action_information_contract": {
+    "cluster_unit": "materialized_episode",
+    "bootstrap_replicates": 500,
+    "bootstrap_seed": 88421,
+    "classification_threshold_absolute_delta_rmse": 0.002,
+    "classification_rule": "supported_if_observed_beats_no_action_or_matched_shuffle_by_0.002_in_at_least_two_targeted_strata_with_one_cluster_CI_excluding_zero"
+  },
+  "prohibited_access": ["existing_test_membership", "existing_test_outcomes", "temporal_lockbox", "RV02R_outcomes", "policy_results"],
+  "upstream_sha256": {
+    "prompt_v5": "384a283dccf23a568cdf5d6d96fdffa725ae8b67132fb9934208f52dfee63742",
+    "kdd097_artifact_manifest": "a45a705e64798eee3a054676bc095eadc409e792e2a9b5ff3c40051bdd6c2b8b",
+    "kdd097_decision": "5f5a8482ee7543c89cda1bea6d5892a56546a2d14140b6d1f85ecc8d5885ddb0",
+    "kdd099r_a_artifact_manifest": "f76decbe78c00ca27908344cd91e3acc287a30a01eb5f339a76de42a1eaab14c",
+    "kdd099r_a_candidate_decisions": "0a443b5dc244c5eed84c4b85e9c01722b3d9c491dd0e303b37b87359e8c211b9",
+    "kdd099r_a_reward_formula": "1d6e5360799c7f4d6618927eac7106b38a79e45f573678bb754bf1a36d42e5e8",
+    "kdd098_v2_artifact_manifest": "e040894d9218e7ffd31bd6b2c85ec405d3d8b57fa6f9324a526855a26fddbbd4",
+    "kdd098_v2_checkpoint_manifest": "eda15719f2f03d8425c96976d34ab27d72f32218053f9198a85479e496a39cba",
+    "kdd098_v2_result_tree": "c3eec231beac8182a5be1b729e83697fbdfd6f534968b72f118d3ff122c0289a",
+    "kdd098_v2_checkpoint_tree": "f79957aca96e4d3574e7fd3880edec073903e0ed41ba39676ac3baae493a4d5d"
+  },
+  "claim_boundary": "Development-only factual logged-action planning-component validation. Action-information deltas are predictive diagnostics, not causal treatment effects. No confirmatory, policy-winner, treatment-benefit, causal, counterfactual, clinical-utility, deployment, or autonomous-decision claim."
+}

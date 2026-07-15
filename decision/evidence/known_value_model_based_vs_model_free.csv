@@ -1,0 +1,7 @@
+cohort,method_group,method_rows,mean_true_return,mean_behavior_relative_true_value_difference,maximum_unsupported_action_mass,uncertainty_note,interpretation
+respiratory,control,5,0.34219471002802393,0.01659741647462808,0.0,descriptive mean across fixed method rows; policy-level paired Monte Carlo uncertainty is retained in the source,known injected mechanisms only
+respiratory,model_free,5,0.32805943254685543,0.00246213899345964,0.0,descriptive mean across fixed method rows; policy-level paired Monte Carlo uncertainty is retained in the source,known injected mechanisms only
+respiratory,world_model_planner,24,0.3621617225347975,0.036564428981401616,0.0,descriptive mean across fixed method rows; policy-level paired Monte Carlo uncertainty is retained in the source,known injected mechanisms only
+shock,control,5,0.3445883685355807,0.01252532096072384,0.0,descriptive mean across fixed method rows; policy-level paired Monte Carlo uncertainty is retained in the source,known injected mechanisms only
+shock,model_free,5,0.3281327948901539,-0.00393025268470288,0.0,descriptive mean across fixed method rows; policy-level paired Monte Carlo uncertainty is retained in the source,known injected mechanisms only
+shock,world_model_planner,24,0.36577315154447115,0.03371010396961419,0.0,descriptive mean across fixed method rows; policy-level paired Monte Carlo uncertainty is retained in the source,known injected mechanisms only

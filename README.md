@@ -1,9 +1,10 @@
-# EHRDyn-ICU: decision evaluation for EHR world models and offline RL
+# EHRDyn-ICU: multi-cohort decision evaluation for EHR model components and offline RL
 
 The paper-facing anonymous release is in [`decision/`](decision/README.md).
-It provides the six-task contracts, four known-value policy extensions, all
-aggregate policy/OPE result rows, the anonymous manuscript, a release
-validator, and an unrestricted synthetic smoke test.
+It provides six EHR P/R/T-component contracts, the complete 36-row transition
+matrix, four adaptive exact-finite policy environments, every aggregate
+policy/OPE result row, the anonymous manuscript, a release validator, and an
+unrestricted synthetic smoke test.
 
 ```bash
 python -m pip install -e .

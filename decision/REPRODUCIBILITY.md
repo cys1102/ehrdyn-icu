@@ -16,7 +16,9 @@ ehrdyn-icu scan-release --root .
 ehrdyn-icu verify-checksums --root .
 ```
 
-The executed respiratory/shock, AKI/HF, and full OPE runner/configuration
+The executed adaptive respiratory/shock/AKI/HF benchmark, historical
+sensitivity benchmark, full OPE grid, P/R/T-component training, model-free
+diagnostics, and AI-Clinician-aligned sepsis materialization runner/configuration
 snapshots are under `reference_code/` with hashes in
 `reference_code/source_manifest.csv`. They are provided for exact source
 audit. They retain their frozen upstream module and aggregate-input
@@ -27,3 +29,9 @@ Full paper-number regeneration currently requires the frozen credentialed
 `world-ehr` inputs and the reader-package builder described in
 `manuscript/reproducibility.md`. This is a remaining release-engineering gap,
 not an authorization to redistribute restricted arrays or patient-level data.
+
+An independent credentialed reconstruction is complete only when another
+MIMIC-credentialed user starts from a clean clone, executes the frozen local
+pipeline inside an authorized environment, and matches the privacy-reviewed
+aggregate targets. This is an artifact reproducibility check. It is not
+external-data, clinical, or methodological-generalization validation.

@@ -1,0 +1,23 @@
+dimension,fidelity,benchmark_contract,compatibility_gap
+task_role,intentional_benchmark_difference,canonical_sepsis_reference,reference contract only
+cohort_inclusion,not_reconstructable,adult ICU sepsis with time-stamped suspected infection and organ-dysfunction increase,paper operational code unavailable
+cohort_exclusion,not_reconstructable,missing demographics/outcome; treatment withdrawal; multiple ICU stays; invalid time ordering; out-of-stay bins,withdrawal and multiple-stay definitions unresolved
+anchor,intentional_benchmark_difference,time-stamped suspected infection followed by qualifying organ-dysfunction increase,current anchor is intentional validity repair
+episode_start,published_compatible_local_parameterization,24h before task anchor for representation; actions begin only at eligible decision points,fixed scaffold preserved
+episode_end,published_compatible_local_parameterization,48h after anchor or earlier ICU/outcome censoring; no partial bins,stay-bounding is intentional validity difference
+decision_interval,published_compatible_local_parameterization,4 hours,fixed 4h is benchmark reference parameterization
+irregular_representation,published_compatible_local_parameterization,within-bin observed values plus masks and elapsed-time gaps on a fixed action clock,"compatible representation, not exact preprocessing"
+split_unit_role,intentional_benchmark_difference,subject-disjoint development train/validation; future confirmatory role external/new,existing evaluation roles are test-informed
+state_cutoff,intentional_benchmark_difference,strictly before action start t,post-action and post-outcome inputs prohibited
+action_interval,published_compatible_local_parameterization,"[t,t+4h)",exact local benchmark interval
+target_interval,published_compatible_local_parameterization,"[t+4h,t+8h)",strictly post-action
+feature_contract,published_compatible_local_parameterization,paper-listed 40 variables plus separate masks/time gaps/prior action; static and step are context-only,40-name list exact; implementations not exact
+action,published_compatible_local_parameterization,"train-derived fluid-5 x vasopressor-5, K=25; zero plus four positive-dose quantiles",canonical action reference
+reward,published_compatible_local_parameterization,published-form SOFA/lactate shaping with explicitly local coefficients plus terminal 90d outcome,published-compatible local parameterization
+sofa_handling,not_reconstructable,published-compatible full SOFA track plus treatment-isolated sensitivity,mechanical action overlap flagged
+lactate_handling,published_compatible_local_parameterization,observed/de-standardized lactate; missingness retained; delta from state to target,measurement process sensitivity required
+terminal_outcome,not_reconstructable,90-day survival/death from task anchor only when complete follow-up/censoring is reproducible,not currently transferable
+discount,exact_from_source,gamma=0.99,source-verifiable public configuration
+return_horizon,not_reconstructable,"17 possible state-action transitions across an 18-bin -24h/+48h scaffold, truncated by stay/outcome",local benchmark parameterization
+behavior_denominator,published_compatible_local_parameterization,denominator-specific cross-fit models; paper LSTM reference retained separately,do not pool denominators
+ope,published_compatible_local_parameterization,WIS/WPDIS/CWPDIS plus DR/WDR/FQE candidates only after prerequisite gates,diagnostic-only and no estimator currently promoted by this audit

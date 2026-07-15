@@ -1,12 +1,13 @@
 {
-  "benchmark_id": "EHRDYN-ICU-DECISION-RC1",
+  "benchmark_id": "EHRDYN-ICU-DECISION-RC2",
+  "ehr_model_scope": "P/R/T world-model components; no generative observation-process head",
   "ehr_world_model_tasks": [
     {
       "task": "sepsis",
       "components": "P/R/T",
       "interval_hours": 4,
       "action_count": 25,
-      "evaluation_role": "canonical_reference_and_retrospective_diagnostics"
+      "evaluation_role": "AI_Clinician_aligned_K25_scaffold_and_retrospective_diagnostics"
     },
     {
       "task": "respiratory",
@@ -50,14 +51,18 @@
       "interval_hours": 4,
       "action_count": 25,
       "decision_horizon": 11,
-      "response_regimes": ["null_response", "weak", "moderate", "delayed"]
+      "response_regimes": ["adaptive_composite"],
+      "historical_sensitivity_regimes": ["null_response", "weak", "moderate", "delayed"],
+      "policy_truth": "exact_dynamic_programming"
     },
     {
       "task": "shock",
       "interval_hours": 4,
       "action_count": 25,
       "decision_horizon": 11,
-      "response_regimes": ["null_response", "weak", "moderate", "delayed"]
+      "response_regimes": ["adaptive_composite"],
+      "historical_sensitivity_regimes": ["null_response", "weak", "moderate", "delayed"],
+      "policy_truth": "exact_dynamic_programming"
     },
     {
       "task": "aki_rrt",
@@ -65,7 +70,9 @@
       "action_count": 2,
       "decision_horizon": 3,
       "action_semantics": "wait_vs_initiate_rrt_absorbing",
-      "response_regimes": ["null_response", "weak", "moderate", "delayed"]
+      "response_regimes": ["adaptive_composite"],
+      "historical_sensitivity_regimes": ["null_response", "weak", "moderate", "delayed"],
+      "policy_truth": "exact_dynamic_programming"
     },
     {
       "task": "heart_failure",
@@ -73,7 +80,9 @@
       "action_count": 8,
       "decision_horizon": 12,
       "action_semantics": "loop_diuretic_quartile_x_vaso_inotrope_indicator",
-      "response_regimes": ["null_response", "weak", "moderate", "delayed"]
+      "response_regimes": ["adaptive_composite"],
+      "historical_sensitivity_regimes": ["null_response", "weak", "moderate", "delayed"],
+      "policy_truth": "exact_dynamic_programming"
     }
   ],
   "retrospective_ehr_policy_value": "not_executed"

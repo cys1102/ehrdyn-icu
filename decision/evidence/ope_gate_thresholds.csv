@@ -1,5 +1,5 @@
 gate,estimand,frozen_threshold
-coverage,interval coverage,>= 0.90
+policy_set_interval_inclusion,policy-set interval inclusion rate within one logged-data realization; not repeated-dataset coverage,>= 0.90
 rank,Spearman policy-rank recovery,>= 0.80
 pairwise,pairwise policy-order recovery,>= 0.80
 sign,behavior-relative improvement-sign recovery,>= 0.90

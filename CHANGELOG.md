@@ -1,5 +1,18 @@
 # Changelog
 
+## EHRDYN-ICU-DECISION-RC2 (paper-facing decision release)
+
+- Narrow the manuscript and release scope to EHR P/R/T world-model components
+  and an AI-Clinician-aligned K25 sepsis scaffold.
+- Promote four adaptive exact-finite tasks to the primary policy benchmark and
+  retain the earlier monotone family only as evaluator sensitivity evidence.
+- Release all 36 cohort-by-transition-method rows, all 700 adaptive policy
+  seed rows, all 480 exploitation-gap rows, and the complete OPE tuple grid.
+- Add the representative prior-study landscape and replace synthetic scenario
+  counts in the cohort table with materialized ICU-stay episode counts.
+- Add portable path-sanitized credentialed runners with original and packaged
+  source hashes while preserving the no-row-level-data release boundary.
+
 ## 1.2.0rc1 (local release candidate; unpublished)
 
 - Add an isolated five-task KDD-RV successor identity without changing the

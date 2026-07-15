@@ -22,6 +22,9 @@ class DecisionReleaseTests(unittest.TestCase):
     def test_release_manifest_and_paper_counts_validate(self):
         receipt = validate_decision_release(ROOT)
         self.assertTrue(receipt["pass"])
+        self.assertEqual(receipt["complete_transition_rows"], 36)
+        self.assertEqual(receipt["adaptive_policy_summary_rows"], 136)
+        self.assertEqual(receipt["adaptive_policy_seed_rows"], 700)
         self.assertEqual(receipt["known_value_policy_rows"], 2448)
         self.assertEqual(receipt["ope_tuple_rows"], 16128)
         self.assertEqual(receipt["aki_task_matched_tier2_approved"], 236)

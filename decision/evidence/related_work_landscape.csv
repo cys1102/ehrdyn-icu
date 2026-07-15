@@ -1,0 +1,9 @@
+study,data_and_task,decision_layer,evaluation_evidence,cross_task_scope
+AI Clinician,MIMIC-III + eRI; sepsis fluids x vasopressors,finite MDP + policy iteration,retrospective OPE and observed action-outcome concordance; no known counterfactual return,one task; two datasets
+POPCORN,MIMIC-III; acute hypotension; hourly K20 fluids x vasopressors,prediction-constrained POMDP + PBVI,"forecasting/likelihood + CWPDIS, ESS, and support diagnostics; no known return",one task
+DeepVent,MIMIC-III; 4-hour mechanical-ventilation decisions,model-free CQL,FQE and action-distribution diagnostics; no known return,one task
+MedDreamer,MIMIC sepsis + eICU ventilation,latent RSSM + imagination-based policy learning,learned-reward/relative-mortality metrics + CWPDIS/ESS; no known return,two tasks; task-specific actions and rewards
+EHR-MPC (2026 preprint),eight-hospital ICU data; sepsis policy evaluation,generative EHR twin + MPC,importance weighting + learned-twin simulation; no known return,one policy task; multiple sites
+EHRWorld (2026 preprint),MIMIC-IV longitudinal trajectories,intervention-aware long-horizon model; no policy learner,forecasting and simulation fidelity,no policy benchmark
+EpiCare / DTR-Bench,synthetic clinical decision tasks,multiple offline and online RL methods,simulator true return + OPE,multiple synthetic tasks; no real-EHR task construction
+Ours,MIMIC-IV; six real-EHR task contracts,four P/R/T component families + matched policy layers,adaptive exact-finite truth + monotone sensitivity + retrospective authorization boundaries; no EHR winner,shared cross-task contract

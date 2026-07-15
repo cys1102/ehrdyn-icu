@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this benchmark software, please cite this release."
-title: "EHRDyn-ICU: Decision Evaluation for EHR World Models and Offline Reinforcement Learning"
+title: "A Multi-Cohort Decision-Evaluation Benchmark for EHR World-Model Components and Offline Reinforcement Learning"
 type: software
 version: "1.2.0rc1"
 date-released: 2026-07-15
@@ -13,5 +13,5 @@ repository-code: "https://anonymous.4open.science/r/ehrdyn-icu-65FB"
 url: "https://anonymous.4open.science/r/ehrdyn-icu-65FB"
 identifiers:
   - type: other
-    value: "EHRDYN-ICU-DECISION-RC1"
+    value: "EHRDYN-ICU-DECISION-RC2"
     description: "Anonymous decision-benchmark release candidate"

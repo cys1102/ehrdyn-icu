@@ -76,7 +76,7 @@ Approval applies only to the exact tuple:
 
 The reference evaluator checks H1, H2, H4, H8, H12, and H17 separately. Task-matched evaluators use the horizons defined by their decision contracts (AKI H1/H2/H3; heart failure H1/H2/H4/H8/H12). Approval requires every gate below:
 
-- policy-set bootstrap-interval coverage within a fixed logged-data realization at least `0.90` (not repeated-dataset frequentist coverage);
+- policy-set interval inclusion rate within a fixed logged-data realization at least `0.90` (not repeated-dataset frequentist coverage);
 - Spearman rank recovery at least `0.80`;
 - pairwise policy-order recovery at least `0.80`;
 - behavior-relative improvement-sign recovery at least `0.90`;

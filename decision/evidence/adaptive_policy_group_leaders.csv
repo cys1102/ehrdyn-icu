@@ -1,0 +1,13 @@
+task,method_group,leader_method,leader_display_method,leader_mean_exact_true_return,leader_mean_exact_regret,leader_behavior_normalized_exact_regret
+aki_rrt,control,severity_rule,Severity rule,0.144703956752042,0.0006628593343874,0.00303773926109897
+aki_rrt,model_free,discrete_cql,Discrete CQL,-0.053315702904606674,0.19868251899103617,0.9105185023771235
+aki_rrt,world_model_planner,dreamer_v3_categorical_rssm__H4_categorical_CEM__support_constrained,categorical RSSM + H4 CEM (support),0.10901706952500063,0.03634974656142876,0.16658293325943452
+heart_failure,control,severity_rule,Severity rule,0.0362893020490864,0.1480770613608817,0.12441858130654977
+heart_failure,model_free,discrete_cql,Discrete CQL,-0.9530009849353537,1.1373673483453217,0.9556485697716627
+heart_failure,world_model_planner,dreamer_v3_categorical_rssm__H1_exhaustive__support_constrained,categorical RSSM + H1 exhaustive (support),-0.28809088816023565,0.4724572515702038,0.3969720929637878
+respiratory,control,severity_rule,Severity rule,0.092554597073499,0.1588503666921752,0.17450156929782407
+respiratory,model_free,discrete_bcq,Discrete BCQ,-0.563658337584771,0.8150633013504454,0.8953698258584133
+respiratory,world_model_planner,gaussian_recurrent_ensemble__H1_exhaustive__support_and_uncertainty_penalized,Gaussian ensemble + H1 exhaustive (support + uncertainty),-0.17131682230704362,0.4227217860727179,0.46437170138243034
+shock,control,severity_rule,Severity rule,0.0754893217268688,0.20757689395165396,0.24069475014086558
+shock,model_free,discrete_bcq,Discrete BCQ,-0.2125973152867818,0.4956635309653047,0.5747441705502145
+shock,world_model_planner,dreamer_v3_categorical_rssm__H1_exhaustive__support_and_uncertainty_penalized,categorical RSSM + H1 exhaustive (support + uncertainty),-0.2895891189839889,0.5726553346625118,0.6640196318070438

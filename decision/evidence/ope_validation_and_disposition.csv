@@ -1,0 +1,4 @@
+evaluation_surface,evaluated_contract_tuples,approved_contract_tuples,authorization
+exact finite known-value environments,3456,32,tuple-specific synthetic validation only
+EHR-calibrated semi-synthetic environments,3456,0,none for retrospective transport
+retrospective EHR policy value,0,0,not executed; no approved estimator contract

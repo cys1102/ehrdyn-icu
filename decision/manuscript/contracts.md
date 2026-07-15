@@ -10,7 +10,7 @@ confidence: high
 
 # Cohort, feature, action, and reward contracts
 
-## Common EHR world-model temporal contract
+## Common EHR P/R/T component temporal contract
 
 - Decision interval: four hours.
 - State cutoff: strictly before action start.
@@ -37,13 +37,13 @@ confidence: high
 - Assignable actions and true counterfactual values exist only inside the constructed known-value environments.
 - No retrospective EHR policy value is inferred from the interval label.
 
-## Sepsis: canonical published-compatibility reference
+## Sepsis: AI-Clinician-aligned K25 scaffold
 
 - Population/anchor: adult ICU sepsis with time-stamped suspected infection followed by qualifying organ-dysfunction increase.
 - Representation window: 24 hours before anchor to 48 hours after anchor, truncated by stay/outcome boundaries.
 - Reference features: paper-listed 40 variables plus separate masks/time gaps and prior action.
 - Action: training-derived fluid quintile × vasopressor quintile, K=25; zero plus four positive-dose quantiles per dimension.
-- Reward tracks: local published-compatible SOFA/lactate shaping; terminal-only sensitivity; lactate-only diagnostic `-tanh(lactate[t+1]-lactate[t])`; treatment-isolated physiology composite; historical sensitivities.
+- Reward tracks: locally parameterized SOFA/lactate shaping; terminal-only sensitivity; lactate-only diagnostic `-tanh(lactate[t+1]-lactate[t])`; treatment-isolated physiology composite; historical sensitivities.
 - Critical gaps: numerical coefficients are local parameterization; full SOFA can mechanically encode vasopressor exposure; anchor-relative 90-day terminal outcome is unavailable; the contract is not an exact paper reproduction.
 
 ## Respiratory support

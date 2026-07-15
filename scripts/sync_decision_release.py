@@ -12,44 +12,93 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-ALLOWLIST = {
+DOCUMENT_ALLOWLIST = {
     "manuscript.tex": "decision/manuscript/manuscript.tex",
     "manuscript.pdf": "decision/manuscript/manuscript.pdf",
     "references.bib": "decision/manuscript/references.bib",
+    "README.md": "decision/manuscript/reader-package.md",
     "benchmark-card.md": "decision/manuscript/benchmark-card.md",
     "contracts.md": "decision/manuscript/contracts.md",
+    "credentialed-reconstruction.md": "decision/manuscript/credentialed-reconstruction.md",
+    "environment-manifest.md": "decision/manuscript/environment-manifest.md",
     "estimator-planner-cards.md": "decision/manuscript/estimator-planner-cards.md",
+    "non-claims-and-limitations.md": "decision/manuscript/non-claims-and-limitations.md",
     "reproducibility.md": "decision/manuscript/reproducibility.md",
+    "artifact-hashes.json": "decision/manuscript/reader-package-hashes.json",
     "number-audit.csv": "decision/evidence/number-audit.csv",
     "provenance-manifest.csv": "decision/evidence/source-provenance.csv",
-    "figures/known_value_policy_level.pdf": "decision/figures/known_value_policy_level.pdf",
-    "figures/known_value_policy_level.png": "decision/figures/known_value_policy_level.png",
-    "figures/cohort_evaluability_roles.pdf": "decision/figures/cohort_evaluability_roles.pdf",
-    "figures/cohort_evaluability_roles.png": "decision/figures/cohort_evaluability_roles.png",
-    "tables/cohort_scale.csv": "decision/evidence/cohort_scale.csv",
-    "tables/baseline_method_inventory.csv": "decision/evidence/baseline_method_inventory.csv",
-    "tables/baseline_surface_atlas.csv": "decision/evidence/baseline_surface_atlas.csv",
-    "tables/all_baseline_transition_leaders.csv": "decision/evidence/all_baseline_transition_leaders.csv",
-    "tables/cross_cohort_evaluation_layers.csv": "decision/evidence/cross_cohort_evaluation_layers.csv",
-    "tables/factual_action_information_primary.csv": "decision/evidence/factual_action_information_primary.csv",
-    "tables/cohort_uncertainty_leaders.csv": "decision/evidence/cohort_uncertainty_leaders.csv",
-    "tables/world_model_fidelity_summary.csv": "decision/evidence/world_model_fidelity_summary.csv",
-    "tables/world_model_uncertainty_summary.csv": "decision/evidence/world_model_uncertainty_summary.csv",
-    "tables/world_model_recursive_horizon_metrics.csv": "decision/evidence/world_model_recursive_horizon_metrics.csv",
-    "tables/world_model_planner_bridge.csv": "decision/evidence/world_model_planner_bridge.csv",
-    "tables/known_value_cross_task_summary.csv": "decision/evidence/known_value_cross_task_summary.csv",
-    "tables/known_value_policy_level.csv": "decision/evidence/known_value_policy_level.csv",
-    "tables/known_value_reference_full_matrix.csv": "decision/evidence/known_value_reference_full_matrix.csv",
-    "tables/known_value_task_extension_full_matrix.csv": "decision/evidence/known_value_task_extension_full_matrix.csv",
-    "tables/task_extension_world_model_planner_matrix.csv": "decision/evidence/task_extension_world_model_planner_matrix.csv",
-    "tables/task_extension_rank_stability.csv": "decision/evidence/task_extension_rank_stability.csv",
-    "tables/ope_gate_thresholds.csv": "decision/evidence/ope_gate_thresholds.csv",
-    "tables/ope_gate_breakdown.csv": "decision/evidence/ope_gate_breakdown.csv",
-    "tables/ope_approved_exact_tuples.csv": "decision/evidence/ope_approved_exact_tuples.csv",
-    "tables/ope_reference_all_tuple_metrics.csv": "decision/evidence/ope_reference_all_tuple_metrics.csv",
-    "tables/ope_task_matched_all_tuple_metrics.csv": "decision/evidence/ope_task_matched_all_tuple_metrics.csv",
-    "tables/task_matched_ope_authorization.csv": "decision/evidence/task_matched_ope_authorization.csv",
-    "tables/retrospective_policy_diagnostics.csv": "decision/evidence/retrospective_policy_diagnostics.csv",
+}
+
+FIGURE_ALLOWLIST = {
+    "adaptive_all_policy_regret_heatmap.pdf",
+    "adaptive_all_policy_regret_heatmap.png",
+    "cohort_evaluability_roles.pdf",
+    "cohort_evaluability_roles.png",
+    "known_value_all_policy_sensitivity_heatmap.pdf",
+    "known_value_all_policy_sensitivity_heatmap.png",
+    "known_value_method_groups.pdf",
+    "known_value_method_groups.png",
+    "known_value_policy_level.pdf",
+    "known_value_policy_level.png",
+}
+
+TABLE_ALLOWLIST = {
+    "adaptive_environment_contract.csv",
+    "adaptive_exploitation_gap_all_rows.csv",
+    "adaptive_exploitation_summary.csv",
+    "adaptive_policy_group_leaders.csv",
+    "adaptive_policy_performance_all_methods.csv",
+    "adaptive_policy_regret_all_rows.csv",
+    "adaptive_policy_true_returns_all_rows.csv",
+    "adaptive_vs_best_fixed_gap.csv",
+    "all_baseline_transition_leaders.csv",
+    "baseline_method_inventory.csv",
+    "baseline_surface_atlas.csv",
+    "cohort_policy_evaluability.csv",
+    "cohort_scale.csv",
+    "cohort_uncertainty_leaders.csv",
+    "complete_model_performance_by_cohort.csv",
+    "complete_model_performance_task_balanced.csv",
+    "cross_cohort_evaluation_layers.csv",
+    "factual_action_information_primary.csv",
+    "known_value_all_policy_sensitivity.csv",
+    "known_value_balanced_core.csv",
+    "known_value_cross_task_summary.csv",
+    "known_value_max_supported_control.csv",
+    "known_value_model_based_vs_model_free.csv",
+    "known_value_policy_level.csv",
+    "known_value_reference_full_matrix.csv",
+    "known_value_scenario_inventory.csv",
+    "known_value_task_extension_full_matrix.csv",
+    "ope_approved_exact_tuples.csv",
+    "ope_gate_breakdown.csv",
+    "ope_gate_thresholds.csv",
+    "ope_reference_all_tuple_metrics.csv",
+    "ope_task_matched_all_tuple_metrics.csv",
+    "ope_validation_and_disposition.csv",
+    "promoted_task_roles.csv",
+    "related_work_landscape.csv",
+    "retrospective_policy_diagnostics.csv",
+    "sepsis_reference_fidelity.csv",
+    "task_extension_rank_stability.csv",
+    "task_extension_world_model_planner_matrix.csv",
+    "task_matched_ope_authorization.csv",
+    "world_model_fidelity_summary.csv",
+    "world_model_planner_bridge.csv",
+    "world_model_recursive_horizon_metrics.csv",
+    "world_model_uncertainty_summary.csv",
+}
+
+ALLOWLIST = {
+    **DOCUMENT_ALLOWLIST,
+    **{
+        f"figures/{name}": f"decision/figures/{name}"
+        for name in sorted(FIGURE_ALLOWLIST)
+    },
+    **{
+        f"tables/{name}": f"decision/evidence/{name}"
+        for name in sorted(TABLE_ALLOWLIST)
+    },
 }
 
 SOURCE_CODE_ALLOWLIST = (
@@ -60,15 +109,44 @@ SOURCE_CODE_ALLOWLIST = (
     "kdd_benchmark_discovery/run_kdd_e02_known_value_full.py",
     "kdd_benchmark_discovery/run_kdd100_complete_known_value.py",
     "kdd_benchmark_discovery/run_kdd100r_task_matched_known_value.py",
+    "kdd_benchmark_discovery/run_kdd_s02_canonical_sepsis_materialization.py",
+    "kdd_benchmark_discovery/run_kdd098r_world_models.py",
+    "kdd_benchmark_discovery/run_kdd101_model_free_diagnostics.py",
+    "kdd_benchmark_discovery/run_kdd_adapt01_adaptive_known_value.py",
     "kdd_benchmark_discovery/run_kdd_x02_cross_cohort_policy_benchmark.py",
     "kdd_benchmark_discovery/run_kdd_x08_task_matched_evaluator.py",
     "kdd_benchmark_discovery/run_kdd_x09_promoted_cohort_policy_benchmark.py",
     "configs/kdd100r_task_matched_known_value.json",
+    "configs/kdd098r_world_model.json",
     "configs/kdd101_model_free_diagnostics_v5.json",
+    "configs/kdd_adapt01_adaptive_known_value_v1.json",
     "configs/kdd_x02_cross_cohort_policy_benchmark_v1.json",
     "configs/kdd_x08_task_matched_evaluator_v1.json",
     "configs/kdd_x09_promoted_cohort_policy_benchmark_v1.json",
 )
+
+DOCUMENT_TEXT_REPLACEMENTS = {
+    "environment-manifest.md": {
+        "/" + "home" + "/cys1102/miniconda3/envs/world-model/bin/python":
+            "<world-model-python>",
+    },
+}
+
+SOURCE_TEXT_REPLACEMENTS = {
+    "kdd_benchmark_discovery/run_kdd_s02_canonical_sepsis_materialization.py": {
+        'Path("/' + 'data/physionet.org/files/mimiciv/3.1")':
+            'Path("<authorized-mimiciv-root>")',
+    },
+    "kdd_benchmark_discovery/run_kdd098r_world_models.py": {
+        'Path("/' + 'data/physionet.org/files/mimiciv/3.1")':
+            'Path("<authorized-mimiciv-root>")',
+        '"/' + 'home/" in text': '"/" + "home" + "/" in text',
+    },
+    "kdd_benchmark_discovery/run_kdd101_model_free_diagnostics.py": {
+        'Path("/' + 'data/physionet.org/files/mimiciv/3.1")':
+            'Path("<authorized-mimiciv-root>")',
+    },
+}
 
 
 def sha256(path: Path) -> str:
@@ -84,6 +162,23 @@ def csv_rows(path: Path) -> int | str:
         return "not_applicable"
     with path.open(newline="", encoding="utf-8") as handle:
         return max(sum(1 for _ in csv.reader(handle)) - 1, 0)
+
+
+def copy_with_replacements(
+    source: Path,
+    destination: Path,
+    replacements: dict[str, str] | None = None,
+) -> bool:
+    if not replacements:
+        shutil.copyfile(source, destination)
+        return False
+    text = source.read_text(encoding="utf-8")
+    for old, new in replacements.items():
+        if old not in text:
+            raise RuntimeError(f"Expected sanitization target is missing: {source}: {old}")
+        text = text.replace(old, new)
+    destination.write_text(text, encoding="utf-8")
+    return True
 
 
 def main() -> None:
@@ -103,7 +198,11 @@ def main() -> None:
             raise FileNotFoundError(source_path)
         destination = ROOT / destination_name
         destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(source_path, destination)
+        copy_with_replacements(
+            source_path,
+            destination,
+            DOCUMENT_TEXT_REPLACEMENTS.get(source_name),
+        )
         manifest_rows.append(
             {
                 "path": destination.relative_to(ROOT).as_posix(),
@@ -135,14 +234,23 @@ def main() -> None:
         if not source_path.is_file():
             raise FileNotFoundError(source_path)
         destination = reference_root / Path(relative).name
-        shutil.copyfile(source_path, destination)
+        sanitized = copy_with_replacements(
+            source_path,
+            destination,
+            SOURCE_TEXT_REPLACEMENTS.get(relative),
+        )
         source_rows.append(
             {
                 "packaged_path": destination.relative_to(ROOT).as_posix(),
                 "source_relative_path": relative,
+                "source_sha256": sha256(source_path),
                 "sha256": sha256(destination),
                 "bytes": destination.stat().st_size,
-                "provenance": "byte_identical_source_snapshot",
+                "provenance": (
+                    "portable_path_sanitized_source_snapshot"
+                    if sanitized
+                    else "byte_identical_source_snapshot"
+                ),
             }
         )
     source_manifest = ROOT / "decision/reference_code/source_manifest.csv"

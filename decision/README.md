@@ -1,8 +1,8 @@
-# EHRDyn-ICU decision-evaluation benchmark
+# EHRDyn-ICU multi-cohort decision-evaluation benchmark
 
 This directory is the anonymous release surface for the paper
-*A Decision-Evaluation Benchmark for EHR World Models and Offline
-Reinforcement Learning*.
+*A Multi-Cohort Decision-Evaluation Benchmark for EHR World-Model
+Components and Offline Reinforcement Learning*.
 
 It is intentionally separate from the historical forecasting benchmark and
 the five-task RV release candidate at the repository root. Nothing in those
@@ -10,15 +10,22 @@ older lineages is relabeled as a decision-benchmark result.
 
 ## What is released
 
-- six EHR world-model task contracts;
-- four known-value policy-evaluation extensions (respiratory, shock,
-  AKI--RRT, and heart failure);
+- six EHR P/R/T-component task contracts and the complete 36-row
+  cohort-by-transition-method matrix;
+- an AI-Clinician-aligned K25 sepsis scaffold, labeled as an alignment
+  surface rather than an exact reproduction;
+- four adaptive exact-finite policy environments (respiratory, shock,
+  AKI--RRT, and heart failure), each with exact dynamic-programming truth;
 - the complete layer-specific inventory of six transition methods, five
   uncertainty-capable methods, 34 policy/planner labels, and nine OPE
   estimators;
 - a cross-layer baseline atlas and cohort-specific uncertainty leader table;
-- all 2,448 aggregate known-value policy rows used by the paper;
+- all 700 adaptive true-return and exact-regret rows, all 480 world-model
+  exploitation-gap rows, and all 136 task-by-method summaries;
+- all 2,448 historical monotone policy rows, retained as evaluator
+  smoke/sensitivity evidence rather than the primary policy benchmark;
 - all 16,128 reference and task-matched OPE tuple metrics and dispositions;
+- a source-verified representative literature landscape;
 - the anonymous manuscript source and compiled PDF;
 - a portable contract/evidence validator; and
 - a synthetic known-value smoke test for exact planning, common random
@@ -28,7 +35,9 @@ The paper-to-code mapping is in [`CODE_MAP.md`](CODE_MAP.md), and the exact
 unrestricted versus credentialed boundary is in
 [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md). Byte-identical
 world-model architecture and exact-evaluator snapshots are under
-`reference_code/`, with hashes in `reference_code/source_manifest.csv`.
+`reference_code/`, with original-source and packaged hashes in
+`reference_code/source_manifest.csv`. Three credentialed runners replace only
+machine-local default paths with explicit portable placeholders.
 
 No MIMIC-IV rows, identifiers, split membership, exact timestamps,
 trajectories, row-level predictions, or checkpoints are included.
@@ -50,17 +59,22 @@ ehrdyn-icu verify-checksums --root .
 ```
 
 The smoke test checks executable invariants only; it does not reproduce paper
-numbers or use EHR data. Numerical paper evidence is validated against
+numbers or use EHR data. Numerical paper evidence, including every complete
+baseline row, is checksum- and row-count-validated against
 `decision/evidence/manifest.csv`.
 
 ## Evidence layers
 
 The release keeps four layers distinct:
 
-1. EHR world-model prediction and uncertainty on development roles;
+1. EHR P/R/T-component prediction and uncertainty on development roles;
 2. retrospective action support, collapse, and observability diagnostics;
-3. true policy returns in constructed known-value environments; and
+3. exact policy returns in adaptive constructed known-value environments;
 4. exact OPE tuple authorization within those environments.
+
+The older monotone known-value family is a fifth, explicitly secondary
+evaluator-sensitivity layer. It is not used to claim that an extreme-action
+control is a meaningful policy winner.
 
 No task completes the trained-target-policy and post-training overlap gates
 needed for retrospective EHR policy-value scoring. The release therefore does
@@ -70,5 +84,8 @@ not contain an EHR policy leaderboard.
 
 MIMIC-IV reconstruction must occur in an authorized environment. Public code
 and task contracts define the inputs and aggregate outputs, while restricted
-arrays remain local. Synthetic clean-room success is not presented as
+arrays remain local. Independent credentialed reconstruction means that a
+second MIMIC-credentialed user regenerates aggregate results from a clean
+clone; it is a reproducibility check, not external-site, clinical, or
+generalization validation. Synthetic clean-room success is not presented as
 credentialed numerical parity.

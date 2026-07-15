@@ -34,6 +34,18 @@ python \
 
 The reproduction directory is additive and must not overwrite the frozen source.
 
+## Rebuild the primary adaptive exact-finite policy benchmark
+
+```bash
+cd ../world-ehr
+python \
+  -m kdd_benchmark_discovery.run_kdd_adapt01_adaptive_known_value \
+  --config configs/kdd_adapt01_adaptive_known_value_v1.json \
+  --output kdd_benchmark_discovery/results/reproduction_adaptive_known_value
+```
+
+This stage uses known constructed mechanisms and does not require patient-level EHR rows. It regenerates the 700 method/oracle seed rows from which the 680 non-oracle rows in the main policy figure are selected.
+
 ## Compile the manuscript
 
 ```bash

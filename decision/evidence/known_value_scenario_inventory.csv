@@ -1,0 +1,7 @@
+cohort,known_value_scenarios,scenario_definition
+sepsis,0,unique known-value response-regime x reward-variant contract; methods and seeds excluded
+respiratory,8,unique known-value response-regime x reward-variant contract; methods and seeds excluded
+shock,8,unique known-value response-regime x reward-variant contract; methods and seeds excluded
+af flutter,0,unique known-value response-regime x reward-variant contract; methods and seeds excluded
+aki,4,unique known-value response-regime x reward-variant contract; methods and seeds excluded
+heart failure,4,unique known-value response-regime x reward-variant contract; methods and seeds excluded

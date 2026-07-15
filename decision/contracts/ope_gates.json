@@ -1,5 +1,6 @@
 {
-  "coverage_min": 0.9,
+  "policy_set_interval_inclusion_min": 0.9,
+  "policy_set_interval_inclusion_is_frequentist_coverage": false,
   "spearman_rank_recovery_min": 0.8,
   "pairwise_order_recovery_min": 0.8,
   "behavior_relative_sign_recovery_min": 0.9,
