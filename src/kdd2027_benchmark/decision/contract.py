@@ -31,6 +31,14 @@ EXPECTED_ROWS = {
     "decision/evidence/current_scale_qualified_world_model_planner_all_rows.csv": 2160,
     "decision/evidence/current_scale_qualified_model_exploitation_all_rows.csv": 2160,
     "decision/evidence/current_scale_qualified_cell_discrimination.csv": 12,
+    "decision/evidence/heterogeneous_repeated_dataset_ope_coverage.csv": 20736,
+    "decision/evidence/heterogeneous_repeated_dataset_ope_rank_and_sign.csv": 3456,
+    "decision/evidence/heterogeneous_repeated_dataset_ope_authorization.csv": 3456,
+    "decision/evidence/heterogeneous_repeated_dataset_ope_mechanism_summary.csv": 16,
+    "decision/evidence/current_scale_qualified_heterogeneous_repeated_dataset_ope_coverage.csv": 15552,
+    "decision/evidence/current_scale_qualified_heterogeneous_repeated_dataset_ope_rank_and_sign.csv": 2592,
+    "decision/evidence/current_scale_qualified_heterogeneous_repeated_dataset_ope_authorization.csv": 2592,
+    "decision/evidence/current_scale_qualified_heterogeneous_repeated_dataset_ope_gate_summary.csv": 4,
     "decision/evidence/known_value_cross_task_summary.csv": 4,
     "decision/evidence/known_value_reference_full_matrix.csv": 1632,
     "decision/evidence/known_value_task_extension_full_matrix.csv": 816,
@@ -62,6 +70,7 @@ REQUIRED_REFERENCE_SOURCES = {
     "run_kdd101_model_free_diagnostics.py",
     "run_kdd_adapt01_adaptive_known_value.py",
     "run_kdd107_heterogeneous_known_value.py",
+    "run_kdd115_heterogeneous_repeated_dataset_ope.py",
     "run_kdd_ope_rd01_repeated_dataset.py",
     "run_kdd_bridge01_ehr_known_value.py",
     "run_kdd_x02_cross_cohort_policy_benchmark.py",
@@ -289,6 +298,25 @@ def validate_decision_release(root: Path) -> dict[str, object]:
     if any(_truth(row["retrospective_ehr_ope_authorized"]) for row in current_repeated):
         raise ReleaseContractError("Current repeated-dataset calibration authorized retrospective EHR OPE")
 
+    current_heterogeneous_repeated = _csv_rows(
+        root
+        / "decision/evidence/current_scale_qualified_heterogeneous_repeated_dataset_ope_authorization.csv"
+    )
+    if {row["task"] for row in current_heterogeneous_repeated} != current_policy_tasks:
+        raise ReleaseContractError("Current heterogeneous OPE includes a pending lineage")
+    heterogeneous_mechanisms = {
+        "interior_optimum",
+        "state_dependent_optimum",
+        "heterogeneous_response",
+        "delayed_tradeoff",
+    }
+    if {row["mechanism"] for row in current_heterogeneous_repeated} != heterogeneous_mechanisms:
+        raise ReleaseContractError("Current heterogeneous OPE mechanism inventory drifted")
+    if any(_truth(row["approved_known_value_tuple"]) for row in current_heterogeneous_repeated):
+        raise ReleaseContractError("Current heterogeneous OPE approval count drifted")
+    if any(_truth(row["retrospective_ehr_ope_authorized"]) for row in current_heterogeneous_repeated):
+        raise ReleaseContractError("Current heterogeneous calibration authorized retrospective EHR OPE")
+
     return {
         "benchmark_id": task_contract["benchmark_id"],
         "manifest_files_verified": len(manifest),
@@ -311,6 +339,9 @@ def validate_decision_release(root: Path) -> dict[str, object]:
         "historical_ope_tuple_rows": 16128,
         "repeated_dataset_ope_tuples": len(repeated),
         "current_repeated_dataset_ope_tuples": len(current_repeated),
+        "current_heterogeneous_repeated_dataset_ope_tuples": len(
+            current_heterogeneous_repeated
+        ),
         "repeated_dataset_adaptive_approved": repeated_adaptive_approved,
         "repeated_dataset_null_approved": repeated_null_approved,
         "reference_exact_approved": reference_approved,

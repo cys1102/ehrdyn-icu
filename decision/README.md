@@ -31,9 +31,10 @@ older lineages is relabeled as a decision-benchmark result.
   but heart-failure rows are not current evidence;
 - all 2,448 historical monotone policy rows, retained as evaluator
   smoke/sensitivity evidence rather than the primary policy benchmark;
-- 7,776 current repeated-dataset coverage rows and 1,296 current OPE
-  dispositions, plus separately labeled historical full and reference/task-
-  matched diagnostic ledgers;
+- 15,552 current heterogeneous repeated-dataset coverage rows and 2,592 current
+  OPE dispositions over four mechanisms and six fixed target policies; the
+  7,776-row null/composite-adaptive grid and prior fixed-dataset diagnostics
+  remain separately labeled sensitivities;
 - the 16-row EHR-to-known-value model-family bridge and all contract mappings;
 - a source-verified representative literature landscape;
 - the anonymous manuscript source and compiled PDF;

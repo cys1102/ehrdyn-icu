@@ -18,7 +18,7 @@ Contents:
 - `benchmark-card.md`: scope, tasks, roles, metrics, and use boundaries.
 - `contracts.md`: cohort, feature, action, reward, timing, and split contracts.
 - `estimator-planner-cards.md`: planner, policy, probability, and OPE contracts.
-- `tables/` and `figures/`: sanitized aggregate publication surfaces. Files prefixed `current_scale_qualified_` contain the primary three-cohort view: all 18 transition method--cohort rows, 3,060 heterogeneous policy--seed rows, 2,160 component-model--planner rows, 7,776 repeated-coverage rows, and 1,296 revised OPE dispositions. The complete prior six-task ledger remains available with superseded rows explicitly separated.
+- `tables/` and `figures/`: sanitized aggregate publication surfaces. Files prefixed `current_scale_qualified_` contain the primary three-cohort view: all 18 transition method--cohort rows, 3,060 heterogeneous policy--seed rows, 2,160 component-model--planner rows, 15,552 heterogeneous repeated-coverage rows, and 2,592 heterogeneous OPE dispositions. The null/composite-adaptive grid and complete prior six-task ledger remain available as explicitly separated sensitivities.
 - `number-audit.csv`: every reported manuscript number with source, estimator, split, and uncertainty method.
 - `provenance-manifest.csv`: internal source IDs, immutable commits, and hashes.
 - `reproducibility.md`, `environment-manifest.md`, and `credentialed-reconstruction.md`: rebuild instructions and data-access boundary.

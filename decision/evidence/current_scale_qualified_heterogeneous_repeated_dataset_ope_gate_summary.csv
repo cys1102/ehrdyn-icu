@@ -1,0 +1,5 @@
+mechanism,tuples,coverage_gate,rank_gate,pairwise_gate,sign_gate,false_improvement_gate,ess_gate,support_gate,finite_gate,approved_known_value_tuple
+delayed_tradeoff,648,10,285,373,18,648,90,648,648,0
+heterogeneous_response,648,0,0,4,24,575,216,648,648,0
+interior_optimum,648,0,0,0,0,584,126,648,648,0
+state_dependent_optimum,648,0,24,30,16,600,216,648,648,0

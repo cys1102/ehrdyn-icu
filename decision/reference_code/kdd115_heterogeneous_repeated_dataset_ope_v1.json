@@ -1,0 +1,84 @@
+{
+  "experiment_id": "KDD115",
+  "contract_version": "kdd115_heterogeneous_repeated_dataset_ope_v1",
+  "claim_boundary": "Exact finite heterogeneous known-value OPE calibration only; no retrospective EHR policy-value authorization, treatment benefit, causal effect, clinical utility, deployment, policy superiority, or cross-disease generalization claim.",
+  "source_environment_contract": "KDD107 kdd107_heterogeneous_known_value_v1",
+  "mechanisms": [
+    "interior_optimum",
+    "state_dependent_optimum",
+    "heterogeneous_response",
+    "delayed_tradeoff"
+  ],
+  "logged_dataset_replicates": {
+    "respiratory": 200,
+    "shock": 200,
+    "aki_rrt": 500,
+    "heart_failure": 200
+  },
+  "logged_episodes_per_dataset": 192,
+  "target_policies": [
+    "empirical_behavior",
+    "random_supported",
+    "minimum_supported_action",
+    "maximum_supported_action",
+    "severity_rule",
+    "exact_dynamic_programming_oracle"
+  ],
+  "task_horizons": {
+    "respiratory": [1, 4, 8],
+    "shock": [1, 4, 8],
+    "aki_rrt": [1, 2, 3],
+    "heart_failure": [1, 4, 8]
+  },
+  "estimators": ["IS", "WIS", "PDIS", "WPDIS", "CWPDIS", "DR", "WDR", "FQE", "support_restricted_WPDIS"],
+  "denominators": ["exact_behavior", "misspecified_behavior", "paper_lstm_h16", "crossfit_stronger"],
+  "clipping": ["none", 20.0],
+  "support_contract": "masked",
+  "interval": {
+    "method": "episode_percentile_bootstrap",
+    "confidence_level": 0.95,
+    "bootstrap_replicates": 500,
+    "bootstrap_seed_namespace": [8401, 8402, 8403]
+  },
+  "coverage_precision_interval": {"method": "wilson_binomial", "confidence_level": 0.95},
+  "seed_namespaces": {
+    "logged_dataset_base": 115000000,
+    "logged_dataset_rule": "115000000 + task_index*1000000 + mechanism_index*100000 + dataset_index",
+    "prior_repeated_dataset_seed_max": 91110499,
+    "optimization_training": [3408, 3411, 3414, 3417, 3420],
+    "evaluation_noise": [9401, 9402, 9403],
+    "stochastic_policy_seed_base": 19401,
+    "behavior_model_fixed": 16401,
+    "bootstrap_fixed": [8401, 8402, 8403]
+  },
+  "authorization_gates": {
+    "minimum_empirical_coverage": 0.9,
+    "minimum_spearman_rank_recovery": 0.8,
+    "minimum_pairwise_order_recovery": 0.8,
+    "minimum_behavior_relative_sign_recovery": 0.9,
+    "maximum_false_improvement_probability": 0.05,
+    "minimum_median_ess": 100,
+    "minimum_median_ess_fraction": 0.05,
+    "maximum_unsupported_action_mass": 0.0,
+    "require_all_finite": true
+  },
+  "authorization_boundary": "Passing tuples remain estimator--denominator--clip--support--horizon--mechanism specific and do not authorize retrospective EHR OPE without separate trained-policy, probability, overlap, and task-contract gates.",
+  "immutable_source_hashes": {
+    "kdd107_config": "d2536f9bd7e4eb25e09b314b25c7bce2230edc641aa6f2bec7b9573c3d97d464",
+    "kdd107_runner": "bba544a8fb7dc14163a8293c93927d8da9b18fa1f0916867a130a632cb6418f3",
+    "kdd107_frozen_environment_contracts": "8938f752441220c85ba760f11332dda8083652c31dd12d265698f7c7659620aa",
+    "kdd107_policy_level_results": "cc0f4193e8a656cd3cceae60d44a0001f968aec8042be95f412e25957d66f5b8",
+    "kdd107_policy_implementation": "23917461c6b08bed6efa925899afc204727c6ea4cb3ed39aeddae027b2429114",
+    "completed_repeated_dataset_config": "6a2b210e3820941cd3caa8d9d3350e73e78f799bc3ce9d0281a1ea728601e401",
+    "completed_repeated_dataset_runner": "e4ea7bfd11da71c0b39dbbc1f71abe5da7dbb41fcb5f99d854f1fe3280d6c26c",
+    "completed_repeated_dataset_authorization": "6c6485676664104f7cf4345e0df64b1254de5896e1462c0e763ec99c66b6cdf7",
+    "e01_evaluator": "fcb5e5263d5f19238f329c1966ab16d60515101a628d5ce40f0e5c628f5dd966",
+    "e02_runner": "0cba032a93599037a0663b4aa1e193325b13db6f8cc911a8a949deb6a7b3bad9"
+  },
+  "allowed_decisions": [
+    "complete_heterogeneous_repeated_dataset_ope_map",
+    "complete_negative_no_heterogeneous_tuple_approved",
+    "stop_interval_or_truth_parity_failure",
+    "stop_repeat_count_or_source_drift"
+  ]
+}

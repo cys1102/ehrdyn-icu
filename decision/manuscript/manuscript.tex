@@ -25,7 +25,7 @@
 \begin{document}
 
 \begin{abstract}
-Electronic health record (EHR) world-model components are increasingly connected to offline reinforcement learning (RL), yet comparisons can be driven by incompatible tasks, actions, rewards, support rules, or evaluator assumptions rather than algorithmic differences. We introduce a development benchmark that standardizes these layers across six scale-qualified ICU cohort targets and compares six transition methods, five uncertainty-capable methods, 34 policy/planner labels, and nine off-policy evaluation (OPE) estimators. We define a minimum decision model by transition ($P$), reward ($R$), and termination ($T$) components, while explicitly excluding an unmodeled observation process from the claim. On the three unchanged cohort lineages with complete current results, the Transformer leads one-step error, the Gaussian ensemble leads recursive error and sharpness, and GRU-D leads recursive calibration. In matched exact-finite mechanisms, model-free and world-model planners trade places and no learned method is uniformly best. Repeated-dataset OPE validates only null-response sanity contracts; no adaptive-response contract passes all frozen gates, so we report no retrospective EHR policy value or winner. Sepsis, AF/flutter, and heart-failure results from smaller superseded constructions are excluded pending preregistered reruns on their restored large lineages. The contribution is an executable multi-cohort scaffold, a complete all-method inventory, and a failure decomposition from component forecasting through policy-evaluation authorization.
+Electronic health record (EHR) world-model components are increasingly connected to offline reinforcement learning (RL), yet comparisons can be driven by incompatible tasks, actions, rewards, support rules, or evaluator assumptions rather than algorithmic differences. We introduce a development benchmark that standardizes these layers across six scale-qualified ICU cohort targets and compares six transition methods, five uncertainty-capable methods, 34 policy/planner labels, and nine off-policy evaluation (OPE) estimators. We define a minimum decision model by transition ($P$), reward ($R$), and termination ($T$) components, while explicitly excluding an unmodeled observation process from the claim. On the three unchanged cohort lineages with complete current results, the Transformer leads one-step error, the Gaussian ensemble leads recursive error and sharpness, and GRU-D leads recursive calibration. In matched exact-finite mechanisms, model-free and world-model planners trade places and no learned method is uniformly best. Across repeated logged datasets for four heterogeneous mechanisms, no frozen OPE contract passes all gates, so we report no retrospective EHR policy value or winner. Sepsis, AF/flutter, and heart-failure results from smaller superseded constructions are excluded pending preregistered reruns on their restored large lineages. The contribution is an executable multi-cohort scaffold, a complete all-method inventory, and a failure decomposition from component forecasting through policy-evaluation authorization.
 \end{abstract}
 
 \keywords{electronic health records, world models, offline reinforcement learning, benchmark, off-policy evaluation, uncertainty}
@@ -178,7 +178,7 @@ All action responses, rewards, and termination mechanisms are known by construct
 
 Exact dynamic-programming value is the primary estimand for every frozen policy. A separate common-random-number Monte Carlo check evaluates all policies from the same initial-state and exogenous-noise streams; policy randomness, training seeds, and evaluation seeds are separately recorded. Exact/Monte Carlo agreement and paired behavior-difference precision are hard evaluator checks, not substitutes for exact value. The complete policy-level release retains exact return, regret, behavior delta, Monte Carlo return and standard error, unsupported mass, training seed, and model-exploitation gap.
 
-The OPE matrix tests trajectory IS and WIS; per-decision IS, WPDIS, and CWPDIS; DR and WDR; FQE; and support-restricted variants \cite{thomas2016data,jiang2016doubly,hao2021bootstrapping}. A contract fixes estimator, behavior denominator, clipping, support rule, horizon, and regime. In the current scale-qualified subset, 200 independent logged datasets are generated per respiratory and shock task--regime cell and 500 for AKI--RRT. Behavior denominators and nuisance models are refit inside each dataset, and each interval uses only that dataset. Empirical coverage is the fraction of independently generated datasets whose interval contains the exact policy value; a 95\% Wilson interval reports its sampling precision. Approval requires minimum policy-specific empirical coverage $\geq0.90$; Spearman rank and pairwise-order recovery $\geq0.80$; behavior-relative sign recovery $\geq0.90$; false-improvement probability $\leq0.05$; median ESS $\geq\max(100,0.05N)$; zero unsupported target mass; and finite required values. The former single-dataset policy-set interval inclusion rate is retained as diagnostic-only and is not an authorization gate.
+The OPE matrix tests trajectory IS and WIS; per-decision IS, WPDIS, and CWPDIS; DR and WDR; FQE; and support-restricted variants \cite{thomas2016data,jiang2016doubly,hao2021bootstrapping}. A contract fixes estimator, behavior denominator, clipping, support rule, horizon, and mechanism. For each of the four heterogeneous mechanisms, 200 independent logged datasets are generated for each current respiratory and shock profile and 500 for AKI--RRT. Six frozen target policies span behavior, random and fixed supported controls, a severity rule, and the exact dynamic-programming policy. Behavior denominators and nuisance models are refit inside each dataset, and each interval uses only that dataset. Empirical coverage is the fraction of independently generated datasets whose interval contains the exact policy value; a 95\% Wilson interval reports its sampling precision. Approval requires minimum policy-specific empirical coverage $\geq0.90$; Spearman rank and pairwise-order recovery $\geq0.80$; behavior-relative sign recovery $\geq0.90$; false-improvement probability $\leq0.05$; median ESS $\geq\max(100,0.05N)$; zero unsupported target mass; and finite required values. The former single-dataset policy-set interval inclusion rate is retained as diagnostic-only and is not an authorization gate. Null and composite-adaptive repeated-dataset grids remain secondary evaluator sensitivities.
 
 \section{Results}
 
@@ -202,7 +202,7 @@ Transition & Final-horizon RMSE & Same six methods & 3 cohorts; step 11 (44 h) &
 Uncertainty & One-step CRPS / MACE & HGB plus four probabilistic components (5); LOCF unavailable & 3 current EHR cohorts & CRPS: Transformer 3/3 \\
 Uncertainty & Recursive CRPS / MACE & Same five probabilistic methods & 3 current EHR cohorts & CRPS: ensemble 3/3; MACE: GRU-D 3/3 \\
 Policy & Exact return / regret & 5 controls + 5 model-free + 24 component--planner labels (34) & 18 exact-finite environments; 3,060 seed rows & Learned $>$ both extremes in 8/12 new cells; no universal winner \\
-OPE & Repeated-dataset authorization & IS, WIS, PDIS, WPDIS, CWPDIS, DR, WDR, FQE, support-restricted WPDIS (9) & 1,800 independent datasets; 1,296 tuples & Null sanity only; adaptive 0/648; none retrospective \\
+OPE & Repeated-dataset authorization & IS, WIS, PDIS, WPDIS, CWPDIS, DR, WDR, FQE, support-restricted WPDIS (9) & 3,600 independent datasets; 2,592 tuples; 4 mechanisms & No joint pass; none retrospective \\
 \bottomrule
 \end{tabularx}
 \end{table*}
@@ -252,34 +252,34 @@ The prior K25-sepsis policy diagnostic belongs to the superseded 3,440-episode c
 
 Component-model planners also exhibit substantial simulator-to-truth disagreement. Across the 2,160 current planner--seed cells, task-level mean absolute learned-model-versus-exact-return gaps range from 0.060 to 1.185, with a maximum of 1.826. These values remain on task-specific constructed reward scales and are not compared as cross-task performance; they show why a planner's value inside its learned model cannot replace exact known truth.
 
-Repeated-dataset evaluation generates 1,800 independent logged datasets and evaluates 1,296 current frozen OPE-contract tuples. Table~\ref{tab:ope} shows the result. Forty tuples pass all gates, all in AKI--RRT null-response sanity cells; zero of 648 adaptive-response tuples passes. Adaptive failures arise across coverage, rank/order, sign, false-improvement, and ESS rather than a single implementation defect. The former fixed-dataset interval-inclusion result is retained as a \emph{policy-set interval inclusion rate} in the historical artifact, not interpreted as frequentist coverage or retrospective authorization. No estimator is transported by family name and no retrospective EHR OPE value is reported.
+Repeated-dataset evaluation generates 3,600 independent logged datasets and evaluates 2,592 current frozen OPE-contract tuples over all four heterogeneous mechanisms. Table~\ref{tab:ope} shows the result: no tuple passes all gates. Coverage passes for only 10 tuples, rank for 309, pairwise order for 407, behavior-relative sign for 58, false improvement for 2,407, and ESS for 648; support and finiteness pass for all 2,592. This is a joint-gate failure decomposition rather than evidence that every estimator is universally unusable. The former fixed-dataset interval-inclusion result is retained as a \emph{policy-set interval inclusion rate} in the historical artifact, and the null/composite-adaptive repeated grid remains a secondary sanity sensitivity. No estimator is transported by family name and no retrospective EHR OPE value is reported.
 
 \begin{table}[t]
 \centering
-\caption{Repeated-dataset OPE gate pass counts for the current scale-qualified subset. Each response regime has 648 frozen contract tuples. Coverage is empirical across independent logged datasets; all thresholds are frozen in Methods.}
+\caption{Repeated-dataset OPE gate pass counts for the current scale-qualified subset. Each heterogeneous mechanism has 648 frozen contract tuples over six fixed target policies. Coverage is empirical across independent logged datasets; all thresholds are frozen in Methods.}
 \label{tab:ope}
 \scriptsize
-\begin{tabular}{lrr}
+\begin{tabular}{lrrrr}
 \toprule
-Gate & Adaptive response & Null response \\
+Gate & Interior & State-dep. & Heterog. & Delayed \\
 \midrule
-Empirical coverage & 64 & 40 \\
-Rank & 194 & 648 \\
-Pairwise order & 272 & 648 \\
-Improvement sign & 75 & 648 \\
-False improvement & 280 & 190 \\
-ESS & 72 & 144 \\
-Support & 648 & 648 \\
-Finite values & 648 & 648 \\
+Empirical coverage & 0 & 0 & 0 & 10 \\
+Rank & 0 & 24 & 0 & 285 \\
+Pairwise order & 0 & 30 & 4 & 373 \\
+Improvement sign & 0 & 16 & 24 & 18 \\
+False improvement & 584 & 600 & 575 & 648 \\
+ESS & 126 & 216 & 216 & 90 \\
+Support & 648 & 648 & 648 & 648 \\
+Finite values & 648 & 648 & 648 & 648 \\
 \midrule
-All gates & 0 & 40 \\
+All gates & 0 & 0 & 0 & 0 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{RQ4: Cross-cohort evaluability}
 
-All six frozen target lineages exceed 10,000 subjects and 10,000 episodes, but higher evaluation layers differ. Respiratory and shock retain rich repeated actions, post-action reward proxies, P/R/T components, and matched known-value task profiles. AKI retains a P/T transition surface and a separate daily wait-versus-RRT constructed decision profile. AF/flutter remains component-only unless strict action--reward ordering succeeds on its restored lineage. Sepsis, AF/flutter, and heart failure cannot re-enter the final six-cohort numeric surface until the large-lineage P/R/T, uncertainty, action-information, and applicable policy diagnostics are recomputed. None of the current tasks yields an adaptive-response repeated-dataset OPE contract that authorizes retrospective scoring.
+All six frozen target lineages exceed 10,000 subjects and 10,000 episodes, but higher evaluation layers differ. Respiratory and shock retain rich repeated actions, post-action reward proxies, P/R/T components, and matched known-value task profiles. AKI retains a P/T transition surface and a separate daily wait-versus-RRT constructed decision profile. AF/flutter remains component-only unless strict action--reward ordering succeeds on its restored lineage. Sepsis, AF/flutter, and heart failure cannot re-enter the final six-cohort numeric surface until the large-lineage P/R/T, uncertainty, action-information, and applicable policy diagnostics are recomputed. None of the current heterogeneous repeated-dataset OPE contracts authorizes retrospective scoring.
 
 \section{Prediction-to-Policy Failure Decomposition}
 
@@ -299,7 +299,7 @@ Authorized users rebuild task arrays locally, fit all data-dependent transforms 
 
 The EHR findings are development benchmark evidence: no genuinely untouched confirmatory role is available. Component-model leader comparisons lack subject-cluster intervals, and the derived Gaussian ensemble contributes one row per task. Recursive evaluation predicts values under a fixed missingness convention rather than modeling a generative observation process; accordingly, we claim P/R/T components rather than a complete EHR world model with an observation head. The four-hour action is a recorded interval exposure, not guaranteed to be assignable at the bin start. Sepsis is an AI-Clinician-aligned K25 scaffold rather than an exact reproduction, and its reference terminal outcome is unavailable. Restoring the large sepsis, AF/flutter, and heart-failure lineages is a submission-critical reevaluation: until it is complete, their old small-lineage metrics remain excluded and the numerical primary synthesis contains only respiratory, shock, and AKI. AKI and heart-failure policy comparisons use separately constructed known-value tasks rather than the original EHR transition actions, and AF remains component-only.
 
-The policy mechanisms are exact and heterogeneous but constructed; their results do not establish value on retrospective EHR trajectories. The frozen 8/12 discrimination statistic is a maximum over the complete learned policy--seed cell and therefore does not support learned-family superiority. The repeated-dataset OPE audit covers null and composite-adaptive regimes, not all four new heterogeneous mechanisms, and authorizes no adaptive or retrospective scoring. MIMIC-IV is restricted, so the artifact shares code, contracts, synthetic fixtures, and aggregate results rather than row-level data. These are evidence boundaries of the technical benchmark.
+The policy mechanisms are exact and heterogeneous but constructed; their results do not establish value on retrospective EHR trajectories. The frozen 8/12 discrimination statistic is a maximum over the complete learned policy--seed cell and therefore does not support learned-family superiority. The heterogeneous repeated-dataset OPE audit covers all four new mechanisms but evaluates six fixed target policies rather than the entire trained-policy inventory; it authorizes no retrospective scoring. MIMIC-IV is restricted, so the artifact shares code, contracts, synthetic fixtures, and aggregate results rather than row-level data. These are evidence boundaries of the technical benchmark.
 
 \section{Conclusion}
 

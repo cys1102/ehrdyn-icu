@@ -89,9 +89,10 @@ The former policy-set interval inclusion rate within one fixed logged-data reali
 
 ## Current disposition
 
-- Repeated-dataset known-value grid: 40 of 1,296 current tuples approved.
+- Heterogeneous repeated-dataset known-value grid: 0 of 2,592 current tuples approved over four mechanisms and six fixed target policies.
+- Secondary null/composite-adaptive repeated grid: 40 of 1,296 current tuples approved, all in AKI null-response sanity cells.
 - Adaptive response: 0 of 648 tuples approved.
 - Null response: 40 of 648 tuples approved, all in AKI--RRT sanity cells.
 - Retrospective EHR policy value: not executed and unavailable.
 
-Current repeated-dataset metrics and dispositions are in the corresponding `current_scale_qualified_repeated_dataset_ope_*.csv` files. Full prior ledgers remain available with historical/superseded labels. No tuple is transferred by estimator family name alone.
+Primary heterogeneous repeated-dataset metrics and dispositions are in the corresponding `current_scale_qualified_heterogeneous_repeated_dataset_ope_*.csv` files. The null/composite-adaptive grid is retained in `current_scale_qualified_repeated_dataset_ope_*.csv`; full prior ledgers remain available with historical/superseded labels. No tuple is transferred by estimator family name alone.

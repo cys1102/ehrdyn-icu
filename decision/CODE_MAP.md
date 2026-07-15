@@ -17,6 +17,7 @@
 | Adaptive exact-finite policy benchmark | `decision/reference_code/run_kdd_adapt01_adaptive_known_value.py` and `kdd_adapt01_adaptive_known_value_v1.json` | byte-identical executed runner and configuration snapshots |
 | Heterogeneous exact-finite policy benchmark | `decision/reference_code/run_kdd107_heterogeneous_known_value.py` and `kdd107_heterogeneous_known_value_v1.json` | portable path-sanitized executed runner and byte-identical configuration snapshot |
 | Repeated-dataset OPE calibration | `decision/reference_code/run_kdd_ope_rd01_repeated_dataset.py` and `kdd_ope_rd01_repeated_dataset_v1.json` | byte-identical executed runner and configuration snapshots |
+| Heterogeneous repeated-dataset OPE calibration | `decision/reference_code/run_kdd115_heterogeneous_repeated_dataset_ope.py` and `kdd115_heterogeneous_repeated_dataset_ope_v1.json` | byte-identical executed runner and configuration snapshots |
 | EHR-to-known-value diagnostic bridge | `decision/reference_code/run_kdd_bridge01_ehr_known_value.py` and `kdd_bridge01_ehr_known_value_v1.json` | byte-identical executed runner and configuration snapshots |
 | Shared known-value utilities | `decision/reference_code/run_kdd100_complete_known_value.py` and `run_kdd100r_task_matched_known_value.py` | byte-identical dependency snapshots |
 | Frozen executed configurations | `decision/reference_code/*.json` | byte-identical configuration snapshots |
@@ -33,8 +34,9 @@
 | Adaptive model exploitation | `decision/evidence/adaptive_exploitation_gap_all_rows.csv` | all 480 planner-seed rows |
 | Current heterogeneous policy labels | `decision/evidence/current_scale_qualified_policy_true_returns_all_rows.csv` | 3,060 policy-seed rows for respiratory, shock, and AKI |
 | Current world-model planning | `decision/evidence/current_scale_qualified_world_model_planner_all_rows.csv` and `current_scale_qualified_model_exploitation_all_rows.csv` | 2,160 planner-seed and exploitation rows for current lineages |
-| Current repeated-dataset OPE | `decision/evidence/current_scale_qualified_repeated_dataset_ope_coverage.csv` and `current_scale_qualified_repeated_dataset_ope_authorization.csv` | 7,776 coverage rows and 1,296 frozen contract dispositions for current lineages |
-| Historical full policy/OPE ledgers | `decision/evidence/heterogeneous_policy_true_returns_all_rows.csv`, `heterogeneous_world_model_planner_all_rows.csv`, and `repeated_dataset_ope_*.csv` | retained for provenance; heart-failure rows are excluded from current synthesis pending rerun |
+| Current heterogeneous repeated-dataset OPE | `decision/evidence/current_scale_qualified_heterogeneous_repeated_dataset_ope_coverage.csv` and `current_scale_qualified_heterogeneous_repeated_dataset_ope_authorization.csv` | 15,552 coverage rows and 2,592 frozen contract dispositions over four mechanisms for current lineages |
+| Secondary null/composite-adaptive OPE | `decision/evidence/current_scale_qualified_repeated_dataset_ope_coverage.csv` and `current_scale_qualified_repeated_dataset_ope_authorization.csv` | 7,776 coverage rows and 1,296 sensitivity dispositions |
+| Historical full policy/OPE ledgers | `decision/evidence/heterogeneous_policy_true_returns_all_rows.csv`, `heterogeneous_world_model_planner_all_rows.csv`, `heterogeneous_repeated_dataset_ope_*.csv`, and `repeated_dataset_ope_*.csv` | retained for provenance; heart-failure rows are excluded from current synthesis pending rerun |
 | EHR-to-known-value bridge | `decision/evidence/cross_surface_model_family_rows.csv` and `ehr_known_value_bridge_coefficients.csv` | complete model-family rows and descriptive bridge coefficients |
 | Representative prior-study landscape | `decision/evidence/related_work_landscape.csv` | source-verified motivation table; not a systematic review |
 | Complete paper result rows | `decision/evidence/` | hash-verified aggregate evidence |

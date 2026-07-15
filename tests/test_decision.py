@@ -38,6 +38,7 @@ class DecisionReleaseTests(unittest.TestCase):
         self.assertEqual(receipt["historical_ope_tuple_rows"], 16128)
         self.assertEqual(receipt["repeated_dataset_ope_tuples"], 1728)
         self.assertEqual(receipt["current_repeated_dataset_ope_tuples"], 1296)
+        self.assertEqual(receipt["current_heterogeneous_repeated_dataset_ope_tuples"], 2592)
         self.assertEqual(receipt["repeated_dataset_adaptive_approved"], 0)
         self.assertEqual(receipt["repeated_dataset_null_approved"], 40)
         self.assertEqual(receipt["aki_task_matched_tier2_approved"], 236)

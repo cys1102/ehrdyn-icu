@@ -56,6 +56,11 @@ python \
   --output kdd_benchmark_discovery/results/reproduction_repeated_dataset_ope
 
 python \
+  -m kdd_benchmark_discovery.run_kdd115_heterogeneous_repeated_dataset_ope \
+  --config configs/kdd115_heterogeneous_repeated_dataset_ope_v1.json \
+  --output kdd_benchmark_discovery/results/reproduction_heterogeneous_repeated_dataset_ope
+
+python \
   -m kdd_benchmark_discovery.run_kdd_bridge01_ehr_known_value \
   --config configs/kdd_bridge01_ehr_known_value_v1.json \
   --output kdd_benchmark_discovery/results/reproduction_ehr_known_value_bridge

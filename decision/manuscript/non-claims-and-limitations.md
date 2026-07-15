@@ -25,5 +25,5 @@ confidence: high
 - Prediction accuracy does not establish counterfactual fidelity or retrospective policy improvement.
 - The current heterogeneous exact-finite results evaluate known constructed mechanisms; the frozen 8/12 cell statistic is a maximum over the complete learned policy--seed cell and is not seed-aware superiority inference.
 - AF/flutter and heart-failure small-lineage metrics are superseded pending reruns on 11,820/14,580 and 27,611/32,552 subjects/episodes, respectively.
-- Repeated-dataset OPE currently covers null and composite-adaptive regimes, not the four new heterogeneous mechanisms; no adaptive tuple passes.
+- Repeated-dataset OPE covers all four heterogeneous mechanisms but only six fixed target policies, not the full trained-policy inventory; no heterogeneous tuple passes the joint gate.
 - Independent credentialed reconstruction remains pending and is a clean-clone aggregate reproducibility check, not external validation.

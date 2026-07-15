@@ -1,0 +1,17 @@
+task,mechanism,tuple_count,approved_tuple_count,coverage_gate_failures,rank_gate_failures,pairwise_gate_failures,sign_gate_failures,false_improvement_gate_failures,ess_gate_failures,support_gate_failures,finite_gate_failures,minimum_policy_empirical_coverage,median_tuple_ess,retrospective_ehr_ope_authorized
+aki_rrt,delayed_tradeoff,216,0,216,67,38,198,0,126,0,0,0.0,94.27634572,False
+aki_rrt,heterogeneous_response,216,0,216,216,212,192,16,0,0,0,0.0,131.3673276,False
+aki_rrt,interior_optimum,216,0,216,216,216,216,16,90,0,0,0.0,104.2966583,False
+aki_rrt,state_dependent_optimum,216,0,216,192,186,200,16,0,0,0,0.0,131.1453425,False
+heart_failure,delayed_tradeoff,216,0,212,211,113,216,4,216,0,0,0.0,0.5004222976,False
+heart_failure,heterogeneous_response,216,0,216,216,216,216,28,216,0,0,0.0,1.0,False
+heart_failure,interior_optimum,216,0,216,216,208,216,24,216,0,0,0.01,1.107210434,False
+heart_failure,state_dependent_optimum,216,0,216,216,216,216,24,216,0,0,0.0,1.200224231,False
+respiratory,delayed_tradeoff,216,0,206,216,185,216,0,216,0,0,0.0,0.5,False
+respiratory,heterogeneous_response,216,0,216,216,216,216,28,216,0,0,0.0,0.5,False
+respiratory,interior_optimum,216,0,216,216,216,216,24,216,0,0,0.0,0.6278735224,False
+respiratory,state_dependent_optimum,216,0,216,216,216,216,8,216,0,0,0.0,1.0,False
+shock,delayed_tradeoff,216,0,216,80,52,216,0,216,0,0,0.0,0.0,False
+shock,heterogeneous_response,216,0,216,216,216,216,29,216,0,0,0.0,0.0,False
+shock,interior_optimum,216,0,216,216,216,216,24,216,0,0,0.0,0.0,False
+shock,state_dependent_optimum,216,0,216,216,216,216,24,216,0,0,0.0,0.0,False

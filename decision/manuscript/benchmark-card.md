@@ -30,8 +30,9 @@ Transition accuracy is a validity layer, not the benchmark endpoint. Retrospecti
 - Frozen cohort-scale gate: at least 10,000 subjects and 10,000 ICU-stay episodes; all six final target lineages pass.
 - Current primary known-value surface: 18 exact-finite task--mechanism environments, including 12 prespecified interior-optimum, state-dependent, heterogeneous-response, and delayed-trade-off cells. Heart-failure results are withheld until its large-lineage rerun.
 - Evaluator sensitivities: null-response, historical monotone, and the earlier composite-adaptive family.
-- Repeated-dataset OPE: 1,800 independent logged datasets; 40/1,296 current known-value tuple approvals, all AKI null-response sanity cells; adaptive response 0/648.
-- Real-EHR OPE: not executed for comparison; no adaptive repeated-dataset contract and policy-specific EHR gate both pass.
+- Primary repeated-dataset OPE: 3,600 independent logged datasets over the four heterogeneous mechanisms and six fixed target policies; 0/2,592 current known-value tuple approvals.
+- Secondary null/composite-adaptive repeated grid: 40/1,296 approvals, all AKI null-response sanity cells.
+- Real-EHR OPE: not executed for comparison; no heterogeneous repeated-dataset contract and policy-specific EHR gate both pass.
 - Independent credentialed reconstruction: pending aggregate-result regeneration from a clean clone; not external validation.
 
 ## Tasks
@@ -66,7 +67,7 @@ Transition accuracy is a validity layer, not the benchmark endpoint. Retrospecti
 - Fixed primary factual-action estimand and per-row episode-bootstrap interval counts.
 - Task-balanced one-step and recursive uncertainty summary.
 - All 3,060 current heterogeneous policy--seed rows and 2,160 component-model--planner rows, plus separately labeled superseded/historical sensitivities.
-- All 7,776 current repeated-dataset policy coverage rows and 1,296 revised OPE tuple dispositions; historical fixed-dataset diagnostics remain separately labeled.
+- All 15,552 current heterogeneous repeated-dataset policy coverage rows and 2,592 OPE tuple dispositions; null/composite-adaptive and fixed-dataset diagnostics remain separately labeled.
 
 ## Intended use
 
