@@ -7,7 +7,7 @@ target-policy replay package and not evidence of causal treatment-policy value.
 ## Quarantine Status
 
 Offline-policy rows are not accepted by the public leaderboard submission
-validator in v1.1.1. They remain frozen aggregate stress tests because exact
+public validator. They remain frozen aggregate stress tests because exact
 KDD078 target-policy probability surfaces are unavailable and no public
 task-policy registry can reproduce every reported value. A future policy track
 requires a new version with policy probabilities, task-policy-denominator row

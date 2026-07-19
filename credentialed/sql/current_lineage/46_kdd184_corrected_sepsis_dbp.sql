@@ -1,5 +1,5 @@
 -- Additive KDD184 corrected sepsis DBP surface.
--- Preserve ehrdyn_icu_internal.observation_events as the historical v1.1.1 view.
+-- Preserve ehrdyn_icu_internal.observation_events as the historical baseline view.
 -- Export this view in place of that historical view for the corrected sepsis lineage.
 CREATE MATERIALIZED VIEW ehrdyn_icu_internal.observation_events_kdd184_corrected AS
 WITH preserved AS (

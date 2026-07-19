@@ -1,14 +1,12 @@
-# EHRDyn-ICU v1.2.0-rc1
+# EHRDyn-ICU
 
 EHRDyn-ICU is a frozen, multi-cohort benchmark contract for recorded ICU
-trajectory forecasting and offline-RL readiness diagnostics. The immutable
-scientific contract identifier is `KDD2027-E060-4H-v1.0.0`; v1.1 adds the
-public credentialed-construction path and paper-to-artifact manifests without
-changing the frozen scientific results. Version 1.1.1 adds action-cardinality
-parity checks and corrects overlap handling in the public construction path.
-Version 1.2.0-rc1 adds the KDD187 Rocky Linux author-side reconstruction
-release contract. It does not convert the externally blocked KDD182 run into
-independent evidence.
+trajectory forecasting and offline-RL readiness diagnostics. Frozen scientific
+contract identifiers remain in the machine-readable task files. The public
+repository includes the credentialed-construction path, paper-to-artifact
+manifests, action-cardinality parity checks, overlap-aware action construction,
+and the KDD187 Rocky Linux author-side reconstruction contract. KDD187 does not
+convert the externally blocked KDD182 run into independent evidence.
 
 This repository contains software, task definitions, synthetic fixtures, and
 aggregate evidence. It does **not** contain MIMIC-IV rows, patient identifiers,

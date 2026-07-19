@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0-rc1
+## KDD187 public reconstruction update
 
 - Added a Rocky Linux conda setup backed by the frozen `uv.lock` dependency
   graph and one documented public/credentialed reconstruction workflow.
@@ -11,7 +11,7 @@
 - Registered the completed KDD186 uncertainty-penalty sensitivity as optional
   aggregate evidence rather than a core reconstruction prerequisite.
 
-## 1.1.1
+## Action-construction and parity update
 
 - Prorated medication amounts by event-window overlap and represented RRT/CRRT
   as four-hour procedure-overlap fraction, closing the binary-to-three-level
@@ -24,7 +24,7 @@
   cross-drug dose-equivalent treatment intensities, and that the respiratory
   task has a historical nominal five-bin name but empirical `K=4`.
 
-## 1.1.0
+## Credentialed reconstruction update
 
 - Published credentialed MIMIC-IV SQL and preprocessing for all seven compact
   tasks, including the five primary paper tasks, with exact aggregate parity
@@ -37,7 +37,7 @@
 - Added compact-task clinician packets, a response template, and a
   machine-readable status table. Independent clinical review remains pending.
 
-## 1.0.3
+## Provenance and clinical-review update
 
 - Added KDD091 headline candidate-set reconciliation.
 - Added KDD093 subject-cluster feasibility and KDD094 OPE provenance audits.
@@ -45,14 +45,14 @@
 - Corrected OPE documentation and explicitly blocked unsupported CWPDIS, exact
   KDD078 probability-surface replay, and subject-cluster robustness claims.
 
-## 1.0.2
+## Rich-action and portability update
 
 - Added aggregate rich-action role and fixed-family transition evidence.
 - Added same-family probabilistic uncertainty evidence.
 - Added bounded eICU evaluator-portability summaries with nonidentity limits.
 - Preserved the immutable scientific task contract and all clinical/causal claim blocks.
 
-## KDD089
+## Initial frozen public benchmark update
 
 - Added exact E060 sepsis K=25 reference task.
 - Added KDD087B/KDD087R corrected action roles.

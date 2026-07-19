@@ -39,7 +39,7 @@ preprocessing statistics, keys, and split membership are restricted local
 artifacts and must never be committed. Only a separately reviewed aggregate
 receipt may be considered for release.
 
-The v1.1.1 extraction path prorates medication amounts by overlap with each
+The public extraction path prorates medication amounts by overlap with each
 four-hour window and encodes RRT/CRRT as procedure-overlap fraction. Review the
 local `amountuom` and `rateuom` distributions before execution: the compact
 axes are recorded-exposure proxies and do not claim cross-drug dose

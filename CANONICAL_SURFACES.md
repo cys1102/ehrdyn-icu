@@ -6,7 +6,7 @@ pooled or silently substituted for one another.
 
 | Surface | Frozen content | Purpose | Selection status |
 | --- | --- | --- | --- |
-| Core v1.0 dynamics | Five primary compact-action tasks, 41 controlled contracts, 11 forecasting methods | One-step versus conditional-recursive method ranking | Headline frozen benchmark surface |
+| Core dynamics | Five primary compact-action tasks, 41 controlled contracts, 11 forecasting methods | One-step versus conditional-recursive method ranking | Headline frozen benchmark surface |
 | Rich-action task audit | Exact sepsis 25-action reference plus promoted non-sepsis 25-action views and exclusions | Action support, task-role, and sepsis-relative diagnostics | Separate audit; never replaces core rankings |
 | Temporal lockbox | Five primary tasks and six representative methods on a later-period patient-disjoint split | No-retuning rank confirmation | Confirmation only; cannot select or retune models |
 | eICU portability pilot | Two nonidentically mapped tasks and 26 baseline-seed fits | Evaluator portability | Not phenotype-identical external validation |
