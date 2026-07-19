@@ -20,6 +20,34 @@ TASK = ROOT / "configs/tasks/kdd2027_sepsis_vasopressor_3bin.json"
 
 
 class KDD089ReleaseTests(unittest.TestCase):
+    def test_kdd187_author_side_reconstruction_contract(self):
+        contract=json.loads((ROOT/"contracts/kdd187_parity_contract.json").read_text(encoding="utf-8"))
+        self.assertEqual(contract["evidence_role"],"author_side_documentation_readiness")
+        self.assertFalse(contract["independent_reconstruction_claimed"])
+        with (ROOT/"contracts/kdd187_five_task_contract_manifest.csv").open(newline="",encoding="utf-8") as handle:
+            rows=list(csv.DictReader(handle))
+        self.assertEqual([row["cohort"] for row in rows],["sepsis","respiratory","shock","aki","heart_failure"])
+        self.assertEqual([int(row["action_count"]) for row in rows],[25,25,25,4,2])
+        self.assertEqual({row["evidence_role"] for row in rows},{"author_side_documentation_readiness"})
+        self.assertIn("corrected_additive_kdd184",rows[0]["lineage_status"])
+
+    def test_kdd187_rocky_and_privacy_instructions(self):
+        environment=(ROOT/"environment-rocky-linux.yml").read_text(encoding="utf-8")
+        instructions=(ROOT/"PUBLIC_RECONSTRUCTION.md").read_text(encoding="utf-8")
+        self.assertIn("python=3.11",environment)
+        self.assertIn("uv sync --frozen",instructions)
+        self.assertIn("author_side_documentation_readiness",instructions)
+        self.assertIn("Do not commit or transmit arrays",instructions)
+        self.assertIn("KDD182 remains externally",instructions)
+
+    def test_kdd184_corrected_sepsis_dbp_is_additive_and_source_based(self):
+        sql=(ROOT/"credentialed/sql/current_lineage/46_kdd184_corrected_sepsis_dbp.sql").read_text(encoding="utf-8")
+        self.assertIn("observation_events_kdd184_corrected",sql)
+        self.assertIn("c.itemid IN (220051, 220180, 225310)",sql)
+        self.assertIn("c.valueuom = 'mmHg'",sql)
+        self.assertIn("c.valuenum BETWEEN 10.0 AND 200.0",sql)
+        self.assertTrue((ROOT/"credentialed/sql/40_observation_events.sql").is_file())
+
     def test_seven_task_configs_validate(self):
         result=_json(_run("validate-config","--config-dir",str(ROOT/"configs/tasks")).stdout)
         self.assertEqual(result["valid_configs"],7)

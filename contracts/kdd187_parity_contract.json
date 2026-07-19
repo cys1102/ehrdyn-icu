@@ -1,0 +1,22 @@
+{
+  "evidence_role": "author_side_documentation_readiness",
+  "exact_fields": [
+    "cohort_identity",
+    "subject_count",
+    "episode_count",
+    "valid_transition_count",
+    "action_count",
+    "ordered_feature_schema_sha256",
+    "split_role_sha256"
+  ],
+  "numerical_tolerances": {
+    "exact_integer_counts": 0.0,
+    "deterministic_hashes": 0.0,
+    "aggregate_float_absolute": 1e-12,
+    "synthetic_smoke_metric_absolute": 1e-10
+  },
+  "failure_policy": "report_and_stop_without_row_filtering_or_tolerance_change",
+  "independent_reconstruction_claimed": false,
+  "kdd182_status": "stop_external_executor_or_credentialed_environment_unavailable"
+}
+

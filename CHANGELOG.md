@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0-rc1
+
+- Added a Rocky Linux conda setup backed by the frozen `uv.lock` dependency
+  graph and one documented public/credentialed reconstruction workflow.
+- Added an additive five-task current-lineage manifest, including the KDD184
+  corrected sepsis DBP lineage while preserving historical E060 manifests.
+- Added explicit aggregate inventory, parity tolerances, privacy boundaries,
+  and author-side evidence labels. KDD182 remains externally blocked.
+- Registered the completed KDD186 uncertainty-penalty sensitivity as optional
+  aggregate evidence rather than a core reconstruction prerequisite.
+
 ## 1.1.1
 
 - Prorated medication amounts by event-window overlap and represented RRT/CRRT
