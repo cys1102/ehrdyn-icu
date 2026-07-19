@@ -25,4 +25,3 @@ corrected_sepsis_dbp AS (
 SELECT * FROM preserved
 UNION ALL
 SELECT * FROM corrected_sepsis_dbp;
-
