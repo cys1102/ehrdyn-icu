@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-message: "If you use this benchmark software, please cite this release."
-title: "EHRDyn-ICU: A Frozen Multi-Cohort Benchmark for ICU Dynamics and Offline-RL Readiness Diagnostics"
+message: "If you use this repository, please cite the accompanying paper."
+title: "Benchmarking World-Model Components and Offline Reinforcement Learning under Partial Observability: A Multi-Cohort EHR Study"
 type: software
 date-released: 2026-07-13
 license: MIT
@@ -11,7 +11,3 @@ authors:
     email: ychung3@tulane.edu
 repository-code: "https://github.com/cys1102/ehrdyn-icu"
 url: "https://github.com/cys1102/ehrdyn-icu"
-identifiers:
-  - type: other
-    value: "KDD2027-E060-4H-v1.0.0+KDD089"
-    description: "Frozen public artifact build"
