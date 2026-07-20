@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ehrdyn-icu"
-version = "1.0.0"
+version = "1.1.0"
 description = "Clean-room utilities for the EHRDyn-ICU multi-cohort benchmark contract"
 requires-python = ">=3.11,<3.14"
-dependencies = ["jsonschema==4.26.0"]
+dependencies = ["jsonschema==4.26.0", "numpy==2.3.3"]
 
 [project.optional-dependencies]
-credentialed = ["numpy>=1.26", "pandas>=2.2"]
+credentialed = ["pandas>=2.2"]
 
 [project.scripts]
 ehrdyn-icu = "kdd2027_benchmark.cli:main"

@@ -1,0 +1,1 @@
+{"capabilities":["policy_probability"],"command":["/usr/bin/python3","/entrant/entrant.py"],"deterministic":true,"entrant_id":"history_softmax_reference","schema_version":"kdd215.entrant.v1","support_handling_acknowledged":true}

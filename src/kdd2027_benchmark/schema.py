@@ -13,9 +13,14 @@ from .errors import ReleaseContractError
 
 SCHEMA_FILES = {
     "aggregate_metrics": "aggregate_metrics.schema.json",
+    "entrant_protocol": "entrant_protocol.schema.json",
     "leaderboard_submission": "leaderboard_submission.schema.json",
     "transition_submission": "transition_submission.schema.json",
 }
+
+
+def validate_json_document(path: Path, schema_name: str) -> dict[str, object]:
+    return validate_json_file(path, schema_path(schema_name))
 
 
 def schema_path(name: str) -> Path:

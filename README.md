@@ -65,6 +65,14 @@ manuscript-bundle workflow is documented in
 [KDD212_PUBLIC_ENTRANT.md](KDD212_PUBLIC_ENTRANT.md). These synthetic and
 aggregate-only interfaces remain separate from credentialed EHR reconstruction.
 
+KDD215 adds a separate full-protocol entrant surface over the 40 frozen
+KDD198-v2 environments and 320 nested repeated-OPE datasets. Start with
+`ehrdyn-icu generate-full-suite`, then use `validate-entrant`,
+`train-entrant`, `evaluate-transition`, `evaluate-policy-return`,
+`evaluate-policy-ope`, and `summarize-submission`. The JSONL isolation contract
+is in [entrant_protocol.md](entrant_protocol.md). The older `pomdp-smoke` and
+`ope-smoke` commands remain installation checks labeled `smoke_only`.
+
 The historical `kdd2027` command remains available as a compatibility alias.
 
 Submission documents are bound to their released Draft 2020-12 schemas; see

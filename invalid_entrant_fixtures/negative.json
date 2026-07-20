@@ -1,0 +1,1 @@
+{"capabilities":["policy_probability"],"command":["/usr/bin/env","INVALID_MODE=negative","/usr/bin/python3","/entrant/invalid.py"],"deterministic":true,"entrant_id":"invalid_negative","schema_version":"kdd215.entrant.v1","support_handling_acknowledged":true}

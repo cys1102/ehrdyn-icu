@@ -1,0 +1,1 @@
+{"capabilities":["transition_point","transition_distribution"],"command":["/usr/bin/python3","/entrant/entrant.py"],"deterministic":true,"entrant_id":"locf_gaussian_reference","schema_version":"kdd215.entrant.v1","support_handling_acknowledged":true}

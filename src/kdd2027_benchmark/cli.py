@@ -23,6 +23,14 @@ from .public_bundle import rebuild_public_bundle
 from .public_ope import run_public_ope_smoke
 from .public_pomdp import run_public_pomdp_smoke
 from .transition_entrant import validate_transition_submission
+from .full_suite import (
+    generate_full_suite,
+    run_component_forecasting,
+    run_direct_returns,
+    run_full_ope,
+    summarize_ope,
+    validate_entrant_conformance,
+)
 
 @dataclass(slots=True)
 class CliArgs(argparse.Namespace):
@@ -51,6 +59,13 @@ class CliArgs(argparse.Namespace):
     bootstrap: int = 8
     bundle: Path = Path()
     schema_dir: Path = Path()
+    entrant: Path = Path()
+    manifest: Path = Path()
+    input: Path = Path()
+    contrasts: Path = Path()
+    direct_returns: Path = Path()
+    workers: int = 1
+    cache_dir: Path | None = None
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -125,6 +140,35 @@ def build_parser() -> argparse.ArgumentParser:
     rebuild = commands.add_parser("rebuild-public-bundle", help="Deterministically materialize public manuscript tables and figures.")
     _ = rebuild.add_argument("--bundle", type=Path, required=True)
     _ = rebuild.add_argument("--output", type=Path, required=True)
+    full = commands.add_parser("generate-full-suite", help="Verify and enumerate the authoritative 40-environment/320-dataset suite.")
+    _ = full.add_argument("--manifest", type=Path, required=True)
+    _ = full.add_argument("--output", type=Path, required=True)
+    _ = full.add_argument("--cache-dir", type=Path)
+    entrant = commands.add_parser("validate-entrant", help="Validate and sandbox-probe a KDD215 entrant.")
+    _ = entrant.add_argument("--entrant", type=Path, required=True)
+    _ = entrant.add_argument("--manifest", type=Path, required=True)
+    train = commands.add_parser("train-entrant", help="Validate the entrant training boundary and public role contract.")
+    _ = train.add_argument("--entrant", type=Path, required=True)
+    _ = train.add_argument("--manifest", type=Path, required=True)
+    _ = train.add_argument("--output", type=Path, required=True)
+    transition_full = commands.add_parser("evaluate-transition", help="Evaluate a component entrant on all 40 environments.")
+    _ = transition_full.add_argument("--entrant", type=Path, required=True)
+    _ = transition_full.add_argument("--manifest", type=Path, required=True)
+    _ = transition_full.add_argument("--output", type=Path, required=True)
+    direct = commands.add_parser("evaluate-policy-return", help="Evaluate a policy entrant by paired full-suite direct return.")
+    _ = direct.add_argument("--entrant", type=Path, required=True)
+    _ = direct.add_argument("--manifest", type=Path, required=True)
+    _ = direct.add_argument("--output", type=Path, required=True)
+    _ = direct.add_argument("--contrasts", type=Path, required=True)
+    full_ope = commands.add_parser("evaluate-policy-ope", help="Run the frozen 320-dataset repeated-OPE protocol.")
+    _ = full_ope.add_argument("--entrant", type=Path, required=True)
+    _ = full_ope.add_argument("--manifest", type=Path, required=True)
+    _ = full_ope.add_argument("--direct-returns", type=Path, required=True)
+    _ = full_ope.add_argument("--workers", type=int, default=1)
+    _ = full_ope.add_argument("--output", type=Path, required=True)
+    summarize = commands.add_parser("summarize-submission", help="Summarize full-suite entrant OPE results.")
+    _ = summarize.add_argument("--input", type=Path, required=True)
+    _ = summarize.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -185,6 +229,22 @@ def _dispatch(args: CliArgs) -> int:
         _print_json(validate_transition_submission(args.submission, _required_path(args.config_dir)))
     elif args.command == "rebuild-public-bundle":
         _print_json(rebuild_public_bundle(args.bundle, args.output))
+    elif args.command == "generate-full-suite":
+        _print_json(generate_full_suite(args.manifest, args.output, args.cache_dir))
+    elif args.command == "validate-entrant":
+        _print_json(validate_entrant_conformance(args.entrant, args.manifest))
+    elif args.command == "train-entrant":
+        receipt = validate_entrant_conformance(args.entrant, args.manifest)
+        receipt.update({"training_data_role": "public_constructed_train_only", "checkpoint_selection_role": "public_constructed_validation_only", "final_role_opened": False})
+        _write_json(args.output, receipt)
+    elif args.command == "evaluate-transition":
+        _print_json({"rows": len(run_component_forecasting(args.entrant, args.manifest, args.output)), "environment_count": 40})
+    elif args.command == "evaluate-policy-return":
+        _print_json({"rows": len(run_direct_returns(args.entrant, args.manifest, args.output, args.contrasts)), "environment_count": 40})
+    elif args.command == "evaluate-policy-ope":
+        _print_json({"rows": len(run_full_ope(args.entrant, args.manifest, args.direct_returns, args.output, args.workers)), "dataset_count": 320})
+    elif args.command == "summarize-submission":
+        _print_json({"rows": len(summarize_ope(args.input, args.output))})
     return 0
 
 
