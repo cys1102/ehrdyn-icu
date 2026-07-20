@@ -1,0 +1,6 @@
+failure_id,gate,status,evidence,consequence
+F001,KDD217AR_complete_handoff,fail,decision=stop_release_instruction_schema_or_privacy_contract_incomplete,KDD219R synchronization not authorized
+F002,KDD217AR_immutable_source,fail,no committed public KDD217AR source,KDD217AR claim and artifact changes cannot enter immutable synchronization manifest
+F003,KDD217BR_immutable_source,fail,executor-unavailable receipt is local and uncommitted,pending reconstruction label recorded but not synchronized
+F004,KDD218B_complete_family_surface,structural_nonavailability,complete convergence-matched family sensitivity estimable=False,no family superiority claim
+F005,manuscript_build,not_executed,upstream gate stopped before manuscript access,no build or page-boundary claim

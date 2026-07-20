@@ -1,0 +1,8 @@
+claim_id,proposed_claim,evidence_layer,source,status,authorized_for_sync,reason
+C01,The public artifact evaluates arbitrary observable-history policy entrants on 40 constructed environments and 320 nested OPE datasets,public_constructed_benchmark,KDD215R;KDD216R,supported_bounded,False,KDD217AR prerequisite failed before synchronization
+C02,All released mechanisms and seeds are public development assets with no hidden final service,public_release_boundary,KDD216R,supported,False,KDD217AR prerequisite failed before synchronization
+C03,Component entrants are transition-only one-step scored unless a complete P/R/T contract passes,public_component_boundary,KDD215R;KDD216R,supported,False,KDD217AR prerequisite failed before synchronization
+C04,Historical KDD199 learned-reference regeneration remains unavailable,historical_reference_boundary,KDD215R;KDD216R,supported_negative,False,retain_existing_limitation_without_edit
+C05,Independent credentialed reconstruction is pending,reproducibility_external_dependency,KDD217BR,externally_blocked,False,receipt is not in immutable public lineage and KDD217AR stopped
+C06,KDD218B supplies refreshed family superiority,constructed_policy_comparison,KDD218B,not_authorized,False,complete convergence-matched family estimand is not estimable
+C07,KDD218B preserves 214 incomplete refreshed rows at the maximum cap,constructed_policy_convergence,KDD218B,supported_negative,False,no synchronization after failed prerequisite

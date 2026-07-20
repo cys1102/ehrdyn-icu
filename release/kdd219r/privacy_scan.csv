@@ -1,0 +1,14 @@
+artifact,patient_level_content,credential_or_secret,private_path,free_text_or_identifier,status
+frozen_kdd219r_bounded_sync_contract.md,False,False,False,False,pass
+upstream_decision_commit_tag_manifest.csv,False,False,False,False,pass
+public_capability_and_limit_matrix.csv,False,False,False,False,pass
+manuscript_claim_to_evidence_matrix.csv,False,False,False,False,pass
+historical_reference_nonreconstruction_disposition.md,False,False,False,False,pass
+credentialed_reconstruction_status.md,False,False,False,False,pass
+convergence_and_family_claim_disposition.md,False,False,False,False,pass
+updated_number_source_audit.csv,False,False,False,False,pass
+build_and_page_boundary_receipt.md,False,False,False,False,pass
+public_release_link_receipt.csv,False,False,False,False,pass
+failure_ledger.csv,False,False,False,False,pass
+result_audit.md,False,False,False,False,pass
+decision.md,False,False,False,False,pass

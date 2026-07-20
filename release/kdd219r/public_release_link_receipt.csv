@@ -1,0 +1,7 @@
+check,target,expected,observed,status
+remote_repository,https://github.com/cys1102/ehrdyn-icu.git,reachable,reachable,pass
+kdd215r_branch,refs/heads/kdd215r-capability-audit,d94a1eade85a9ff3afd72d1e58f58b5623f82bce,d94a1eade85a9ff3afd72d1e58f58b5623f82bce,pass
+kdd216r_branch,refs/heads/kdd216r-clean-clone-audit,dda838b9867fbf6a75be391ca669f8a32954a580,dda838b9867fbf6a75be391ca669f8a32954a580,pass
+kdd216r_tag,refs/tags/v1.2.0-bounded.1^\{\},dda838b9867fbf6a75be391ca669f8a32954a580,dda838b9867fbf6a75be391ca669f8a32954a580,pass
+kdd217ar_immutable_public_source,public_commit,required,unavailable,fail
+kdd217br_immutable_public_source,public_commit_or_external_packet,required,unavailable,fail
