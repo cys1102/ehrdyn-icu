@@ -1,0 +1,6 @@
+task,action_exposure,action_class,reward_value,reward_mask,termination_continuation,status
+sepsis,pass,not_reached,not_reached,not_reached,not_reached,incomplete_blocking
+respiratory_support,pass,not_reached,not_reached,not_reached,not_reached,incomplete_blocking
+shock,pass,not_reached,not_reached,not_reached,not_reached,incomplete_blocking
+aki,pass,not_reached,not_reached,not_reached,not_reached,incomplete_blocking
+heart_failure,pass,not_reached,not_reached,not_reached,not_reached,incomplete_blocking

@@ -84,7 +84,8 @@ portable byte contract in [CANONICAL_SERIALIZATION.md](CANONICAL_SERIALIZATION.m
 - `configs/tasks/`: five primary and two extended compact paper contracts.
 - `configs/rich_action/`: separate K25/reference/exclusion audit contracts.
 - `contracts/`: preprocessing and layered gate definitions.
-- `credentialed/`: public SQL, preprocessing, action encoding, and aggregate parity targets for authorized local MIMIC-IV execution.
+- `src/kdd2027_benchmark/current_five_task/`: source-closed Python flat-file candidate for the retained five tasks; credentialed parity is pending KDD220B.
+- `credentialed/`: preserved historical SQL/preprocessing surfaces; these are not the current five-task candidate.
 - `dictionaries/`: feature, action, reward, metric, and baseline provenance.
 - `src/`: aggregate evaluator, fixture, split, gate, privacy, and submission code.
 - `fixtures/`: schema-compatible synthetic data only.

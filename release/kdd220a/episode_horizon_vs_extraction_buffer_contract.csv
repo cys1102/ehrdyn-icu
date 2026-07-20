@@ -1,0 +1,10 @@
+field,value,unit,role,allowed_public_label,status
+bin_hours,4,hours,alignment,bin_width,pass
+episode_pre_anchor_hours,24,hours,final_episode,history_window,pass
+episode_post_anchor_hours,48,hours,final_episode,transition_limit,pass
+episode_window_hours,72,hours,final_episode,episode_horizon,pass
+episode_bins,18,bins,final_model_interface,episode_bins,pass
+raw_rv01r_post_base_anchor_extraction_hours,96,hours,raw_extraction_only,raw_extraction_buffer_only,pass
+sepsis_max_base_to_final_anchor_shift_hours,48,hours,anchor_finalization,anchor_shift_limit,pass
+longest_recursive_target_hours,44,hours,state_action_target_alignment,recursive_target_sensitivity,pass
+raw_buffer_invariant,96=48+48,hours,source_closed_invariant,not_episode_policy_reward_ope_or_forecasting_horizon,pass

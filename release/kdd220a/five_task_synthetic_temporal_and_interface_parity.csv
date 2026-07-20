@@ -1,0 +1,6 @@
+task,inclusion_and_anchor,role,ordered_transitions,safe_interface_18_bins,action_class,reward_and_mask,termination_and_continuation,maximum_absolute_difference,status
+sepsis,pass,pass,pass,pass,pass,pass,pass,0,pass
+respiratory_support,pass,pass,pass,pass,pass,pass,pass,0,pass
+shock,pass,pass,pass,pass,pass,pass,pass,0,pass
+aki,pass,pass,pass,pass,pass,pass,pass,0,pass
+heart_failure,pass,pass,pass,pass,pass,pass,pass,0,pass

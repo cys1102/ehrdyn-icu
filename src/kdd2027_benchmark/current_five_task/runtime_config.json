@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "mimiciv_version": "3.1",
+  "temporal": {
+    "bin_hours": 4,
+    "episode_pre_anchor_hours": 24,
+    "episode_post_anchor_hours": 48,
+    "episode_window_hours": 72,
+    "episode_bins": 18,
+    "raw_rv01r_post_base_anchor_extraction_hours": 96,
+    "sepsis_max_base_to_final_anchor_shift_hours": 48,
+    "longest_recursive_target_hours": 44
+  },
+  "lineage_router": {
+    "sepsis": "kdd121_large_lineage",
+    "respiratory_support": "rv01r_kdd097_compact_lineage",
+    "shock": "rv01r_kdd097_compact_lineage",
+    "aki": "rv01r_kdd097_compact_lineage",
+    "heart_failure": "kdd121_large_lineage"
+  },
+  "roles": {
+    "large_lineage_salt": "KDD-RV-SUBJECT-ROLE-v1|",
+    "large_lineage_ranges": {
+      "train": 7000,
+      "validation": 1500,
+      "historical_other": 1500
+    },
+    "compact_lineage_modulus": 100,
+    "compact_lineage_multiplier": 1103515245,
+    "compact_lineage_increment": 12345,
+    "compact_lineage_ranges": {
+      "train": 70,
+      "validation": 15,
+      "historical_other": 15
+    }
+  },
+  "cohort_parameters": {
+    "sepsis": {
+      "minimum_observed_sofa_domains": 2,
+      "sofa_increase_min": 2,
+      "baseline": "minimum_observed_proxy_sofa_in_fully_contained_preinfection_bins",
+      "current_action_vasopressor_in_state": false
+    },
+    "aki": {
+      "creatinine_absolute_delta_48h": 0.3,
+      "creatinine_ratio_7d": 1.5,
+      "urine_output_identity_enabled": false
+    },
+    "heart_failure": {
+      "icd9_prefix": ["428"],
+      "icd10_prefix": ["I50"]
+    }
+  },
+  "runtime": {
+    "timezone": "UTC",
+    "locale": "C.UTF-8",
+    "stable_sort_kind": "stable",
+    "float_comparison_rtol": 1e-12,
+    "float_comparison_atol": 1e-12
+  }
+}

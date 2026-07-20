@@ -1,0 +1,8 @@
+gate,authoritative,public,status
+prior_disease_context,prior_completed_I50_admission,prior_completed_I50_admission,pass
+current_anchor,first_current_ICU_diuretic_event,first_current_ICU_diuretic_event,pass
+candidate_count,1,1,pass
+role_assignment,hash_role,hash_role,pass
+safe_feature_surface,33,33,pass
+binary_diuretic_action,K2,K2,pass
+terminal_reward_once,required,not_end_to_end_reached,incomplete_blocking

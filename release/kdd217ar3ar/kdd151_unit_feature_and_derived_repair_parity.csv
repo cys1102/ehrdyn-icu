@@ -1,0 +1,10 @@
+mechanism,comparison,status,maximum_absolute_difference
+temperature,item_semantic_F_to_C_and_C_identity,pass,0
+fio2,explicit_percent_only_and_blank_223835_excluded,pass,0
+gcs,direct_total_priority_complete_component_sum,pass,0
+mbp,invasive_priority_noninvasive_fallback,pass,0
+ionized_calcium,mmol_per_L_and_range,pass,0
+lactate,mmol_per_L_and_range,pass,0
+shock_index,authoritative_helper,pass,0
+sirs_proxy,authoritative_helper,pass,0
+sofa_proxy,authoritative_helper_internal_only,pass,0

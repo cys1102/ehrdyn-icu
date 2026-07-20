@@ -1,0 +1,2 @@
+failure_id,gate,status,detail,disposition
+KDD220A-F000,all_frozen_gates,none,all_source_closure_synthetic_schema_privacy_and_clean_install_gates_passed,authorize_KDD220B_only

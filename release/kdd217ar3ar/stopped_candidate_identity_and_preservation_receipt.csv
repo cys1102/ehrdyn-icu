@@ -1,0 +1,9 @@
+surface,identity,status
+branch,kdd217ar3a-python-reconstruction-candidate,pass
+base_commit,dda838b9867fbf6a75be391ca669f8a32954a580,pass
+base_tag,v1.2.0-bounded.1,pass
+stopped_decision,stop_dependency_closure_intermediate_regeneration_or_differential_failure,pass
+failure_inventory,KDD217AR3A-F001;KDD217AR3A-F002;KDD217AR3A-F003;KDD217AR3A-F004,pass
+release_kdd217ar3a_file_count,18,pass
+release_kdd217ar3a_preservation,all_18_sha256_unchanged,pass
+initial_git_status,2_modified_5_untracked_surfaces_exactly_as_frozen,pass

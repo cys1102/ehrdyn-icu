@@ -1,0 +1,5 @@
+surface,feature_count,excluded_fields,status
+authoritative_dense_internal,40,none_internal_only,pass
+task_facing_SAFE,33,age;gender_male;weight;readmission;elixhauser_score_proxy;sofa_proxy;step_id,pass
+safe_feature_order,33,exact_KDD121_SAFE_FEATURE_INDICES,pass
+safe_masks,33,no_static_or_privileged_fields_materialized,pass

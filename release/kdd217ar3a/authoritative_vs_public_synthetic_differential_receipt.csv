@@ -1,0 +1,17 @@
+comparison,comparison_type,scope,status,maximum_absolute_difference,blocking
+source_hash_preflight,exact,author_files_used_by_pure_differential,pass,0,False
+subject_role,exact,6_synthetic_subject_ids,pass,0,False
+eligible_transition_indices,exact,variable_horizon_fixture,pass,0,False
+train_positive_edges,exact,train_validation_fixture,pass,0,False
+five_level_encoder,exact,K5_fixture,pass,0,False
+joint_action_codes,exact,K25_fixture,pass,0,False
+KDD201_temporal_repair,exact,physiology_and_treatment_anchor_sources,pass,0,False
+sepsis_terminal_reward_and_mask,exact,primary_terminal_channel,pass,0,False
+shock_dense_reward_and_mask,exact,primary_next_MBP_channel,pass,0,False
+task_inclusion,exact,sepsis_respiratory_shock_AKI_author_old_source_fixture,pass,0,False
+transition_order_after_KDD201,exact,sepsis_respiratory_shock_AKI_author_old_source_fixture,pass,0,False
+observation_masks,exact,shared_18_bin_author_public_fixture,fail,NA,True
+floating_features,tolerance_rtol_1e-12_atol_1e-12,shared_observed_cells,fail,1.0,True
+heart_failure_current_large_lineage_full_diff,exact,current_KDD121_source,not_completed,NA,True
+end_to_end_action_reward_termination_all_five,exact,complete_fixture,not_completed,NA,True
+

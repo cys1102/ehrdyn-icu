@@ -1,0 +1,7 @@
+gate,status,detail
+focused_kdd217ar3a_and_ar3ar,pass,10_tests_passed
+full_public_suite,pass,71_tests_passed
+schema_positive_negative,pass,existing_and_new_forbidden_field_tests
+py_compile,pass,candidate_modules_and_focused_tests
+manifest_checksum,pass,rebuilt_and_full_suite_verified
+privacy_allowlist,pass,no_restricted_export_or_hidden_path

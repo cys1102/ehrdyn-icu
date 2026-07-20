@@ -1,0 +1,6 @@
+task,safe_features,mask_exact,compared_observed_cells,maximum_absolute_difference,rtol,atol,status
+sepsis,33,True,172,0,1e-12,1e-12,pass
+respiratory_support,33,True,184,0,1e-12,1e-12,pass
+shock,33,True,675,0,1e-12,1e-12,pass
+aki,33,True,184,0,1e-12,1e-12,pass
+heart_failure,33,True,122,0,1e-12,1e-12,pass

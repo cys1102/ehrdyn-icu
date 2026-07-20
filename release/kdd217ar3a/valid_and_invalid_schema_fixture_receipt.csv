@@ -1,0 +1,14 @@
+fixture,expected,observed,status
+valid_five_task_aggregate,pass,pass,pass
+unknown_top_level_field,reject,reject,pass
+subject_id_field,reject,reject,pass
+stay_id_field,reject,reject,pass
+timestamp_field,reject,reject,pass
+trajectory_field,reject,reject,pass
+split_membership_field,reject,reject,pass
+free_text_field,reject,reject,pass
+checkpoint_field,reject,reject,pass
+raw_path_field,reject,reject,pass
+wrong_task_order,reject,reject,pass
+wrong_action_count,reject,reject,pass
+
