@@ -1,0 +1,27 @@
+\begin{table*}[t]
+\centering
+\caption{Prespecified paired estimator contrasts under known constructed truth. Differences average 18 policies within each estimator and environment before profile-stratified inference. Lower is better for all three metrics. These results do not authorize retrospective EHR policy ranking.}
+\label{tab:kdd213-estimator-contrasts}
+\scriptsize
+\begin{tabular}{llrrr}
+\toprule
+Contrast & Metric & Mean difference & 95\% CI & Holm $p$ \\
+\midrule
+IS minus WIS & normalized\_mae & 1.637e+09 & [9.734e+08, 2.511e+09] & 6.37e-11 \\
+IS minus WIS & normalized\_rmse & 3.55e+09 & [1.974e+09, 5.931e+09] & 6.37e-11 \\
+IS minus WIS & absolute\_coverage\_deviation & 0.1039 & [0.08778, 0.1195] & 0.000682 \\
+WIS minus CWPDIS & normalized\_mae & -0.05697 & [-0.06198, -0.0519] & 0.152 \\
+WIS minus CWPDIS & normalized\_rmse & -0.06052 & [-0.06654, -0.0542] & 0.365 \\
+WIS minus CWPDIS & absolute\_coverage\_deviation & 0.008785 & [-0.009549, 0.02691] & 1 \\
+WIS minus FQE & normalized\_mae & 0.02563 & [0.02239, 0.02885] & 0.00492 \\
+WIS minus FQE & normalized\_rmse & 0.04216 & [0.03835, 0.0461] & 0.00492 \\
+WIS minus FQE & absolute\_coverage\_deviation & -0.6217 & [-0.6399, -0.6029] & 6.37e-11 \\
+DR minus WDR & normalized\_mae & 4.071e+07 & [1.586e+07, 8.121e+07] & 6.37e-11 \\
+DR minus WDR & normalized\_rmse & 8.74e+07 & [2.844e+07, 1.88e+08] & 6.37e-11 \\
+DR minus WDR & absolute\_coverage\_deviation & -0.05035 & [-0.06747, -0.03368] & 0.77 \\
+WDR minus FQE & normalized\_mae & 0.01011 & [0.006447, 0.0138] & 0.00492 \\
+WDR minus FQE & normalized\_rmse & 0.02196 & [0.01778, 0.02624] & 5.64e-07 \\
+WDR minus FQE & absolute\_coverage\_deviation & -0.583 & [-0.598, -0.569] & 6.37e-11 \\
+\bottomrule
+\end{tabular}
+\end{table*}

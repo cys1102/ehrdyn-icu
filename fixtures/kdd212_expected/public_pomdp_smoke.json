@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "constructed POMDP truth only; no EHR treatment or clinical claim",
+  "environment_hash": "645fd44f8a2dcbf99a06c58ca7220cfb462a2a2f61d8d39178af99bddee17e99",
+  "environment_seed": 21201,
+  "episode_seed_namespace": 13408,
+  "mechanism_version": "kdd198_dense_reward_exogenous_sign_v2_public",
+  "planner_trace": {
+    "candidates_per_iteration": 64,
+    "cem_iterations": 3,
+    "elites": 8,
+    "executed_actions": 537,
+    "horizon": 4,
+    "sequences_evaluated": 103104,
+    "smoothing": 0.2
+  },
+  "policies": [
+    {
+      "mean_return": -0.15916150922270184,
+      "method": "behavior",
+      "return_se": 0.11109420464644536
+    },
+    {
+      "mean_return": -0.1190970112550338,
+      "method": "behavior_cloning",
+      "return_se": 0.1083917890333176
+    },
+    {
+      "mean_return": -0.14768907058571126,
+      "method": "tabular_component_plus_h4",
+      "return_se": 0.10704135637269906
+    }
+  ],
+  "profile": "aki",
+  "reconstruction_hash_equal": true,
+  "training_seed_namespace": 3408
+}

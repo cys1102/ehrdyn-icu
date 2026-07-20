@@ -1,0 +1,16 @@
+{
+  "rows": [
+    {
+      "benchmark_version": "KDD2027-E060-4H-v1.0.0+KDD089",
+      "claim_boundary_acknowledged": true,
+      "horizon": "one_step",
+      "metric_name": "rmse",
+      "metric_value": 0.25,
+      "model_id": "public_fixture_persistence",
+      "observed_target_count": 128,
+      "source_commit": "synthetic-fixture",
+      "task_config_sha256": "f4eb0b17f964dac0f3e25e44cd75530fb33599f2c9c704bbc968bfada8aaf4cc",
+      "task_id": "kdd2027_sepsis_vasopressor_3bin"
+    }
+  ]
+}

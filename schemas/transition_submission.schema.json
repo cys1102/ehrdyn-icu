@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["submission_id", "rows"],
+  "properties": {
+    "submission_id": {"type": "string", "minLength": 1},
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["task_id", "task_config_sha256", "benchmark_version", "model_id", "source_commit", "horizon", "metric_name", "metric_value", "observed_target_count", "claim_boundary_acknowledged"],
+        "properties": {
+          "task_id": {"type": "string"},
+          "task_config_sha256": {"pattern": "^[0-9a-f]{64}$"},
+          "benchmark_version": {"type": "string"},
+          "model_id": {"type": "string"},
+          "source_commit": {"pattern": "^[0-9a-fA-F]{7,40}$"},
+          "horizon": {"enum": ["one_step", "recursive_40h", "task_specific_44h_sensitivity"]},
+          "metric_name": {"type": "string"},
+          "metric_value": {"type": "number"},
+          "observed_target_count": {"type": "integer", "minimum": 1},
+          "claim_boundary_acknowledged": {"const": true}
+        }
+      }
+    }
+  }
+}

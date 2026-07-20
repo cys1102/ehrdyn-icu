@@ -58,6 +58,11 @@ ehrdyn-icu scan-release --root .
 ehrdyn-icu verify-checksums --root .
 ```
 
+The KDD212 public constructed-POMDP, repeated-OPE, transition entrant, and
+manuscript-bundle workflow is documented in
+[KDD212_PUBLIC_ENTRANT.md](KDD212_PUBLIC_ENTRANT.md). These synthetic and
+aggregate-only interfaces remain separate from credentialed EHR reconstruction.
+
 The historical `kdd2027` command remains available as a compatibility alias.
 
 ## Repository Contents

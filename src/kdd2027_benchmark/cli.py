@@ -18,6 +18,10 @@ from .privacy import scan_release, verify_checksums
 from .report import write_aggregate_report
 from .split import deterministic_split
 from .submission import validate_submission
+from .public_bundle import rebuild_public_bundle
+from .public_ope import run_public_ope_smoke
+from .public_pomdp import run_public_pomdp_smoke
+from .transition_entrant import validate_transition_submission
 
 JSON_INDENT: Final = 2
 
@@ -43,6 +47,11 @@ class CliArgs(argparse.Namespace):
     task_manifest: Path = Path()
     contract_manifest: Path = Path()
     evidence: Path = Path()
+    profile: str = "aki"
+    environment_seed: int = 21201
+    datasets: int = 4
+    bootstrap: int = 8
+    bundle: Path = Path()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -93,6 +102,28 @@ def build_parser() -> argparse.ArgumentParser:
     _ = manifest.add_argument("--task-manifest", type=Path, required=True)
     _ = manifest.add_argument("--contract-manifest", type=Path, required=True)
     _ = manifest.add_argument("--evidence", type=Path, required=True)
+    pomdp = commands.add_parser("pomdp-smoke", help="Run the repaired public constructed-POMDP entrant smoke.")
+    _ = pomdp.add_argument("--config", type=Path, required=True)
+    _ = pomdp.add_argument("--profile", required=True)
+    _ = pomdp.add_argument("--environment-seed", type=int, default=21201)
+    _ = pomdp.add_argument("--episodes", type=int, default=64)
+    _ = pomdp.add_argument("--seed", type=int, default=3408)
+    _ = pomdp.add_argument("--output", type=Path, required=True)
+    ope = commands.add_parser("ope-smoke", help="Run the bounded KDD202B-compatible repeated-dataset OPE smoke.")
+    _ = ope.add_argument("--config", type=Path, required=True)
+    _ = ope.add_argument("--profile", required=True)
+    _ = ope.add_argument("--environment-seed", type=int, default=21201)
+    _ = ope.add_argument("--datasets", type=int, default=4)
+    _ = ope.add_argument("--episodes", type=int, default=64)
+    _ = ope.add_argument("--bootstrap", type=int, default=8)
+    _ = ope.add_argument("--seed", type=int, default=3411)
+    _ = ope.add_argument("--output", type=Path, required=True)
+    transition = commands.add_parser("validate-transition-submission", help="Validate aggregate transition rows and task/version hashes.")
+    _ = transition.add_argument("--submission", type=Path, required=True)
+    _ = transition.add_argument("--config-dir", type=Path, required=True)
+    rebuild = commands.add_parser("rebuild-public-bundle", help="Deterministically materialize public manuscript tables and figures.")
+    _ = rebuild.add_argument("--bundle", type=Path, required=True)
+    _ = rebuild.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -149,6 +180,14 @@ def _dispatch(args: CliArgs) -> int:
                 sort_keys=True,
             )
         )
+    elif args.command == "pomdp-smoke":
+        _write_json(args.output, run_public_pomdp_smoke(_required_path(args.config), args.profile, args.environment_seed, args.episodes, args.seed))
+    elif args.command == "ope-smoke":
+        _write_json(args.output, run_public_ope_smoke(_required_path(args.config), args.profile, args.environment_seed, args.datasets, args.episodes, args.bootstrap, args.seed))
+    elif args.command == "validate-transition-submission":
+        print(json.dumps(validate_transition_submission(args.submission, _required_path(args.config_dir)), sort_keys=True))
+    elif args.command == "rebuild-public-bundle":
+        print(json.dumps(rebuild_public_bundle(args.bundle, args.output), sort_keys=True))
     return 0
 
 

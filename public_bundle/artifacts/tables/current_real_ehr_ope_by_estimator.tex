@@ -1,0 +1,129 @@
+\begin{table*}[p]
+\centering
+\caption{Fixed-contract retrospective development OPE for Sepsis. Cells are seed-averaged retrospective full-episode estimates. The display fixes the task's primary reward, train-fitted sequence-logistic denominator, clipping at 20, frozen support, and full episode horizon. The table contains the five controls and six current model-free methods shared by all five tasks. H4 planners are reported separately as validation diagnostics because a common historical-other planner-OPE contract is unavailable. ESS/N is the median across the six displayed estimators and measures target-policy support rather than estimator performance. True EHR policy return is unknown.}
+\label{tab:ope-estimator-sepsis}
+\scriptsize
+\setlength{\tabcolsep}{3.6pt}
+\begin{tabular}{llrrrrrrr}
+\toprule
+Role & Method & IS & WIS & CWPDIS & DR & WDR & FQE & ESS/N \\
+\midrule
+Control & Behavior & 0.306 & 0.306 & 0.724 & 0.396 & -0.447 & 3.280 & 1.000 \\
+Control & Supported random & 0.078 & 0.371 & -0.583 & 0.012 & -1.958 & 1.188 & 0.002 \\
+Control & Minimum action & 0.071 & 0.300 & 0.517 & 2.879 & -1.004 & 4.326 & 0.147 \\
+Control & Maximum action & -0.003 & -0.345 & 0.288 & -3.427 & -0.109 & -4.256 & 6.1e-04 \\
+Control & Severity rule & 0.011 & 0.290 & 0.930 & -0.324 & -2.290 & -0.697 & 0.007 \\
+\midrule
+Model-free & Behavior cloning & -2.540 & -0.009 & 0.845 & -194.721 & -1.718 & 3.191 & 0.003 \\
+Model-free & Decision Transformer & 62.103 & 0.386 & 0.832 & -105.814 & -1.740 & 3.260 & 0.005 \\
+Model-free & Discrete BCQ & 0.046 & 0.203 & 0.506 & 0.485 & -1.752 & 3.247 & 0.016 \\
+Model-free & Discrete CQL & 113.542 & 0.162 & 0.813 & -617.825 & -2.011 & 3.191 & 0.002 \\
+Model-free & Discrete IQL & 16.182 & 0.062 & 0.872 & -296.951 & -1.606 & 3.205 & 0.001 \\
+Model-free & Count-blend adapter & 116.313 & 0.170 & 0.810 & -597.121 & -2.023 & 3.194 & 0.002 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table*}[p]
+\centering
+\caption{Fixed-contract retrospective development OPE for Respiratory. Cells are seed-averaged retrospective full-episode estimates. The display fixes the task's primary reward, train-fitted sequence-logistic denominator, clipping at 20, frozen support, and full episode horizon. The table contains the five controls and six current model-free methods shared by all five tasks. H4 planners are reported separately as validation diagnostics because a common historical-other planner-OPE contract is unavailable. ESS/N is the median across the six displayed estimators and measures target-policy support rather than estimator performance. True EHR policy return is unknown.}
+\label{tab:ope-estimator-respiratory}
+\scriptsize
+\setlength{\tabcolsep}{3.6pt}
+\begin{tabular}{llrrrrrrr}
+\toprule
+Role & Method & IS & WIS & CWPDIS & DR & WDR & FQE & ESS/N \\
+\midrule
+Control & Behavior & 1.409 & 1.409 & -- & 1.369 & -- & 2.254 & 1.000 \\
+Control & Supported random & 4.933 & 2.477 & -- & 11.731 & -- & 2.851 & 0.003 \\
+Control & Minimum action & 0 & 0.571 & -- & 0 & -- & 0 & 0.158 \\
+Control & Maximum action & 0.854 & 2.853 & -- & -177.938 & -- & 4.211 & 0.029 \\
+Control & Severity rule & 0.180 & 1.854 & -- & -34.933 & -- & 3.632 & 0.011 \\
+\midrule
+Model-free & Behavior cloning & 2.4e+04 & 3.741 & -- & -18.533 & -- & 2.309 & 8.0e-04 \\
+Model-free & Decision Transformer & 7.2e+03 & 1.992 & -- & -3.0e+03 & -- & 2.304 & 9.3e-04 \\
+Model-free & Discrete BCQ & 52.122 & 3.256 & -- & 47.836 & -- & 2.400 & 4.4e-04 \\
+Model-free & Discrete CQL & 1.7e+04 & 5.721 & -- & 2.0e+03 & -- & 2.330 & 5.8e-04 \\
+Model-free & Discrete IQL & 453.550 & 0.012 & -- & -1.1e+04 & -- & 2.504 & 3.2e-04 \\
+Model-free & Count-blend adapter & 2.0e+04 & 5.893 & -- & 2.6e+03 & -- & 2.325 & 4.1e-04 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table*}[p]
+\centering
+\caption{Fixed-contract retrospective development OPE for Shock. Cells are seed-averaged retrospective full-episode estimates. The display fixes the task's primary reward, train-fitted sequence-logistic denominator, clipping at 20, frozen support, and full episode horizon. The table contains the five controls and six current model-free methods shared by all five tasks. H4 planners are reported separately as validation diagnostics because a common historical-other planner-OPE contract is unavailable. ESS/N is the median across the six displayed estimators and measures target-policy support rather than estimator performance. True EHR policy return is unknown.}
+\label{tab:ope-estimator-shock}
+\scriptsize
+\setlength{\tabcolsep}{3.6pt}
+\begin{tabular}{llrrrrrrr}
+\toprule
+Role & Method & IS & WIS & CWPDIS & DR & WDR & FQE & ESS/N \\
+\midrule
+Control & Behavior & 2.496 & 2.496 & 3.691 & 2.505 & 2.147 & 3.764 & 1.000 \\
+Control & Supported random & 0.220 & 0.925 & 4.254 & 2.646 & 3.009 & 3.155 & 0.002 \\
+Control & Minimum action & 1.024 & 2.305 & 3.891 & 1.842 & 2.831 & 3.875 & 0.110 \\
+Control & Maximum action & 4.070 & 7.703 & 3.578 & 45.810 & 5.434 & 3.396 & 2.3e-04 \\
+Control & Severity rule & 0.190 & 1.436 & 3.933 & 7.024 & 2.239 & 3.067 & 0.009 \\
+\midrule
+Model-free & Behavior cloning & 1.3e+07 & 2.716 & 3.647 & -5.8e+05 & 3.129 & 3.757 & 1.3e-04 \\
+Model-free & Decision Transformer & 5.7e+06 & 2.855 & 3.658 & -2.5e+05 & 3.031 & 3.775 & 1.2e-04 \\
+Model-free & Discrete BCQ & 333.082 & 5.483 & 4.202 & -16.324 & 2.932 & 3.801 & 1.4e-04 \\
+Model-free & Discrete CQL & 8.8e+06 & 2.488 & 3.683 & -4.8e+05 & 3.154 & 3.761 & 1.6e-04 \\
+Model-free & Discrete IQL & 2.3e+04 & 2.747 & 3.775 & 151.488 & 3.083 & 3.766 & 1.9e-04 \\
+Model-free & Count-blend adapter & 8.7e+06 & 2.490 & 3.683 & -4.7e+05 & 3.164 & 3.761 & 1.6e-04 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table*}[p]
+\centering
+\caption{Fixed-contract retrospective development OPE for AKI. Cells are seed-averaged retrospective full-episode estimates. The display fixes the task's primary reward, train-fitted sequence-logistic denominator, clipping at 20, frozen support, and full episode horizon. The table contains the five controls and six current model-free methods shared by all five tasks. H4 planners are reported separately as validation diagnostics because a common historical-other planner-OPE contract is unavailable. ESS/N is the median across the six displayed estimators and measures target-policy support rather than estimator performance. True EHR policy return is unknown.}
+\label{tab:ope-estimator-aki}
+\scriptsize
+\setlength{\tabcolsep}{3.6pt}
+\begin{tabular}{llrrrrrrr}
+\toprule
+Role & Method & IS & WIS & CWPDIS & DR & WDR & FQE & ESS/N \\
+\midrule
+Control & Behavior & 0.246 & 0.246 & 0.409 & 0.243 & -0.268 & 2.760 & 1.000 \\
+Control & Supported random & 1.2e+03 & 0.753 & -0.106 & 621.238 & 3.134 & 2.437 & 4.7e-04 \\
+Control & Minimum action & 0.107 & 0.210 & 0.281 & -905.474 & -0.580 & 2.065 & 0.323 \\
+Control & Maximum action & -0.170 & -0.575 & -1.172 & 1.5e+05 & 1.822 & 1.591 & 0.002 \\
+Control & Severity rule & -5.142 & -0.876 & 0.400 & 1.3e+05 & 1.421 & 1.066 & 3.0e-04 \\
+\midrule
+Model-free & Behavior cloning & -2.2e+03 & -0.538 & 0.334 & -2.7e+03 & 0.457 & 2.750 & 6.7e-04 \\
+Model-free & Decision Transformer & -9.2e+03 & -0.539 & 0.338 & -8.6e+03 & -0.109 & 2.764 & 5.5e-04 \\
+Model-free & Discrete BCQ & -18.559 & -0.724 & 0.507 & 2.711 & -0.173 & 3.000 & 5.2e-04 \\
+Model-free & Discrete CQL & -9.4e+03 & -0.780 & 0.325 & -1.3e+04 & 0.608 & 2.759 & 7.5e-04 \\
+Model-free & Discrete IQL & -3.6e+03 & -0.744 & 0.312 & -1.9e+03 & 0.316 & 2.766 & 6.9e-04 \\
+Model-free & Count-blend adapter & -9.0e+03 & -0.774 & 0.325 & -1.3e+04 & 0.540 & 2.759 & 7.4e-04 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table*}[p]
+\centering
+\caption{Fixed-contract retrospective development OPE for HF/decongestion. Cells are seed-averaged retrospective full-episode estimates. The display fixes the task's primary reward, train-fitted sequence-logistic denominator, clipping at 20, frozen support, and full episode horizon. The table contains the five controls and six current model-free methods shared by all five tasks. H4 planners are reported separately as validation diagnostics because a common historical-other planner-OPE contract is unavailable. ESS/N is the median across the six displayed estimators and measures target-policy support rather than estimator performance. True EHR policy return is unknown.}
+\label{tab:ope-estimator-hf}
+\scriptsize
+\setlength{\tabcolsep}{3.6pt}
+\begin{tabular}{llrrrrrrr}
+\toprule
+Role & Method & IS & WIS & CWPDIS & DR & WDR & FQE & ESS/N \\
+\midrule
+Control & Behavior & 0.658 & 0.658 & -- & 0.695 & -- & 6.711 & 1.000 \\
+Control & Supported random & 4.7e+07 & 0.914 & -- & 7.4e+06 & -- & 6.531 & 2.3e-04 \\
+Control & Minimum action & 0.444 & 0.682 & -- & -2.7e+04 & -- & 6.585 & 0.169 \\
+Control & Maximum action & 0.361 & 0.496 & -- & -496.944 & -- & 6.580 & 0.079 \\
+Control & Severity rule & 346.953 & 0.913 & -- & -1.1e+03 & -- & 6.762 & 2.3e-04 \\
+\midrule
+Model-free & Behavior cloning & 9.0e+07 & 0.914 & -- & 1.4e+07 & -- & 6.664 & 2.3e-04 \\
+Model-free & Decision Transformer & 1.0e+08 & 0.914 & -- & 1.6e+07 & -- & 6.662 & 2.3e-04 \\
+Model-free & Discrete BCQ & 3.6e+07 & 0.906 & -- & 5.5e+06 & -- & 6.753 & 2.3e-04 \\
+Model-free & Discrete CQL & 8.9e+07 & 0.914 & -- & 1.4e+07 & -- & 6.658 & 2.3e-04 \\
+Model-free & Discrete IQL & 9.5e+07 & 0.914 & -- & 1.5e+07 & -- & 6.675 & 2.3e-04 \\
+Model-free & Count-blend adapter & 8.9e+07 & 0.914 & -- & 1.4e+07 & -- & 6.659 & 2.3e-04 \\
+\bottomrule
+\end{tabular}
+\end{table*}

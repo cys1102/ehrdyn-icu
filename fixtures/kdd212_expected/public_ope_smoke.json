@@ -1,0 +1,146 @@
+{
+  "behavior_data_seed_namespace": 3411,
+  "bootstrap_seed_namespace": 9003411,
+  "datasets": 4,
+  "environment_seed": 21201,
+  "episodes_per_dataset": 64,
+  "estimators": [
+    "IS",
+    "WIS",
+    "CWPDIS",
+    "DR",
+    "WDR",
+    "FQE"
+  ],
+  "full_kdd202b_contract": {
+    "bootstrap_replicates": 500,
+    "datasets": 320,
+    "episodes_per_dataset": 256
+  },
+  "full_refit_bootstrap_replicates": 8,
+  "nuisance_refit_inside_each_bootstrap": true,
+  "profile": "aki",
+  "rows": [
+    {
+      "between_dataset_sd": 0.11603077613893661,
+      "dataset_count": 4,
+      "estimator": "IS",
+      "finite_fraction": 1.0,
+      "mean_ess": 40.5215152749159,
+      "mean_estimate": -0.15571440988069907,
+      "mean_full_refit_interval_width": 0.38280511035885467,
+      "target": "behavior"
+    },
+    {
+      "between_dataset_sd": 0.11845975394952157,
+      "dataset_count": 4,
+      "estimator": "WIS",
+      "finite_fraction": 1.0,
+      "mean_ess": 40.5215152749159,
+      "mean_estimate": -0.16093711993288523,
+      "mean_full_refit_interval_width": 0.4329911473096142,
+      "target": "behavior"
+    },
+    {
+      "between_dataset_sd": 0.23531056159244265,
+      "dataset_count": 4,
+      "estimator": "CWPDIS",
+      "finite_fraction": 1.0,
+      "mean_ess": 40.5215152749159,
+      "mean_estimate": -0.2326044538086943,
+      "mean_full_refit_interval_width": 0.6966601394178946,
+      "target": "behavior"
+    },
+    {
+      "between_dataset_sd": 0.4121645725655569,
+      "dataset_count": 4,
+      "estimator": "DR",
+      "finite_fraction": 1.0,
+      "mean_ess": 40.5215152749159,
+      "mean_estimate": 1.057973217725854,
+      "mean_full_refit_interval_width": 2.182347955093671,
+      "target": "behavior"
+    },
+    {
+      "between_dataset_sd": 0.20985735215728044,
+      "dataset_count": 4,
+      "estimator": "WDR",
+      "finite_fraction": 1.0,
+      "mean_ess": 40.5215152749159,
+      "mean_estimate": 0.41268438195857987,
+      "mean_full_refit_interval_width": 1.06676854622236,
+      "target": "behavior"
+    },
+    {
+      "between_dataset_sd": 0.0804405222308843,
+      "dataset_count": 4,
+      "estimator": "FQE",
+      "finite_fraction": 1.0,
+      "mean_ess": 40.5215152749159,
+      "mean_estimate": 0.1823523583412772,
+      "mean_full_refit_interval_width": 0.3647738244114982,
+      "target": "behavior"
+    },
+    {
+      "between_dataset_sd": 0.37345440004130276,
+      "dataset_count": 4,
+      "estimator": "IS",
+      "finite_fraction": 1.0,
+      "mean_ess": 9.53974760973131,
+      "mean_estimate": -0.005675043588452668,
+      "mean_full_refit_interval_width": 1.0689712353895213,
+      "target": "fixed_context_action"
+    },
+    {
+      "between_dataset_sd": 0.24787586821426677,
+      "dataset_count": 4,
+      "estimator": "WIS",
+      "finite_fraction": 1.0,
+      "mean_ess": 9.53974760973131,
+      "mean_estimate": -0.010976099406485609,
+      "mean_full_refit_interval_width": 0.7446878287298654,
+      "target": "fixed_context_action"
+    },
+    {
+      "between_dataset_sd": 0.27544040889336036,
+      "dataset_count": 4,
+      "estimator": "CWPDIS",
+      "finite_fraction": 1.0,
+      "mean_ess": 9.53974760973131,
+      "mean_estimate": -0.1990985560030452,
+      "mean_full_refit_interval_width": 1.3258250710103372,
+      "target": "fixed_context_action"
+    },
+    {
+      "between_dataset_sd": 0.4911444128881219,
+      "dataset_count": 4,
+      "estimator": "DR",
+      "finite_fraction": 1.0,
+      "mean_ess": 9.53974760973131,
+      "mean_estimate": 0.5147464250650202,
+      "mean_full_refit_interval_width": 2.5729833291849395,
+      "target": "fixed_context_action"
+    },
+    {
+      "between_dataset_sd": 0.3627588428716651,
+      "dataset_count": 4,
+      "estimator": "WDR",
+      "finite_fraction": 1.0,
+      "mean_ess": 9.53974760973131,
+      "mean_estimate": 0.1578239345309875,
+      "mean_full_refit_interval_width": 1.4676849809064108,
+      "target": "fixed_context_action"
+    },
+    {
+      "between_dataset_sd": 0.0804405222308843,
+      "dataset_count": 4,
+      "estimator": "FQE",
+      "finite_fraction": 1.0,
+      "mean_ess": 9.53974760973131,
+      "mean_estimate": 0.1823523583412772,
+      "mean_full_refit_interval_width": 0.3647738244114982,
+      "target": "fixed_context_action"
+    }
+  ],
+  "scope": "bounded public smoke; not the immutable KDD202B evidence run"
+}
