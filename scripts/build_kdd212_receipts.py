@@ -7,7 +7,6 @@ import argparse
 import csv
 import hashlib
 import json
-import platform
 from pathlib import Path
 
 
@@ -34,6 +33,7 @@ def main() -> int:
     parser.add_argument("--branch", required=True)
     parser.add_argument("--remote", required=True)
     parser.add_argument("--clean-clone-wall-seconds", type=int, required=True)
+    parser.add_argument("--python-version", required=True)
     parser.add_argument("--push-status", default="pending_release_artifact_commit")
     parser.add_argument("--release-artifact-commit", default="pending")
     args = parser.parse_args()
@@ -80,7 +80,7 @@ def main() -> int:
 
     clean_rows = [
         {"check": "clean_clone_commit", "result": args.implementation_commit, "status": "pass"},
-        {"check": "editable_install_no_dependencies", "result": platform.python_version(), "status": "pass"},
+        {"check": "editable_install_no_dependencies", "result": args.python_version, "status": "pass"},
         {"check": "focused_and_release_tests", "result": "33 run; 2 credentialed-extra skips", "status": "pass"},
         {"check": "synthetic_fixture_hash", "result": "84435f4dc4a54fc52ca55eebcb42596fb54843f83576d31008ad2b76fd65d955", "status": "pass"},
         {"check": "bounded_ope_fixture_hash", "result": "bce577b73ed63f6a0c290a191d498827aeed1402f428ccc3d914dec6cdecf323", "status": "pass"},

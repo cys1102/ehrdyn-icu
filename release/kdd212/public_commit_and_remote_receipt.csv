@@ -1,2 +1,2 @@
 remote,branch,implementation_commit,implementation_tree,release_artifact_commit,push_status
-https://github.com/cys1102/ehrdyn-icu.git,kdd212-public-entrant-release,d9fde67c62995c2872dbb53f21c55a2656689d44,18dc1348b26a71fdb986ea2a142ced748fb0881d,pending,pending_release_artifact_commit
+https://github.com/cys1102/ehrdyn-icu.git,kdd212-public-entrant-release,d9fde67c62995c2872dbb53f21c55a2656689d44,18dc1348b26a71fdb986ea2a142ced748fb0881d,e2b7ff5ac93b56fb68d90cf8151e791d2ac118af,verified_origin_branch
