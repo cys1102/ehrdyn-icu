@@ -1,0 +1,4 @@
+component_scope,horizons,row_count,status,complete_prt,planner_role
+transition_one_step,H1,40,numeric,False,none
+recursive_transition_or_observation_process,H2-H11,400,structural_nonavailability,False,none
+complete_prt_planning,H1/H4/H8,15,structural_nonavailability,False,not_executed

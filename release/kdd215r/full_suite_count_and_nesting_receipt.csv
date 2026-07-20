@@ -1,0 +1,15 @@
+quantity,expected,observed,status
+profiles,5,5,pass
+environments,40,40,pass
+direct_return_rows,280,280,pass
+logged_datasets,320,320,pass
+episodes_per_dataset,256,256,pass
+bootstrap_refits_per_dataset_contract,500,500,pass
+ope_rows,15360,15360,pass
+component_rows,440,440,pass
+committed_kdd215_test_methods,11,11,pass
+clean_install_schema_and_entrant_validation,pass,pass,pass
+clean_install_direct_byte_parity,True,True,pass
+original_privacy_receipt_rows,20,20,pass
+verified_immutable_checksums,288,288,pass
+supported_runtime_exact_hash_rows,3,3,pass

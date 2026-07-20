@@ -1,0 +1,14 @@
+artifact,forbidden_hits,row_level_ehr,latent_trajectory_export,status
+component_numeric_vs_structural_nonavailability.csv,,False,False,pass
+decision.md,,False,False,pass
+failure_ledger.csv,,False,False,pass
+four_axis_capability_matrix.csv,,False,False,pass
+frozen_kdd215r_gate_disaggregation_contract.md,,False,False,pass
+full_suite_count_and_nesting_receipt.csv,,False,False,pass
+generator_and_official_behavior_parity.csv,,False,False,pass
+historical_reference_nonreconstruction_matrix.csv,,False,False,pass
+immutable_kdd215_source_and_checksum_identity.csv,,False,False,pass
+kdd216r_authorization_or_nonexecution.md,,False,False,pass
+public_claim_allow_deny_matrix.csv,,False,False,pass
+result_audit.md,,False,False,pass
+role_isolation_and_entrant_security_receipt.csv,,False,False,pass

@@ -1,0 +1,5 @@
+axis,capability,status,independent_of_axis_d,claim_scope
+A,generator_and_evaluator_fidelity,pass,True,40 public constructed environments; official behavior evaluator
+B,role_isolation_and_external_entrant_execution,pass,True,observable-history JSONL entrant contract
+C,operational_full_suite_evidence,pass,True,existing immutable aggregate outputs only
+D,historical_manuscript_reference_reproduction,structural_nonavailability,False,three named historical references not reconstructed
