@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import math
@@ -84,6 +85,34 @@ def _mortality_90d(frame: pd.DataFrame) -> pd.Series:
 
 
 def load_core(paths: dict[str, Path]) -> tuple[pd.DataFrame, pd.DataFrame]:
+    base, diagnoses, _ = load_core_with_time_audit(paths)
+    return base, diagnoses
+
+
+def classify_icu_time_eligibility(frame: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, int]]:
+    missing_intime = frame["intime"].isna()
+    missing_outtime = ~missing_intime & frame["outtime"].isna()
+    both_observed = frame["intime"].notna() & frame["outtime"].notna()
+    equal_time = both_observed & frame["outtime"].eq(frame["intime"])
+    reversed_time = both_observed & frame["outtime"].lt(frame["intime"])
+    valid_time = both_observed & frame["outtime"].gt(frame["intime"])
+    audit = {
+        "total_merged_icu_stays_considered": int(len(frame)),
+        "valid_time_order_stays": int(valid_time.sum()),
+        "missing_intime": int(missing_intime.sum()),
+        "missing_outtime": int(missing_outtime.sum()),
+        "equal_intime_outtime": int(equal_time.sum()),
+        "reversed_time_order": int(reversed_time.sum()),
+    }
+    if sum(audit[key] for key in audit if key != "total_merged_icu_stays_considered") != audit["total_merged_icu_stays_considered"]:
+        raise ContractError("ICU time-order eligibility categories are not exhaustive and mutually exclusive")
+    retained = frame.loc[valid_time].copy()
+    if retained["intime"].isna().any() or retained["outtime"].isna().any() or retained["outtime"].le(retained["intime"]).any():
+        raise ContractError("invalid ICU time order remained after eligibility filtering")
+    return retained, audit
+
+
+def load_core_with_time_audit(paths: dict[str, Path]) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, int]]:
     patients = _read(paths["hosp/patients"], dates=("dod",))
     admissions = _read(paths["hosp/admissions"], dates=("admittime", "dischtime", "deathtime"))
     stays = _read(paths["icu/icustays"], dates=("intime", "outtime"))
@@ -95,8 +124,7 @@ def load_core(paths: dict[str, Path]) -> tuple[pd.DataFrame, pd.DataFrame]:
         .merge(patients[["subject_id", "gender", "anchor_age", "dod"]], on="subject_id", how="inner")
         .sort_values(["subject_id", "intime", "stay_id"], kind="stable")
     )
-    if base["intime"].isna().any() or base["outtime"].isna().any() or base["outtime"].le(base["intime"]).any():
-        raise ContractError("malformed ICU time order")
+    base, time_audit = classify_icu_time_eligibility(base)
     discharge = base["discharge_location"].fillna("").astype(str).str.upper()
     base = base[
         base["anchor_age"].ge(18)
@@ -104,10 +132,11 @@ def load_core(paths: dict[str, Path]) -> tuple[pd.DataFrame, pd.DataFrame]:
         & base["dischtime"].notna()
         & ~discharge.str.contains("HOSPICE")
     ].copy()
+    time_audit["retained_after_existing_public_base_eligibility"] = int(len(base))
     base["mortality_90d"] = _mortality_90d(base)
     base["role"] = [subject_role(value) for value in base["subject_id"]]
     diagnoses = _read(paths["hosp/diagnoses_icd"])
-    return base.reset_index(drop=True), diagnoses
+    return base.reset_index(drop=True), diagnoses, time_audit
 
 
 def _first_anchor(frame: pd.DataFrame, source: str | None = None) -> pd.DataFrame:
@@ -450,7 +479,7 @@ def reconstruct(root: Path, output: Path, schema: Path, *, source_hashes: dict[s
     load_runtime_config(runtime_config)
     if output.exists(): raise FileExistsError(output)
     paths = validate_layout(root)
-    stays, diagnoses = load_core(paths); candidates = build_anchors(paths, stays, diagnoses); arrays = build_arrays(paths, candidates); candidates = finalize_sepsis_anchors(candidates, arrays); transitions = build_transitions(candidates)
+    stays, diagnoses, time_audit = load_core_with_time_audit(paths); candidates = build_anchors(paths, stays, diagnoses); arrays = build_arrays(paths, candidates); candidates = finalize_sepsis_anchors(candidates, arrays); transitions = build_transitions(candidates)
     rows: dict[str, dict[str, Any]] = {}
     for task in TASKS:
         local = transitions[transitions["task"].eq(task)].reset_index(drop=True)
@@ -461,7 +490,21 @@ def reconstruct(root: Path, output: Path, schema: Path, *, source_hashes: dict[s
         row["cutpoint_hash"] = hashlib.sha256(json.dumps(contract["edges"], sort_keys=True).encode()).hexdigest(); rows[task] = row
     receipt = aggregate_receipt(rows, source_hashes or {})
     schema_object = json.loads(schema.read_text(encoding="utf-8")); Draft202012Validator.check_schema(schema_object); Draft202012Validator(schema_object).validate(receipt)
-    output.mkdir(parents=True); (output / "aggregate_receipt.json").write_text(json.dumps(receipt, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
+    output.mkdir(parents=True)
+    (output / "aggregate_receipt.json").write_text(json.dumps(receipt, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
+    with (output / "icu_time_order_eligibility_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=("category", "count", "precedence"), lineterminator="\n")
+        writer.writeheader()
+        precedence = {
+            "total_merged_icu_stays_considered": "denominator",
+            "valid_time_order_stays": "after_all_invalid_categories",
+            "missing_intime": "first",
+            "missing_outtime": "second_only_when_intime_present",
+            "equal_intime_outtime": "third_only_when_both_present",
+            "reversed_time_order": "fourth_only_when_both_present",
+            "retained_after_existing_public_base_eligibility": "after_time_filter_and_unchanged_existing_base_filters",
+        }
+        writer.writerows({"category": key, "count": value, "precedence": precedence[key]} for key, value in time_audit.items())
     return receipt
 
 

@@ -1,0 +1,8 @@
+gate,status,detail
+focused_KDD220AR2,pass,5_tests
+full_public_suite,pass,82_tests
+schema_positive_negative,pass,Draft_2020_12_and_forbidden_field_tests
+py_compile,pass,current_five_task_and_KDD220AR2_test
+clean_isolated_install,pass,wheel_install_and_21_candidate_tests
+checksum_manifest,pass,414_files_verified
+privacy_scan,pass,414_files_scanned_zero_findings
