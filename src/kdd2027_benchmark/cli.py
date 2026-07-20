@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import argparse
-import json
+import sys
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
 
 from . import BENCHMARK_VERSION
 from .baseline import BASELINES, run_baseline
+from .canonical import canonical_bytes, write_canonical_json
 from .config import validate_config_directory, validate_task_config
 from .errors import ReleaseContractError
 from .evaluator import evaluate_fixture, evaluate_predictions
@@ -17,14 +17,12 @@ from .manifest import validate_paper_manifests
 from .privacy import scan_release, verify_checksums
 from .report import write_aggregate_report
 from .split import deterministic_split
+from .schema import validate_schema_directory
 from .submission import validate_submission
 from .public_bundle import rebuild_public_bundle
 from .public_ope import run_public_ope_smoke
 from .public_pomdp import run_public_pomdp_smoke
 from .transition_entrant import validate_transition_submission
-
-JSON_INDENT: Final = 2
-
 
 @dataclass(slots=True)
 class CliArgs(argparse.Namespace):
@@ -52,6 +50,7 @@ class CliArgs(argparse.Namespace):
     datasets: int = 4
     bootstrap: int = 8
     bundle: Path = Path()
+    schema_dir: Path = Path()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -92,6 +91,8 @@ def build_parser() -> argparse.ArgumentParser:
     _ = scan.add_argument("--root", type=Path, required=True)
     checksums = commands.add_parser("verify-checksums", help="Verify the frozen public artifact manifest.")
     _ = checksums.add_argument("--root", type=Path, required=True)
+    schemas = commands.add_parser("validate-schemas", help="Validate every released JSON Schema as Draft 2020-12.")
+    _ = schemas.add_argument("--schema-dir", type=Path, required=True)
     submission = commands.add_parser("validate-submission", help="Validate an aggregate leaderboard submission.")
     _ = submission.add_argument("--submission", type=Path, required=True)
     _ = submission.add_argument("--config-dir", type=Path, required=True)
@@ -142,14 +143,14 @@ def main() -> int:
 
 def _dispatch(args: CliArgs) -> int:
     if args.command == "generate-fixture":
-        print(json.dumps({"rows": generate_fixture(args.output, args.episodes, args.seed), "synthetic": True}))
+        _print_json({"rows": generate_fixture(args.output, args.episodes, args.seed), "synthetic": True})
     elif args.command == "validate-config":
         if bool(args.config) == bool(args.config_dir):
             raise ReleaseContractError("Choose exactly one of --config or --config-dir")
         count = 1 if args.config is not None else len(validate_config_directory(_required_path(args.config_dir)))
         if args.config is not None:
             _ = validate_task_config(args.config)
-        print(json.dumps({"valid_configs": count, "benchmark_version": BENCHMARK_VERSION}))
+        _print_json({"valid_configs": count, "benchmark_version": BENCHMARK_VERSION})
     elif args.command == "evaluate":
         config = validate_task_config(args.task_config)
         _write_json(args.output, evaluate_fixture(args.fixture, str(config["task_id"])))
@@ -163,37 +164,36 @@ def _dispatch(args: CliArgs) -> int:
         config = validate_task_config(args.task_config)
         _write_json(args.output, run_baseline(args.fixture, args.output_fixture, str(config["task_id"]), args.baseline))
     elif args.command == "aggregate-report":
-        print(json.dumps({"aggregate_records": write_aggregate_report(args.input_dir, args.output)}))
+        _print_json({"aggregate_records": write_aggregate_report(args.input_dir, args.output)})
     elif args.command == "split":
-        print(json.dumps({"split": deterministic_split(args.entity_key)}))
+        _print_json({"split": deterministic_split(args.entity_key)})
     elif args.command == "scan-release":
-        print(json.dumps(scan_release(args.root), sort_keys=True))
+        _print_json(scan_release(args.root))
     elif args.command == "verify-checksums":
-        print(json.dumps(verify_checksums(args.root), sort_keys=True))
+        _print_json(verify_checksums(args.root))
+    elif args.command == "validate-schemas":
+        _print_json({"schemas": validate_schema_directory(args.schema_dir), "pass": True})
     elif args.command == "validate-submission":
-        configs = validate_config_directory(_required_path(args.config_dir))
-        print(json.dumps(validate_submission(args.submission, configs), sort_keys=True))
+        _print_json(validate_submission(args.submission, _required_path(args.config_dir)))
     elif args.command == "validate-manifest":
-        print(
-            json.dumps(
-                validate_paper_manifests(args.task_manifest, args.contract_manifest, args.evidence),
-                sort_keys=True,
-            )
-        )
+        _print_json(validate_paper_manifests(args.task_manifest, args.contract_manifest, args.evidence))
     elif args.command == "pomdp-smoke":
         _write_json(args.output, run_public_pomdp_smoke(_required_path(args.config), args.profile, args.environment_seed, args.episodes, args.seed))
     elif args.command == "ope-smoke":
         _write_json(args.output, run_public_ope_smoke(_required_path(args.config), args.profile, args.environment_seed, args.datasets, args.episodes, args.bootstrap, args.seed))
     elif args.command == "validate-transition-submission":
-        print(json.dumps(validate_transition_submission(args.submission, _required_path(args.config_dir)), sort_keys=True))
+        _print_json(validate_transition_submission(args.submission, _required_path(args.config_dir)))
     elif args.command == "rebuild-public-bundle":
-        print(json.dumps(rebuild_public_bundle(args.bundle, args.output), sort_keys=True))
+        _print_json(rebuild_public_bundle(args.bundle, args.output))
     return 0
 
 
 def _write_json(path: Path, value: Mapping[str, object]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    _ = path.write_text(json.dumps(value, indent=JSON_INDENT, sort_keys=True) + "\n", encoding="utf-8")
+    write_canonical_json(path, value)
+
+
+def _print_json(value: object) -> None:
+    sys.stdout.buffer.write(canonical_bytes(value))
 
 
 def _required_path(path: Path | None) -> Path:

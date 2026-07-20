@@ -1,8 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ehrdyn-icu.org/schemas/transition_submission.schema.json",
+  "title": "EHRDyn-ICU aggregate transition metric submission",
   "type": "object",
-  "required": ["submission_id", "rows"],
+  "additionalProperties": false,
+  "required": ["schema_version", "submission_id", "rows"],
   "properties": {
+    "schema_version": {"const": "kdd214-transition-submission-v1"},
     "submission_id": {"type": "string", "minLength": 1},
     "rows": {
       "type": "array",
@@ -10,15 +14,21 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["task_id", "task_config_sha256", "benchmark_version", "model_id", "source_commit", "horizon", "metric_name", "metric_value", "observed_target_count", "claim_boundary_acknowledged"],
+        "required": [
+          "task_id", "task_config_sha256", "feature_order_sha256",
+          "benchmark_version", "model_id", "source_commit", "horizon",
+          "metric_name", "metric_value", "observed_target_count",
+          "claim_boundary_acknowledged"
+        ],
         "properties": {
-          "task_id": {"type": "string"},
-          "task_config_sha256": {"pattern": "^[0-9a-f]{64}$"},
-          "benchmark_version": {"type": "string"},
-          "model_id": {"type": "string"},
-          "source_commit": {"pattern": "^[0-9a-fA-F]{7,40}$"},
+          "task_id": {"type": "string", "minLength": 1},
+          "task_config_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "feature_order_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "benchmark_version": {"const": "KDD2027-E060-4H-v1.0.0+KDD089"},
+          "model_id": {"type": "string", "minLength": 1},
+          "source_commit": {"type": "string", "pattern": "^[0-9a-fA-F]{7,40}$"},
           "horizon": {"enum": ["one_step", "recursive_40h", "task_specific_44h_sensitivity"]},
-          "metric_name": {"type": "string"},
+          "metric_name": {"enum": ["rmse", "mae", "crps", "mace", "coverage_error", "width90"]},
           "metric_value": {"type": "number"},
           "observed_target_count": {"type": "integer", "minimum": 1},
           "claim_boundary_acknowledged": {"const": true}

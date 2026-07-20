@@ -6,8 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "ehrdyn-icu"
 version = "1.0.0"
 description = "Clean-room utilities for the EHRDyn-ICU multi-cohort benchmark contract"
-requires-python = ">=3.11"
-dependencies = []
+requires-python = ">=3.11,<3.14"
+dependencies = ["jsonschema==4.26.0"]
 
 [project.optional-dependencies]
 credentialed = ["numpy>=1.26", "pandas>=2.2"]

@@ -33,7 +33,8 @@ over earlier aggregate summaries.
 
 ## Quick Start
 
-Python 3.11 or later is required.
+Python 3.11, 3.12, or 3.13 is required. Runtime dependencies are frozen in
+`uv.lock`.
 
 ```bash
 python -m venv .venv
@@ -41,6 +42,7 @@ source .venv/bin/activate
 python -m pip install -e .
 
 ehrdyn-icu validate-config --config-dir configs/tasks
+ehrdyn-icu validate-schemas --schema-dir schemas
 ehrdyn-icu generate-fixture --output /tmp/ehrdyn_fixture.csv
 ehrdyn-icu evaluate \
   --fixture /tmp/ehrdyn_fixture.csv \
@@ -64,6 +66,10 @@ manuscript-bundle workflow is documented in
 aggregate-only interfaces remain separate from credentialed EHR reconstruction.
 
 The historical `kdd2027` command remains available as a compatibility alias.
+
+Submission documents are bound to their released Draft 2020-12 schemas; see
+[SCHEMA_VALIDATION.md](SCHEMA_VALIDATION.md). Generated aggregate JSON uses the
+portable byte contract in [CANONICAL_SERIALIZATION.md](CANONICAL_SERIALIZATION.md).
 
 ## Repository Contents
 

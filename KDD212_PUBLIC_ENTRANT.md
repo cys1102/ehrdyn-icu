@@ -8,13 +8,14 @@ row-level probabilities, or patient trajectories.
 
 ## Clean install and deterministic smoke
 
-Python 3.11 is the supported runtime. Dependencies are pinned by
+The KDD212 smoke hashes were frozen on Python 3.11. The successor public
+package supports Python 3.11--3.13 under the dependencies pinned by
 `pyproject.toml` and `uv.lock`.
 
 ```bash
 python -m venv .venv
 . .venv/bin/activate
-python -m pip install --no-deps -e .
+python -m pip install -e .
 
 ehrdyn-icu validate-config --config-dir configs/tasks
 ehrdyn-icu validate-transition-submission \

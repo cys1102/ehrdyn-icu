@@ -5,6 +5,7 @@
     {
       "action_view": "vasopressor__three_bin",
       "evaluator_version": "KDD2027-E060-4H-v1.0.0+KDD089",
+      "feature_order_sha256": "772e18fc1be00da5e3012196ea0d488e7940f7dd041bf8a90d3bdf2682f7118c",
       "horizon": "conditional_recursive_17",
       "implementation_fidelity": "adapted",
       "metrics": {
@@ -17,10 +18,12 @@
       "seed_count": 3,
       "source_commit": "0123456",
       "task_id": "kdd2027_sepsis_vasopressor_3bin",
+      "task_config_sha256": "f4eb0b17f964dac0f3e25e44cd75530fb33599f2c9c704bbc968bfada8aaf4cc",
       "timing_view": "current_4h_window_exposure_predicts_next_4h_state",
       "track": "point_transition",
       "training_budget": "3 seeds; fixed train split; no test tuning"
     }
   ],
+  "schema_version": "kdd214-leaderboard-submission-v1",
   "submission_id": "example-method-v1"
 }

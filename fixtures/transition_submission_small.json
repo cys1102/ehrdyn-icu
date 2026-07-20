@@ -3,14 +3,17 @@
     {
       "benchmark_version": "KDD2027-E060-4H-v1.0.0+KDD089",
       "claim_boundary_acknowledged": true,
+      "feature_order_sha256": "772e18fc1be00da5e3012196ea0d488e7940f7dd041bf8a90d3bdf2682f7118c",
       "horizon": "one_step",
       "metric_name": "rmse",
       "metric_value": 0.25,
       "model_id": "public_fixture_persistence",
       "observed_target_count": 128,
-      "source_commit": "synthetic-fixture",
+      "source_commit": "f7d8123",
       "task_config_sha256": "f4eb0b17f964dac0f3e25e44cd75530fb33599f2c9c704bbc968bfada8aaf4cc",
       "task_id": "kdd2027_sepsis_vasopressor_3bin"
     }
-  ]
+  ],
+  "schema_version": "kdd214-transition-submission-v1",
+  "submission_id": "public-transition-fixture-v1"
 }

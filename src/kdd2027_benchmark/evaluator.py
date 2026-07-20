@@ -54,6 +54,7 @@ def evaluate_predictions(
     absolute = [abs(error) for error in errors]
     variances = [_positive_std(row) ** 2 for row in rows]
     return {
+        "schema_version": "kdd214-aggregate-metrics-v1",
         "benchmark_version": BENCHMARK_VERSION,
         "task_id": task_id,
         "synthetic_fixture": synthetic,

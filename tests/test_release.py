@@ -121,7 +121,7 @@ class KDD089ReleaseTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/"bad.json"; path.write_text(json.dumps(template),encoding="utf-8")
             result=_run("validate-submission","--submission",str(path),"--config-dir",str(ROOT/"configs/tasks"),expected=2)
-        self.assertIn("Unsupported submission track",result.stdout)
+        self.assertIn("/rows/0/track [enum]",result.stdout)
 
     def test_submission_rejects_wrong_action_view(self):
         template=json.loads((ROOT/"submission/leaderboard_submission_template.json").read_text(encoding="utf-8")); template["rows"][0]["action_view"]="wrong"
@@ -221,7 +221,7 @@ class KDD089ReleaseTests(unittest.TestCase):
         self.assertFalse((ROOT/"evidence/policy").exists())
         self.assertTrue((ROOT/"evidence/quarantine/policy/ope_wis_wpdis_clipping.csv").is_file())
         schema=json.loads((ROOT/"schemas/leaderboard_submission.schema.json").read_text(encoding="utf-8"))
-        self.assertNotIn("policy_diagnostic",schema["properties"]["rows"]["items"]["properties"]["track"]["enum"])
+        self.assertNotIn("policy_diagnostic",schema["$defs"]["row"]["properties"]["track"]["enum"])
 
     def test_clinical_review_is_explicitly_pending(self):
         with (ROOT/"clinical_review/core_review_status.csv").open(newline="",encoding="utf-8") as handle:

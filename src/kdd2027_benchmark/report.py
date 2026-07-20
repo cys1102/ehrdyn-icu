@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import cast
 
 from . import CLAIM_BOUNDARY
 from .errors import ReleaseContractError
+from .schema import schema_path, validate_json_file
 
 
 def write_aggregate_report(input_dir: Path, output: Path) -> int:
     records: list[dict[str, object]] = []
     for path in sorted(input_dir.glob("*.json")):
-        value = cast(object, json.loads(path.read_text(encoding="utf-8")))
+        value = cast(object, validate_json_file(path, schema_path("aggregate_metrics")))
         if isinstance(value, dict) and "overall_rmse" in value:
             records.append(cast(dict[str, object], value))
     if not records:

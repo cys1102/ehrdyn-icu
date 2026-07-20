@@ -9,6 +9,7 @@ from pathlib import Path
 from statistics import fmean, stdev
 from typing import Callable
 
+from .canonical import canonical_sha256
 from .errors import ReleaseContractError
 
 
@@ -98,8 +99,7 @@ class PublicPOMDPConfig:
 
     @property
     def fingerprint(self) -> str:
-        payload = json.dumps(asdict(self), sort_keys=True, separators=(",", ":"), default=list)
-        return hashlib.sha256(payload.encode()).hexdigest()
+        return canonical_sha256(asdict(self))
 
 
 @dataclass(frozen=True)
@@ -143,9 +143,7 @@ class PublicPOMDP:
             "response_multiplier": self.response_multiplier,
             "cost_multiplier": self.cost_multiplier,
         }
-        self.mechanism_hash = hashlib.sha256(
-            json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
-        ).hexdigest()
+        self.mechanism_hash = canonical_sha256(payload)
 
     def ideal_action(self, state: int, subtype: int) -> int:
         if self.config.action_count == 25:

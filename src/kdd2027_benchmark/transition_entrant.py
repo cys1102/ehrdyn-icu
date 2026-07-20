@@ -1,46 +1,47 @@
 from __future__ import annotations
 
-import hashlib
 import json
-import math
 from pathlib import Path
+from typing import cast
 
 from .errors import ReleaseContractError
-
-
-def file_sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+from .identity import feature_order_sha256, file_sha256
+from .schema import schema_path, validate_json_file
 
 
 def validate_transition_submission(path: Path, config_dir: Path) -> dict[str, object]:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict) or not isinstance(data.get("rows"), list) or not data["rows"]:
-        raise ReleaseContractError("Transition submission must contain nonempty rows")
-    configs = {}
+    data = validate_json_file(path, schema_path("transition_submission"))
+    root = config_dir.parent.parent
+    configs: dict[str, tuple[dict[str, object], Path]] = {}
     for config_path in sorted(config_dir.glob("*.json")):
-        config = json.loads(config_path.read_text(encoding="utf-8"))
-        configs[str(config["task_id"])] = (config, file_sha256(config_path))
-    required = {
-        "task_id", "task_config_sha256", "benchmark_version", "model_id", "source_commit",
-        "horizon", "metric_name", "metric_value", "observed_target_count", "claim_boundary_acknowledged",
-    }
-    for row in data["rows"]:
-        if not isinstance(row, dict) or required - set(row):
-            raise ReleaseContractError("Transition submission row is missing frozen identity fields")
+        config = cast(dict[str, object], json.loads(config_path.read_text(encoding="utf-8")))
+        configs[str(config["task_id"])] = (config, config_path)
+    rows = cast(list[dict[str, object]], data["rows"])
+    identities: set[tuple[str, str, str, str]] = set()
+    counts: dict[tuple[str, str, str], int] = {}
+    for row in rows:
         task = str(row["task_id"])
         if task not in configs:
             raise ReleaseContractError(f"Unknown transition task: {task}")
-        config, digest = configs[task]
-        if row["task_config_sha256"] != digest or row["benchmark_version"] != config["benchmark_version"]:
-            raise ReleaseContractError(f"Task/version hash mismatch: {task}")
-        if row["horizon"] not in {"one_step", "recursive_40h", "task_specific_44h_sensitivity"}:
-            raise ReleaseContractError("Unsupported transition horizon")
-        if not isinstance(row["observed_target_count"], int) or row["observed_target_count"] <= 0:
-            raise ReleaseContractError("observed_target_count must be positive")
-        try:
-            metric = float(row["metric_value"])
-        except (TypeError, ValueError) as error:
-            raise ReleaseContractError("Transition metric must be numeric") from error
-        if not math.isfinite(metric) or row["claim_boundary_acknowledged"] is not True:
-            raise ReleaseContractError("Transition metric or claim boundary is invalid")
-    return {"valid_rows": len(data["rows"]), "task_hashes_verified": True, "aggregate_only": True}
+        config, config_path = configs[task]
+        if row["task_config_sha256"] != file_sha256(config_path):
+            raise ReleaseContractError(f"Transition task hash mismatch: {task}")
+        if row["feature_order_sha256"] != feature_order_sha256(config, root):
+            raise ReleaseContractError(f"Transition feature order mismatch: {task}")
+        identity = (task, str(row["model_id"]), str(row["horizon"]), str(row["metric_name"]))
+        if identity in identities:
+            raise ReleaseContractError(f"Duplicate transition metric identity: {identity}")
+        identities.add(identity)
+        count_identity = identity[:3]
+        count = int(row["observed_target_count"])
+        if count_identity in counts and counts[count_identity] != count:
+            raise ReleaseContractError(f"Observed target count mismatch: {count_identity}")
+        counts[count_identity] = count
+    return {
+        "valid_rows": len(rows),
+        "schema_version": data["schema_version"],
+        "schema_bound": True,
+        "task_hashes_verified": True,
+        "feature_order_verified": True,
+        "aggregate_only": True,
+    }

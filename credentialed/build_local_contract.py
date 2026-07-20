@@ -9,7 +9,6 @@ before a separate privacy check.
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 
@@ -23,6 +22,7 @@ if str(SOURCE) not in sys.path:
     sys.path.insert(0, str(SOURCE))
 
 from kdd2027_benchmark.config import validate_config_directory  # noqa: E402
+from kdd2027_benchmark.canonical import canonical_bytes, write_canonical_json  # noqa: E402
 from kdd2027_benchmark.split import deterministic_split  # noqa: E402
 
 
@@ -85,8 +85,8 @@ def main() -> int:
         "parity": parity,
         "parity_pass": all(row["pass"] for row in parity),
     }
-    (args.output_dir / "aggregate_receipt.json").write_text(json.dumps(output, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({"tasks": len(receipts), "parity_pass": output["parity_pass"]}, sort_keys=True))
+    write_canonical_json(args.output_dir / "aggregate_receipt.json", output)
+    sys.stdout.buffer.write(canonical_bytes({"tasks": len(receipts), "parity_pass": output["parity_pass"]}))
     return 0 if output["parity_pass"] else 2
 
 
@@ -157,7 +157,7 @@ def _build_task(task_id, config, all_observations, actions, static, output_dir):
         local_subject_key=episodes["subject_id"].to_numpy(),
         local_stay_key=episodes["stay_id"].to_numpy(),
     )
-    (output_dir / f"{task_id}.preprocessing.json").write_text(json.dumps(stats, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    write_canonical_json(output_dir / f"{task_id}.preprocessing.json", stats)
     return {
         "task_id": task_id,
         "episodes": len(episodes),
