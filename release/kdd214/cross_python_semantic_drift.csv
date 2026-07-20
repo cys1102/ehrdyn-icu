@@ -1,0 +1,4 @@
+reference_python,comparison_python,float_count,maximum_absolute_drift,max_absolute_pointer,maximum_relative_drift,max_relative_pointer,absolute_tolerance,status
+3.11,3.11,80,0.0,/aggregate_metrics/cov80,0.0,/aggregate_metrics/cov80,5e-12,pass
+3.11,3.12,80,8.881784197001252e-16,/ope_smoke/rows/0/mean_ess,4.064034355810674e-15,/ope_smoke/rows/9/mean_estimate,5e-12,pass
+3.11,3.13,80,8.881784197001252e-16,/ope_smoke/rows/0/mean_ess,4.064034355810674e-15,/ope_smoke/rows/9/mean_estimate,5e-12,pass
