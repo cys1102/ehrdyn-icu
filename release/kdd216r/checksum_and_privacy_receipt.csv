@@ -1,0 +1,6 @@
+check,files,status,detail
+immutable_kdd215r_source_manifest,303,pass,verified_before_full_execution
+preaudit_public_privacy_scan,304,pass,zero_findings
+kdd216r_output_privacy_scan,18,pass,aggregate_only_no_private_paths
+final_manifest_inventory,324,pass_after_manifest_refresh,zero_checksum_mismatches
+final_public_privacy_scan,325,pass_after_manifest_refresh,zero_findings

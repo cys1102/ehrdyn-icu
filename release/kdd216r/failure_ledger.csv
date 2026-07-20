@@ -1,0 +1,2 @@
+scope,status,impact_on_kdd216r,decision_blocking,detail
+historical_reference_reproduction,structural_nonavailability,none_bounded_scope,False,exact learned policy and complete P/R/T H4 references remain unavailable
