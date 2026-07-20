@@ -55,6 +55,7 @@
     "timezone": "UTC",
     "locale": "C.UTF-8",
     "stable_sort_kind": "stable",
+    "high_volume_chunk_rows": 250000,
     "float_comparison_rtol": 1e-12,
     "float_comparison_atol": 1e-12
   }

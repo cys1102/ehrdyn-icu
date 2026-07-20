@@ -42,6 +42,9 @@ def load_runtime_config(path: Path | None = None) -> dict[str, Any]:
         raise RuntimeConfigError("lineage router must contain exactly the retained five tasks")
     if config.get("mimiciv_version") != "3.1":
         raise RuntimeConfigError("only MIMIC-IV 3.1 is supported")
+    chunk_rows = config.get("runtime", {}).get("high_volume_chunk_rows")
+    if not isinstance(chunk_rows, int) or chunk_rows <= 0:
+        raise RuntimeConfigError("high-volume chunk rows must be a positive integer")
     return config
 
 

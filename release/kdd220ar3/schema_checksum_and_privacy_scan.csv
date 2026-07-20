@@ -1,0 +1,10 @@
+gate,expected,observed,status
+focused_AKI_nullable_tests,4_pass,4_pass,pass
+focused_chunk_compression_order_tests,4_pass,4_pass,pass
+five_task_reconstruction_tests,3_pass,3_pass,pass
+complete_public_test_suite,all_pass,90_pass,pass
+py_compile,current_five_task_and_new_tests,pass,pass
+all_released_JSON_schemas,Draft_2020_12_valid,5_valid,pass
+checksum_manifest,all_files_match,431_files_0_mismatches,pass
+privacy_scan,zero_findings,432_files_0_findings,pass
+prohibited_private_path_scan,zero_findings,0_findings,pass
