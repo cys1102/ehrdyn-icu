@@ -1,7 +1,7 @@
 {
   "config": "configs/public_pomdp/kdd198_repaired_v2.json",
   "fixtures": {
-    "fixtures/kdd212_expected/public_ope_smoke.json": "17fdbf516f4cc6fff4f75c6eb0a8deb053052a9b75f9d7fae1e2dcecc700f9a8",
+    "fixtures/kdd212_expected/public_ope_smoke.json": "bce577b73ed63f6a0c290a191d498827aeed1402f428ccc3d914dec6cdecf323",
     "fixtures/kdd212_expected/public_pomdp_smoke.json": "84435f4dc4a54fc52ca55eebcb42596fb54843f83576d31008ad2b76fd65d955"
   },
   "ope_smoke": {
