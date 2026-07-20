@@ -1,0 +1,7 @@
+check,result,status
+clean_clone_commit,d9fde67c62995c2872dbb53f21c55a2656689d44,pass
+editable_install_no_dependencies,3.11.14,pass
+focused_and_release_tests,33 run; 2 credentialed-extra skips,pass
+synthetic_fixture_hash,84435f4dc4a54fc52ca55eebcb42596fb54843f83576d31008ad2b76fd65d955,pass
+bounded_ope_fixture_hash,bce577b73ed63f6a0c290a191d498827aeed1402f428ccc3d914dec6cdecf323,pass
+clean_clone_wall_seconds,3,measured

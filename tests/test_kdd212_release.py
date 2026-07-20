@@ -46,6 +46,11 @@ class KDD212ReleaseTests(unittest.TestCase):
         self.assertEqual(len(first["rows"]), 2 * len(ESTIMATORS))
         self.assertTrue(all(row["finite_fraction"] == 1.0 for row in first["rows"]))
 
+    def test_frozen_smoke_files_match_documented_hashes(self):
+        receipt = json.loads((ROOT / "fixtures/kdd212_public_smoke_hashes.json").read_text())
+        for relative, expected in receipt["fixtures"].items():
+            self.assertEqual(hashlib.sha256((ROOT / relative).read_bytes()).hexdigest(), expected)
+
     def test_transition_fixture_verifies_task_and_version_hashes(self):
         result = validate_transition_submission(
             ROOT / "fixtures/transition_submission_small.json", ROOT / "configs/tasks"

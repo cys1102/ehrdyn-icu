@@ -1,0 +1,2 @@
+fixture,task_config_sha256,valid_rows,wrong_hash_rejected,aggregate_only,status
+fixtures/transition_submission_small.json,f4eb0b17f964dac0f3e25e44cd75530fb33599f2c9c704bbc968bfada8aaf4cc,1,True,True,pass
