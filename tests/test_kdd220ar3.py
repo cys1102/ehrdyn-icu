@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -152,10 +153,17 @@ class KDD220AR3AKIAndStreamingTests(unittest.TestCase):
             first, second = Path(directory) / "first", Path(directory) / "second"
             reconstruct(root, first, SCHEMA, source_hashes={"fixture": "a" * 64}, chunk_rows=2)
             reconstruct(root, second, SCHEMA, source_hashes={"fixture": "a" * 64}, chunk_rows=17)
+            left = json.loads((first / "aggregate_receipt.json").read_text())
+            right = json.loads((second / "aggregate_receipt.json").read_text())
+            left_streaming, right_streaming = left.pop("streaming"), right.pop("streaming")
+            self.assertEqual(left, right)
+            self.assertEqual([row["table"] for row in left_streaming], [row["table"] for row in right_streaming])
+            self.assertTrue(all(row["effective_chunk_size"] == 2 for row in left_streaming))
+            self.assertTrue(all(row["effective_chunk_size"] == 17 for row in right_streaming))
             for name in (
-                "aggregate_receipt.json",
                 "icu_time_order_eligibility_aggregate.csv",
                 "nullable_key_and_timestamp_exclusion_aggregate.csv",
+                "respiratory_action_filter_aggregate.csv",
             ):
                 self.assertEqual((first / name).read_bytes(), (second / name).read_bytes())
 

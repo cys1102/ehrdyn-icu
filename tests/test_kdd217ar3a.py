@@ -24,7 +24,7 @@ from kdd2027_benchmark.current_five_task.contracts import (
     subject_role,
     validate_layout,
 )
-from kdd2027_benchmark.current_five_task.reconstruct import reconstruct
+from kdd2027_benchmark.current_five_task.reconstruct import HIGH_VOLUME_TABLE_ORDER, reconstruct
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -169,7 +169,16 @@ class ContractTests(unittest.TestCase):
         task_rows = {}
         for task, k in zip(("sepsis", "respiratory_support", "shock", "aki", "heart_failure"), (25, 25, 25, 4, 2)):
             task_rows[task] = {"subjects": 1, "episodes": 1, "decisions": 1, "action_counts": [1] + [0] * (k - 1), "minimum_horizon": 1, "maximum_horizon": 1, "action_count": k, "cutpoint_hash": "0" * 64, "reward_contract": "synthetic", "reward_observed_decisions": 1, "terminal_reward_count": 0}
-        receipt = aggregate_receipt(task_rows, {"source": "1" * 64})
+        streaming = [
+            {
+                "table": table, "rows_read": 1, "rows_retained": 1,
+                "chunks_processed": 1, "maximum_retained_rows_per_chunk": 1,
+                "effective_chunk_size": 250000, "compression_encoding": "csv_gz",
+                "scan_count": 1,
+            }
+            for table in HIGH_VOLUME_TABLE_ORDER
+        ]
+        receipt = aggregate_receipt(task_rows, {"source": "1" * 64}, streaming)
         Draft202012Validator(schema).validate(receipt)
         for field in ("subject_id", "stay_id", "timestamp", "trajectory", "split_membership", "free_text", "checkpoint", "raw_path"):
             invalid = copy.deepcopy(receipt); invalid[field] = "forbidden"
@@ -196,7 +205,7 @@ class ContractTests(unittest.TestCase):
             frame = pd.read_csv(patients); pd.concat([frame, frame.iloc[[0]]]).to_csv(patients, index=False, compression="gzip")
             with self.assertRaises(ContractError): reconstruct(root, Path(directory) / "out", SCHEMA)
             wrong = Path(directory) / "3.2"; root.rename(wrong)
-            with self.assertRaises(ContractError): validate_layout(wrong)
+            with self.assertRaises(ContractError): reconstruct(wrong, Path(directory) / "wrong-out", SCHEMA)
 
 
 if __name__ == "__main__":

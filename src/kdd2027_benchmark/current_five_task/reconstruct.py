@@ -8,6 +8,8 @@ import json
 import math
 import os
 import re
+import resource
+import time
 from collections import deque
 from pathlib import Path
 from typing import Any, Iterable
@@ -74,16 +76,42 @@ def _read(path: Path, columns: Iterable[str] | None = None, dates: Iterable[str]
     return parse_times(frame, dates, path.name)
 
 
-HIGH_VOLUME_TABLES = frozenset({
-    "icu/chartevents",
+HIGH_VOLUME_TABLE_ORDER = (
     "hosp/labevents",
     "hosp/microbiologyevents",
     "hosp/prescriptions",
+    "icu/chartevents",
     "icu/inputevents",
     "icu/outputevents",
     "icu/procedureevents",
-})
+)
+HIGH_VOLUME_TABLES = frozenset(HIGH_VOLUME_TABLE_ORDER)
 DEFAULT_CHUNK_ROWS = int(RUNTIME_CONFIG["runtime"]["high_volume_chunk_rows"])
+
+
+def _streaming_rows(
+    audit: dict[str, dict[str, int | str]],
+    *,
+    chunk_rows: int,
+    paths: dict[str, Path] | None = None,
+) -> list[dict[str, int | str]]:
+    rows: list[dict[str, int | str]] = []
+    for table in HIGH_VOLUME_TABLE_ORDER:
+        observed = audit.get(table, {})
+        encoding = observed.get("compression_encoding")
+        if encoding is None and paths is not None:
+            encoding = "csv_gz" if paths[table].suffix == ".gz" else "csv"
+        rows.append({
+            "table": table,
+            "rows_read": int(observed.get("rows_read", 0)),
+            "rows_retained": int(observed.get("rows_retained", 0)),
+            "chunks_processed": int(observed.get("chunks_processed", 0)),
+            "maximum_retained_rows_per_chunk": int(observed.get("maximum_retained_rows_per_chunk", 0)),
+            "effective_chunk_size": int(observed.get("effective_chunk_size", chunk_rows)),
+            "compression_encoding": str(encoding or "not_scanned"),
+            "scan_count": int(observed.get("scan_count", 0)),
+        })
+    return rows
 
 
 def _audit_add(audit: dict[tuple[str, str, str], int], table: str, field: str, reason: str, count: int) -> None:
@@ -142,11 +170,27 @@ def _stream_events(
     point_time: str | None = None,
     interval_times: tuple[str, str] | None = None,
     sort_by: Iterable[str] = (),
+    streaming_audit: dict[str, dict[str, int | str]] | None = None,
 ) -> pd.DataFrame:
     if table not in HIGH_VOLUME_TABLES:
         raise ContractError(f"unregistered high-volume table: {table}")
     if chunk_rows <= 0:
         raise ContractError("chunk_rows must be positive")
+    stream_row: dict[str, int | str] | None = None
+    if streaming_audit is not None:
+        encoding = "csv_gz" if path.suffix == ".gz" else "csv"
+        stream_row = streaming_audit.setdefault(table, {
+            "rows_read": 0,
+            "rows_retained": 0,
+            "chunks_processed": 0,
+            "maximum_retained_rows_per_chunk": 0,
+            "effective_chunk_size": int(chunk_rows),
+            "compression_encoding": encoding,
+            "scan_count": 0,
+        })
+        if stream_row["effective_chunk_size"] != int(chunk_rows) or stream_row["compression_encoding"] != encoding:
+            raise ContractError(f"streaming contract drift for {table}")
+        stream_row["scan_count"] = int(stream_row["scan_count"]) + 1
     selected_frames: list[pd.DataFrame] = []
     source_offset = 0
     chunks: Any | None = None
@@ -156,6 +200,9 @@ def _stream_events(
         chunks = pd.read_csv(source, usecols=list(columns), chunksize=chunk_rows, low_memory=False)
         try:
             for raw_chunk in chunks:
+                if stream_row is not None:
+                    stream_row["chunks_processed"] = int(stream_row["chunks_processed"]) + 1
+                    stream_row["rows_read"] = int(stream_row["rows_read"]) + len(raw_chunk)
                 chunk = raw_chunk.copy()
                 chunk["__source_order"] = np.arange(source_offset, source_offset + len(chunk), dtype=np.int64)
                 source_offset += len(chunk)
@@ -203,6 +250,11 @@ def _stream_events(
                     else:
                         raise ContractError("bounded stream requires point or interval time semantics")
                 if not chunk.empty:
+                    if stream_row is not None:
+                        stream_row["rows_retained"] = int(stream_row["rows_retained"]) + len(chunk)
+                        stream_row["maximum_retained_rows_per_chunk"] = max(
+                            int(stream_row["maximum_retained_rows_per_chunk"]), len(chunk)
+                        )
                     selected_frames.append(chunk)
         finally:
             chunks.close()
@@ -228,6 +280,7 @@ def scan_creatinine(
     *,
     chunk_rows: int,
     audit: dict[tuple[str, str, str], int],
+    streaming_audit: dict[str, dict[str, int | str]] | None = None,
 ) -> pd.DataFrame:
     creatinine = _stream_events(
         path,
@@ -240,6 +293,7 @@ def scan_creatinine(
         chunk_rows=chunk_rows,
         itemids=set(CREATININE_ITEMIDS),
         sort_by=("subject_id", "charttime"),
+        streaming_audit=streaming_audit,
     )
     if creatinine.empty:
         return pd.DataFrame(columns=("subject_id", "hadm_id", "charttime", "value", "__source_order"))
@@ -381,6 +435,7 @@ def suspected_infection_anchors(
     *,
     chunk_rows: int,
     audit: dict[tuple[str, str, str], int],
+    streaming_audit: dict[str, dict[str, int | str]] | None = None,
 ) -> pd.DataFrame:
     prescriptions = _stream_events(
         paths["hosp/prescriptions"], table="hosp/prescriptions",
@@ -388,6 +443,7 @@ def suspected_infection_anchors(
         dates=("starttime", "stoptime"), required_ids=("subject_id", "hadm_id"), required_times=("starttime",),
         audit=audit, chunk_rows=chunk_rows,
         key="hadm_id", eligible_keys=set(stays["hadm_id"].astype(int)), sort_by=("subject_id", "starttime"),
+        streaming_audit=streaming_audit,
     )
     antibiotics = prescriptions[
         prescriptions["hadm_id"].isin(stays["hadm_id"])
@@ -401,6 +457,7 @@ def suspected_infection_anchors(
         dates=("chartdate", "charttime"), required_ids=("subject_id",), required_times=(),
         audit=audit, chunk_rows=chunk_rows,
         key="subject_id", eligible_keys=set(stays["subject_id"].astype(int)), sort_by=("subject_id", "charttime", "chartdate"),
+        streaming_audit=streaming_audit,
     )
     cultures["culture_time"] = cultures["charttime"].fillna(cultures["chartdate"])
     missing_culture_time = cultures["culture_time"].isna()
@@ -457,6 +514,7 @@ def build_anchors(
     *,
     chunk_rows: int = DEFAULT_CHUNK_ROWS,
     audit: dict[tuple[str, str, str], int] | None = None,
+    streaming_audit: dict[str, dict[str, int | str]] | None = None,
 ) -> pd.DataFrame:
     audit = audit if audit is not None else {}
     items = _read(paths["icu/d_items"])[["itemid", "label"]]
@@ -470,6 +528,7 @@ def build_anchors(
         audit=audit, chunk_rows=chunk_rows,
         itemids=set(MECHVENT_ITEMIDS + SBP_ITEMIDS + MBP_ITEMIDS),
         key="stay_id", eligible_keys=stay_ids, sort_by=("stay_id", "charttime", "itemid"),
+        streaming_audit=streaming_audit,
     )
     input_label_ids = set(label[label.astype(str).str.contains(f"{DIURETIC_PATTERN}|{VASODILATOR_PATTERN}|{RRT_PATTERN}", case=False, regex=True, na=False)].index.astype(int))
     inputs = _stream_events(
@@ -479,6 +538,7 @@ def build_anchors(
         audit=audit, chunk_rows=chunk_rows,
         itemids=set(VASO_ITEMIDS) | input_label_ids,
         key="stay_id", eligible_keys=stay_ids, sort_by=("stay_id", "starttime", "itemid"),
+        streaming_audit=streaming_audit,
     )
     procedure_label_ids = set(label[label.astype(str).str.contains(f"oxygen|ventilat|intubat|bipap|cpap|{RRT_PATTERN}", case=False, regex=True, na=False)].index.astype(int))
     procedures = _stream_events(
@@ -488,10 +548,13 @@ def build_anchors(
         audit=audit, chunk_rows=chunk_rows,
         itemids=set(MECHVENT_ITEMIDS) | procedure_label_ids,
         key="stay_id", eligible_keys=stay_ids, sort_by=("stay_id", "starttime", "itemid"),
+        streaming_audit=streaming_audit,
     )
     frames: list[pd.DataFrame] = []
 
-    sepsis = suspected_infection_anchors(paths, stays, chunk_rows=chunk_rows, audit=audit)
+    sepsis = suspected_infection_anchors(
+        paths, stays, chunk_rows=chunk_rows, audit=audit, streaming_audit=streaming_audit
+    )
     if not sepsis.empty:
         local = stays.merge(sepsis, on="stay_id", how="inner")
         local = local[(local["anchor_time"] >= local["intime"]) & (local["anchor_time"] < local["outtime"])]
@@ -519,7 +582,9 @@ def build_anchors(
     if not shock.empty:
         local = stays.merge(shock, on="stay_id", how="inner"); local["task_id"] = "shock"; frames.append(local)
 
-    creat = scan_creatinine(paths["hosp/labevents"], chunk_rows=chunk_rows, audit=audit)
+    creat = scan_creatinine(
+        paths["hosp/labevents"], chunk_rows=chunk_rows, audit=audit, streaming_audit=streaming_audit
+    )
     aki_lab = kdigo_creatinine_events(creat)
     if not aki_lab.empty:
         aki_lab = aki_lab.merge(stays[["hadm_id", "stay_id", "intime", "outtime"]], on="hadm_id", how="inner")
@@ -540,6 +605,7 @@ def build_anchors(
         dates=("starttime", "stoptime"), required_ids=("subject_id", "hadm_id"), required_times=("starttime",),
         audit=audit, chunk_rows=chunk_rows,
         key="hadm_id", eligible_keys=set(hf_stays["hadm_id"].astype(int)), sort_by=("hadm_id", "starttime"),
+        streaming_audit=streaming_audit,
     )
     rx = rx[rx["drug"].astype(str).str.contains(f"{DIURETIC_PATTERN}|{VASODILATOR_PATTERN}", case=False, regex=True, na=False)]
     hf_event = rx.merge(hf_stays[["hadm_id", "stay_id", "intime", "outtime"]], on="hadm_id")
@@ -581,6 +647,7 @@ def build_arrays(
     *,
     chunk_rows: int = DEFAULT_CHUNK_ROWS,
     audit: dict[tuple[str, str, str], int] | None = None,
+    streaming_audit: dict[str, dict[str, int | str]] | None = None,
 ) -> dict[str, np.ndarray]:
     audit = audit if audit is not None else {}
     steps = RAW_EXTRACTION_BINS
@@ -603,6 +670,7 @@ def build_arrays(
         audit=audit, chunk_rows=chunk_rows, itemids=set(CHART_ITEM_MAP) | set(PEEP_ITEMIDS),
         key="stay_id", bounds=stay_bounds, point_time="charttime",
         sort_by=("episode_idx", "charttime", "itemid"),
+        streaming_audit=streaming_audit,
     )
     chart["bin"] = np.floor((chart["charttime"] - chart["window_start"]).dt.total_seconds() / (BIN_HOURS * 3600)).astype(int)
     chart["value"] = [corrected_chart_value(item, value, unit) for item, value, unit in zip(chart["itemid"], chart["valuenum"], chart["valueuom"])]
@@ -634,6 +702,7 @@ def build_arrays(
         audit=audit, chunk_rows=chunk_rows, itemids=set(LAB_ITEM_MAP),
         key="hadm_id", bounds=hadm_bounds, point_time="charttime",
         sort_by=("episode_idx", "charttime", "itemid"),
+        streaming_audit=streaming_audit,
     )
     labs["bin"] = np.floor((labs["charttime"] - labs["window_start"]).dt.total_seconds() / (BIN_HOURS * 3600)).astype(int)
     labs["value"] = pd.to_numeric(labs["valuenum"], errors="coerce")
@@ -654,6 +723,7 @@ def build_arrays(
         audit=audit, chunk_rows=chunk_rows, itemids=set(URINE_ITEMIDS),
         key="stay_id", bounds=stay_bounds, point_time="charttime",
         sort_by=("episode_idx", "charttime", "itemid"),
+        streaming_audit=streaming_audit,
     )
     outputs["bin"] = np.floor((outputs["charttime"] - outputs["window_start"]).dt.total_seconds() / (BIN_HOURS * 3600)).astype(int)
     outputs["numeric"] = pd.to_numeric(outputs["value"], errors="coerce")
@@ -674,6 +744,7 @@ def build_arrays(
         itemids=set(FLUID_ITEMIDS) | set(VASO_ITEMIDS) | label_ids,
         key="stay_id", bounds=stay_bounds, interval_times=("starttime", "endtime"),
         sort_by=("episode_idx", "starttime", "itemid"),
+        streaming_audit=streaming_audit,
     )
     ib["label"] = ib["itemid"].map(labels).fillna("")
     ib["endtime"] = ib["endtime"].fillna(ib["starttime"])
@@ -700,6 +771,7 @@ def build_arrays(
         audit=audit, chunk_rows=chunk_rows, itemids=set(MECHVENT_ITEMIDS) | procedure_label_ids,
         key="stay_id", bounds=stay_bounds, interval_times=("starttime", "endtime"),
         sort_by=("episode_idx", "starttime", "itemid"),
+        streaming_audit=streaming_audit,
     )
     pb["label"] = pb["itemid"].map(labels).fillna("")
     pb["endtime"] = pb["endtime"].fillna(pb["starttime"])
@@ -718,6 +790,7 @@ def build_arrays(
         audit=audit, chunk_rows=chunk_rows,
         key="hadm_id", bounds=hadm_bounds, interval_times=("starttime", "stoptime"),
         sort_by=("episode_idx", "starttime"),
+        streaming_audit=streaming_audit,
     )
     rb["stoptime"] = rb["stoptime"].fillna(rb["starttime"])
     rb = rb[(rb["stoptime"] >= rb["window_start"]) & (rb["starttime"] < rb["window_end"])].copy()
@@ -789,7 +862,44 @@ def encode_actions(task: str, transitions: pd.DataFrame, arrays: dict[str, np.nd
     else: raise ContractError(f"unknown task: {task}")
     le, re_ = fit_train_positive_edges(left, lo, roles), fit_train_positive_edges(right, ro, roles)
     valid = lo & ro
-    return joint_codes(encode_five_levels(left, lo, le), encode_five_levels(right, ro, re_), valid), {"K": 25, "edges": [le, re_]}
+    return joint_codes(encode_five_levels(left, lo, le), encode_five_levels(right, ro, re_), valid), {
+        "K": 25,
+        "edges": [le, re_],
+        "valid_action_mask": valid,
+    }
+
+
+def filter_respiratory_action_transitions(
+    transitions: pd.DataFrame,
+    actions: np.ndarray,
+    valid_action_mask: np.ndarray,
+    *,
+    action_count: int = 25,
+) -> tuple[pd.DataFrame, np.ndarray, dict[str, int]]:
+    actions = np.asarray(actions, dtype=np.int16)
+    valid_action_mask = np.asarray(valid_action_mask, dtype=bool)
+    if len(transitions) != len(actions) or actions.shape != valid_action_mask.shape:
+        raise ContractError("respiratory transition and action arrays differ in shape")
+    if np.any(actions < -1) or np.any(actions >= action_count):
+        raise ContractError("respiratory action class outside frozen K=25 range")
+    if not np.array_equal(valid_action_mask, actions >= 0):
+        raise ContractError("respiratory action mask and encoded missingness disagree")
+    retained = transitions.loc[valid_action_mask].copy().reset_index(drop=True)
+    retained_actions = actions[valid_action_mask]
+    if retained.empty:
+        raise ContractError("no valid transitions for respiratory_support")
+    if np.any(retained_actions < 0) or np.any(retained_actions >= action_count):
+        raise ContractError("retained respiratory action class outside frozen K=25 range")
+    before_episodes = transitions["episode_idx"].nunique()
+    after_episodes = retained["episode_idx"].nunique()
+    return retained, retained_actions, {
+        "candidate_transitions": int(len(transitions)),
+        "retained_transitions": int(len(retained)),
+        "excluded_missing_action_transitions": int((~valid_action_mask).sum()),
+        "candidate_episodes": int(before_episodes),
+        "retained_episodes": int(after_episodes),
+        "excluded_empty_episodes": int(before_episodes - after_episodes),
+    }
 
 
 def task_aggregate(task: str, candidates: pd.DataFrame, transitions: pd.DataFrame, actions: np.ndarray, arrays: dict[str, np.ndarray]) -> dict[str, Any]:
@@ -813,6 +923,71 @@ def task_aggregate(task: str, candidates: pd.DataFrame, transitions: pd.DataFram
     return {"subjects": int(local["subject_id"].nunique()), "episodes": int(len(episode_ids)), "decisions": int(len(transitions)), "action_counts": counts.astype(int).tolist(), "minimum_horizon": int(lengths.min()) if len(lengths) else 0, "maximum_horizon": int(lengths.max()) if len(lengths) else 0, "reward_contract": reward_contract, "reward_observed_decisions": reward_observed, "terminal_reward_count": terminal_rewards}
 
 
+def _runtime_resource_payload(started: float) -> dict[str, int | float]:
+    return {
+        "wall_seconds": round(max(0.0, time.perf_counter() - started), 6),
+        "maximum_resident_set_size_kib": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss),
+        "temporary_disk_bytes": 0,
+    }
+
+
+def _write_streaming_instrumentation(output: Path, rows: list[dict[str, int | str]]) -> None:
+    fields = (
+        "table", "rows_read", "rows_retained", "chunks_processed",
+        "maximum_retained_rows_per_chunk", "effective_chunk_size",
+        "compression_encoding", "scan_count",
+    )
+    with (output / "streaming_instrumentation_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _write_runtime_resource(output: Path, started: float, status: str) -> None:
+    payload = {"status": status, **_runtime_resource_payload(started)}
+    (output / "runtime_resource_aggregate.json").write_text(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8"
+    )
+
+
+def _write_controlled_stop(
+    output: Path,
+    started: float,
+    rows: list[dict[str, int | str]],
+    error: BaseException,
+    schema_directory: Path,
+) -> None:
+    if isinstance(error, ContractError):
+        failure_code = "contract_error"
+    elif isinstance(error, MemoryError):
+        failure_code = "memory_error"
+    else:
+        failure_code = "runtime_error"
+    payload = {
+        "schema_version": "1.0.0",
+        "release": RELEASE,
+        "candidate_status": "controlled_stop",
+        "failure_code": failure_code,
+        "runtime": _runtime_resource_payload(started),
+        "streaming": rows,
+        "privacy": {
+            "aggregate_only": True,
+            "row_level_fields_exported": False,
+            "private_paths_exported": False,
+        },
+    }
+    controlled_schema = schema_directory / "credentialed_controlled_stop_receipt.schema.json"
+    schema_object = json.loads(controlled_schema.read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema_object)
+    Draft202012Validator(schema_object).validate(payload)
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "controlled_stop_receipt.json").write_text(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8"
+    )
+    _write_streaming_instrumentation(output, rows)
+    _write_runtime_resource(output, started, "controlled_stop")
+
+
 def reconstruct(
     root: Path,
     output: Path,
@@ -829,45 +1004,88 @@ def reconstruct(
     if effective_chunk_rows <= 0:
         raise ContractError("chunk_rows must be positive")
     if output.exists(): raise FileExistsError(output)
-    paths = validate_layout(root)
-    ingestion_audit: dict[tuple[str, str, str], int] = {}
-    stays, diagnoses, time_audit = load_core_with_time_audit(paths, ingestion_audit)
-    candidates = build_anchors(paths, stays, diagnoses, chunk_rows=effective_chunk_rows, audit=ingestion_audit)
-    arrays = build_arrays(paths, candidates, chunk_rows=effective_chunk_rows, audit=ingestion_audit)
-    candidates = finalize_sepsis_anchors(candidates, arrays); transitions = build_transitions(candidates)
-    rows: dict[str, dict[str, Any]] = {}
-    for task in TASKS:
-        local = transitions[transitions["task"].eq(task)].reset_index(drop=True)
-        if local.empty: raise ContractError(f"no valid transitions for {task}")
-        actions, contract = encode_actions(task, local, arrays)
-        if np.any(actions < 0): raise ContractError(f"missing action observation for {task}")
-        row = task_aggregate(task, candidates, local, actions, arrays); row["action_count"] = contract["K"]
-        row["cutpoint_hash"] = hashlib.sha256(json.dumps(contract["edges"], sort_keys=True).encode()).hexdigest(); rows[task] = row
-    receipt = aggregate_receipt(rows, source_hashes or {})
-    schema_object = json.loads(schema.read_text(encoding="utf-8")); Draft202012Validator.check_schema(schema_object); Draft202012Validator(schema_object).validate(receipt)
-    output.mkdir(parents=True)
-    (output / "aggregate_receipt.json").write_text(json.dumps(receipt, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
-    with (output / "icu_time_order_eligibility_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=("category", "count", "precedence"), lineterminator="\n")
-        writer.writeheader()
-        precedence = {
-            "total_merged_icu_stays_considered": "denominator",
-            "valid_time_order_stays": "after_all_invalid_categories",
-            "missing_intime": "first",
-            "missing_outtime": "second_only_when_intime_present",
-            "equal_intime_outtime": "third_only_when_both_present",
-            "reversed_time_order": "fourth_only_when_both_present",
-            "retained_after_existing_public_base_eligibility": "after_time_filter_and_unchanged_existing_base_filters",
-        }
-        writer.writerows({"category": key, "count": value, "precedence": precedence[key]} for key, value in time_audit.items())
-    with (output / "nullable_key_and_timestamp_exclusion_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=("table", "field", "reason", "excluded_count"), lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(
-            {"table": table, "field": field, "reason": reason, "excluded_count": count}
-            for (table, field, reason), count in sorted(ingestion_audit.items())
+    started = time.perf_counter()
+    paths: dict[str, Path] | None = None
+    streaming_audit: dict[str, dict[str, int | str]] = {}
+    try:
+        paths = validate_layout(root)
+        ingestion_audit: dict[tuple[str, str, str], int] = {}
+        stays, diagnoses, time_audit = load_core_with_time_audit(paths, ingestion_audit)
+        candidates = build_anchors(
+            paths, stays, diagnoses, chunk_rows=effective_chunk_rows,
+            audit=ingestion_audit, streaming_audit=streaming_audit,
         )
-    return receipt
+        arrays = build_arrays(
+            paths, candidates, chunk_rows=effective_chunk_rows,
+            audit=ingestion_audit, streaming_audit=streaming_audit,
+        )
+        candidates = finalize_sepsis_anchors(candidates, arrays)
+        transitions = build_transitions(candidates)
+        rows: dict[str, dict[str, Any]] = {}
+        respiratory_filter: dict[str, int] | None = None
+        for task in TASKS:
+            local = transitions[transitions["task"].eq(task)].reset_index(drop=True)
+            if local.empty: raise ContractError(f"no valid transitions for {task}")
+            actions, contract = encode_actions(task, local, arrays)
+            if task == "respiratory_support":
+                local, actions, respiratory_filter = filter_respiratory_action_transitions(
+                    local, actions, contract["valid_action_mask"], action_count=contract["K"]
+                )
+            elif np.any(actions < 0):
+                raise ContractError(f"missing action observation for {task}")
+            row = task_aggregate(task, candidates, local, actions, arrays)
+            row["action_count"] = contract["K"]
+            row["cutpoint_hash"] = hashlib.sha256(
+                json.dumps(contract["edges"], sort_keys=True).encode()
+            ).hexdigest()
+            rows[task] = row
+        if respiratory_filter is None:
+            raise ContractError("respiratory action filter did not execute")
+        streaming_rows = _streaming_rows(streaming_audit, chunk_rows=effective_chunk_rows, paths=paths)
+        receipt = aggregate_receipt(rows, source_hashes or {}, streaming_rows)
+        schema_object = json.loads(schema.read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema_object)
+        Draft202012Validator(schema_object).validate(receipt)
+        output.mkdir(parents=True)
+        (output / "aggregate_receipt.json").write_text(
+            json.dumps(receipt, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8"
+        )
+        with (output / "icu_time_order_eligibility_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=("category", "count", "precedence"), lineterminator="\n")
+            writer.writeheader()
+            precedence = {
+                "total_merged_icu_stays_considered": "denominator",
+                "valid_time_order_stays": "after_all_invalid_categories",
+                "missing_intime": "first",
+                "missing_outtime": "second_only_when_intime_present",
+                "equal_intime_outtime": "third_only_when_both_present",
+                "reversed_time_order": "fourth_only_when_both_present",
+                "retained_after_existing_public_base_eligibility": "after_time_filter_and_unchanged_existing_base_filters",
+            }
+            writer.writerows({"category": key, "count": value, "precedence": precedence[key]} for key, value in time_audit.items())
+        with (output / "nullable_key_and_timestamp_exclusion_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=("table", "field", "reason", "excluded_count"), lineterminator="\n")
+            writer.writeheader()
+            writer.writerows(
+                {"table": table, "field": field, "reason": reason, "excluded_count": count}
+                for (table, field, reason), count in sorted(ingestion_audit.items())
+            )
+        with (output / "respiratory_action_filter_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=tuple(respiratory_filter), lineterminator="\n")
+            writer.writeheader()
+            writer.writerow(respiratory_filter)
+        _write_streaming_instrumentation(output, streaming_rows)
+        _write_runtime_resource(output, started, "complete")
+        return receipt
+    except Exception as error:
+        streaming_rows = _streaming_rows(
+            streaming_audit, chunk_rows=effective_chunk_rows, paths=paths
+        )
+        try:
+            _write_controlled_stop(output, started, streaming_rows, error, schema.parent)
+        except Exception as receipt_error:
+            raise ContractError("controlled stop receipt failure") from receipt_error
+        raise
 
 
 def main() -> None:

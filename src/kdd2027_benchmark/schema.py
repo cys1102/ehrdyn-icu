@@ -14,6 +14,7 @@ from .errors import ReleaseContractError
 SCHEMA_FILES = {
     "aggregate_metrics": "aggregate_metrics.schema.json",
     "credentialed_aggregate_receipt": "credentialed_aggregate_receipt.schema.json",
+    "credentialed_controlled_stop_receipt": "credentialed_controlled_stop_receipt.schema.json",
     "entrant_protocol": "entrant_protocol.schema.json",
     "leaderboard_submission": "leaderboard_submission.schema.json",
     "transition_submission": "transition_submission.schema.json",

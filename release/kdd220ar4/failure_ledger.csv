@@ -1,0 +1,2 @@
+failure_id,stage,description,disposition,status
+NONE,all,no_unresolved_contract_test_schema_privacy_checksum_or_clean_install_failure,complete,closed

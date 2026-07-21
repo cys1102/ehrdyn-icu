@@ -337,11 +337,17 @@ def assert_subject_disjoint(frame: pd.DataFrame) -> None:
         raise ContractError("subject role overlap")
 
 
-def aggregate_receipt(task_rows: Mapping[str, Mapping[str, object]], source_hashes: Mapping[str, str]) -> dict[str, object]:
+def aggregate_receipt(
+    task_rows: Mapping[str, Mapping[str, object]],
+    source_hashes: Mapping[str, str],
+    streaming_rows: Sequence[Mapping[str, object]],
+) -> dict[str, object]:
     if tuple(task_rows) != TASKS:
         raise ContractError("receipt task inventory or order mismatch")
+    if len(streaming_rows) != 7:
+        raise ContractError("streaming receipt must contain seven high-volume tables")
     return {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "release": RELEASE,
         "candidate_status": "credentialed_parity_pending",
         "source_hashes": dict(sorted(source_hashes.items())),
@@ -364,6 +370,7 @@ def aggregate_receipt(task_rows: Mapping[str, Mapping[str, object]], source_hash
             "sepsis_max_base_to_final_anchor_shift_hours": SEPSIS_MAX_ANCHOR_SHIFT_HOURS,
             "longest_recursive_target_hours": LONGEST_RECURSIVE_TARGET_HOURS,
         },
+        "streaming": [dict(row) for row in streaming_rows],
         "tasks": [dict({"task_id": task}, **task_rows[task]) for task in TASKS],
         "privacy": {
             "aggregate_only": True,
