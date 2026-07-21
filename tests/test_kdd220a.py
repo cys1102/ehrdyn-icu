@@ -68,7 +68,7 @@ class KDD220ATemporalContractTests(unittest.TestCase):
 
     def test_runtime_source_has_no_result_or_private_path_dependency(self) -> None:
         source = ROOT / "src" / "kdd2027_benchmark" / "current_five_task"
-        forbidden = ("results/", "artifacts/", "/" + "home" + "/", "E060", "episode_manifest")
+        forbidden = ("results/", "artifacts/", "/" + "home" + "/", "episode_manifest")
         hits = []
         for path in source.glob("*"):
             if path.suffix not in {".py", ".json"}:

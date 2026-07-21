@@ -17,6 +17,7 @@ from typing import Any, Iterable
 import numpy as np
 import pandas as pd
 from jsonschema import Draft202012Validator
+from kdd2027_benchmark.canonical import write_canonical_json
 
 from .authoritative_semantics import (
     GCS_ITEMIDS,
@@ -44,7 +45,8 @@ from .contracts import (
     FEATURE_INDEX,
     FEATURE_NAMES,
     SAFE_FEATURE_INDICES,
-    FIO2_ITEMIDS,
+    LEGACY_ACTION_FIO2_ITEMIDS,
+    SAFE_STATE_FIO2_ITEMIDS,
     FLUID_ITEMIDS,
     LAB_ITEM_MAP,
     MECHVENT_ITEMIDS,
@@ -54,6 +56,7 @@ from .contracts import (
     PRE_ANCHOR_HOURS,
     RAW_EXTRACTION_BINS,
     RELEASE,
+    ROLE_ORDER,
     RRT_PATTERN,
     SBP_ITEMIDS,
     TASKS,
@@ -71,7 +74,10 @@ from .contracts import (
     encode_five_levels,
     fit_train_positive_edges,
     joint_codes,
+    legacy_action_fio2_value,
+    legacy_action_peep_value,
     parse_times,
+    pre_repair_chart_value,
     reward_components,
     subject_role,
     validate_layout,
@@ -308,14 +314,14 @@ def scan_creatinine(
     invalid_value = ~np.isfinite(creatinine["value"]) | creatinine["value"].le(0)
     _audit_add(audit, "hosp/labevents", "valuenum", "missing_nonfinite_or_nonpositive_creatinine", int(invalid_value.sum()))
     creatinine = creatinine.loc[~invalid_value, ["subject_id", "hadm_id", "charttime", "value", "__source_order"]]
-    return creatinine.sort_values(["subject_id", "hadm_id", "charttime", "__source_order"], kind="stable").reset_index(drop=True)
+    return creatinine.sort_values(["subject_id", "charttime", "__source_order"], kind="stable").reset_index(drop=True)
 
 
 def kdigo_creatinine_events(creatinine: pd.DataFrame) -> pd.DataFrame:
     qualifying: list[dict[str, Any]] = []
     h48 = pd.Timedelta(hours=48).value
     d7 = pd.Timedelta(days=7).value
-    current_admission: tuple[int, int] | None = None
+    current_subject: int | None = None
     q48: deque[tuple[int, float]] = deque()
     q7: deque[tuple[int, float]] = deque()
     for row in creatinine.itertuples(index=False):
@@ -323,8 +329,8 @@ def kdigo_creatinine_events(creatinine: pd.DataFrame) -> pd.DataFrame:
         admission = int(row.hadm_id)
         when = int(pd.Timestamp(row.charttime).value)
         value = float(row.value)
-        if (subject, admission) != current_admission:
-            current_admission = (subject, admission)
+        if subject != current_subject:
+            current_subject = subject
             q48.clear()
             q7.clear()
         while q48 and q48[0][0] < when - h48:
@@ -465,14 +471,36 @@ def suspected_infection_anchors(
     )
     matches = match_suspected_infections(antibiotics, cultures)
     if matches.empty:
-        return _first_anchor(pd.DataFrame(columns=("stay_id", "anchor_time")), "suspected_infection_plus_SOFA_ge2_scaffold")
+        return _first_anchor(pd.DataFrame(columns=("stay_id", "anchor_time")), "E060_suspected_infection_plus_SOFA_ge2_scaffold")
     matches = matches.rename(columns={"suspected_infection_time": "anchor_time"})
-    return _first_anchor(matches[["stay_id", "anchor_time"]], "suspected_infection_plus_SOFA_ge2_scaffold")
+    return _first_anchor(matches[["stay_id", "anchor_time"]], "E060_suspected_infection_plus_SOFA_ge2_scaffold")
 
 
 def _interval_filter(events: pd.DataFrame, stays: pd.DataFrame, time: str) -> pd.DataFrame:
     merged = events.merge(stays[["stay_id", "intime", "outtime"]], on="stay_id", how="inner")
     return merged[(merged[time] >= merged["intime"]) & (merged[time] < merged["outtime"])].copy()
+
+
+def sustained_hypotension_from_chart(
+    chart: pd.DataFrame,
+    stays: pd.DataFrame,
+    *,
+    authoritative_chunk_rows: int,
+) -> pd.DataFrame:
+    """Reproduce the frozen KDD152 logical source-chunk grouping."""
+    bp = chart[chart["itemid"].isin(SBP_ITEMIDS + MBP_ITEMIDS)].dropna(subset=["charttime"]).copy()
+    bp["value"] = pd.to_numeric(bp["valuenum"], errors="coerce")
+    bp = _interval_filter(bp, stays, "charttime")
+    bp["relative_bin"] = np.floor((bp["charttime"] - bp["intime"]).dt.total_seconds() / (BIN_HOURS * 3600)).astype(int)
+    bp["authoritative_source_chunk"] = bp["__source_order"].astype(np.int64) // int(authoritative_chunk_rows)
+    low = ((bp["itemid"].isin(SBP_ITEMIDS)) & bp["value"].lt(90)) | ((bp["itemid"].isin(MBP_ITEMIDS)) & bp["value"].lt(65))
+    bp = bp[low]
+    grouped = bp.groupby(
+        ["authoritative_source_chunk", "stay_id", "relative_bin"], observed=True
+    ).agg(event_count=("charttime", "size"), anchor_time=("charttime", "min")).reset_index()
+    grouped = grouped[grouped["event_count"].ge(2)][["stay_id", "anchor_time"]]
+    grouped["anchor_source"] = "sustained_hypotension"
+    return _first_anchor(grouped)
 
 
 def build_anchors(
@@ -544,13 +572,10 @@ def build_anchors(
     if not respiratory.empty:
         local = compact_stays.merge(respiratory, on="stay_id", how="inner"); local["task_id"] = "respiratory_support"; frames.append(local)
 
-    bp = chart[chart["itemid"].isin(SBP_ITEMIDS + MBP_ITEMIDS)].dropna(subset=["charttime"]).copy()
-    bp["value"] = pd.to_numeric(bp["valuenum"], errors="coerce")
-    bp = _interval_filter(bp, stays, "charttime")
-    bp["relative_bin"] = np.floor((bp["charttime"] - bp["intime"]).dt.total_seconds() / (BIN_HOURS * 3600)).astype(int)
-    bp = bp[((bp["itemid"].isin(SBP_ITEMIDS)) & bp["value"].lt(90)) | ((bp["itemid"].isin(MBP_ITEMIDS)) & bp["value"].lt(65))]
-    bp = bp.groupby(["stay_id", "relative_bin"], observed=True).agg(event_count=("charttime", "size"), anchor_time=("charttime", "min")).reset_index()
-    bp = bp[bp["event_count"].ge(2)][["stay_id", "anchor_time"]]; bp["anchor_source"] = "sustained_hypotension"
+    bp = sustained_hypotension_from_chart(
+        chart, stays,
+        authoritative_chunk_rows=int(RUNTIME_CONFIG["runtime"]["authoritative_kdd152_source_chunk_rows"]),
+    )
     vaso = inputs[inputs["itemid"].isin(VASO_ITEMIDS)].copy()
     positive = np.maximum(pd.to_numeric(vaso["amount"], errors="coerce").fillna(0), pd.to_numeric(vaso["rate"], errors="coerce").fillna(0)).gt(0)
     vaso = _interval_filter(vaso[positive], compact_stays, "starttime")[["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); vaso["anchor_source"] = "vasopressor_support"
@@ -617,6 +642,49 @@ def _bin(events: pd.DataFrame, candidates: pd.DataFrame, key: str, time: str) ->
     return merged
 
 
+def respiratory_chart_surfaces(chart: pd.DataFrame) -> pd.DataFrame:
+    """Return independent legacy-action and repaired SAFE-state chart values."""
+    required = {"itemid", "valuenum", "valueuom"}
+    if not required.issubset(chart.columns):
+        raise ContractError("respiratory chart fixture lacks itemid, valuenum, or valueuom")
+    output = chart.copy()
+    output["legacy_peep_value"] = [
+        legacy_action_peep_value(item, value)
+        for item, value in zip(output["itemid"], output["valuenum"])
+    ]
+    output["legacy_fio2_value"] = [
+        legacy_action_fio2_value(item, value)
+        for item, value in zip(output["itemid"], output["valuenum"])
+    ]
+    output["safe_fio2_value"] = [
+        corrected_chart_value(item, value, unit) if int(item) in SAFE_STATE_FIO2_ITEMIDS else math.nan
+        for item, value, unit in zip(output["itemid"], output["valuenum"], output["valueuom"])
+    ]
+    return output
+
+
+def aggregate_respiratory_action_bins(chart: pd.DataFrame) -> pd.DataFrame:
+    parsed = respiratory_chart_surfaces(chart)
+    required = {"episode_idx", "bin"}
+    if not required.issubset(parsed.columns):
+        raise ContractError("respiratory chart aggregation lacks episode_idx or bin")
+    rows: list[dict[str, Any]] = []
+    for (episode, step), group in parsed.groupby(["episode_idx", "bin"], sort=True, observed=True):
+        peep = group["legacy_peep_value"].to_numpy(float)
+        fio2 = group["legacy_fio2_value"].to_numpy(float)
+        safe = group["safe_fio2_value"].to_numpy(float)
+        rows.append({
+            "episode_idx": int(episode), "bin": int(step),
+            "legacy_peep": float(np.median(peep[np.isfinite(peep)])) if np.isfinite(peep).any() else math.nan,
+            "legacy_peep_observed": bool(np.isfinite(peep).any()),
+            "legacy_fio2": float(np.median(fio2[np.isfinite(fio2)])) if np.isfinite(fio2).any() else math.nan,
+            "legacy_fio2_observed": bool(np.isfinite(fio2).any()),
+            "safe_fio2": float(np.median(safe[np.isfinite(safe)])) if np.isfinite(safe).any() else math.nan,
+            "safe_fio2_observed": bool(np.isfinite(safe).any()),
+        })
+    return pd.DataFrame(rows).sort_values(["episode_idx", "bin"], kind="stable").reset_index(drop=True)
+
+
 def build_arrays(
     paths: dict[str, Path],
     candidates: pd.DataFrame,
@@ -629,6 +697,8 @@ def build_arrays(
     steps = RAW_EXTRACTION_BINS
     shape = (len(candidates), steps, len(FEATURE_NAMES))
     values = np.full(shape, np.nan, dtype=np.float32); masks = np.zeros(shape, dtype=bool)
+    pre_repair_values = np.full(shape, np.nan, dtype=np.float32)
+    pre_repair_masks = np.zeros(shape, dtype=bool)
     fluid = np.zeros(shape[:2], dtype=np.float32); vaso = np.zeros(shape[:2], dtype=np.float32)
     peep = np.full(shape[:2], np.nan, dtype=np.float32); peep_observed = np.zeros(shape[:2], dtype=bool)
     fio2_action = np.full(shape[:2], np.nan, dtype=np.float32); fio2_action_observed = np.zeros(shape[:2], dtype=bool)
@@ -638,34 +708,40 @@ def build_arrays(
         values[row.episode_idx, :, FEATURE_INDEX["gender_male"]] = float(str(row.gender).upper() == "M")
         values[row.episode_idx, :, FEATURE_INDEX["step_id"]] = np.arange(steps)
         masks[row.episode_idx, :, [FEATURE_INDEX["age"], FEATURE_INDEX["gender_male"], FEATURE_INDEX["step_id"]]] = True
+        pre_repair_values[row.episode_idx, :, :] = values[row.episode_idx, :, :]
+        pre_repair_masks[row.episode_idx, :, :] = masks[row.episode_idx, :, :]
 
     stay_bounds = candidates[["stay_id", "episode_idx", "window_start", "window_end"]]
     chart = _stream_events(
         paths["icu/chartevents"], table="icu/chartevents",
         columns=("stay_id", "charttime", "itemid", "valuenum", "valueuom"),
         dates=("charttime",), required_ids=("stay_id", "itemid"), required_times=("charttime",),
-        audit=audit, chunk_rows=chunk_rows, itemids=set(CHART_ITEM_MAP) | set(PEEP_ITEMIDS),
+        audit=audit, chunk_rows=chunk_rows,
+        itemids=set(CHART_ITEM_MAP) | set(PEEP_ITEMIDS) | set(LEGACY_ACTION_FIO2_ITEMIDS) | set(MECHVENT_ITEMIDS),
         key="stay_id", bounds=stay_bounds, point_time="charttime",
         sort_by=("episode_idx", "charttime", "itemid"),
         streaming_audit=streaming_audit,
     )
     chart["bin"] = np.floor((chart["charttime"] - chart["window_start"]).dt.total_seconds() / (BIN_HOURS * 3600)).astype(int)
+    chart = respiratory_chart_surfaces(chart)
     chart["value"] = [corrected_chart_value(item, value, unit) for item, value, unit in zip(chart["itemid"], chart["valuenum"], chart["valueuom"])]
+    chart["pre_repair_value"] = [pre_repair_chart_value(item, value) for item, value in zip(chart["itemid"], chart["valuenum"])]
     valid_chart = chart[np.isfinite(chart["value"])].copy()
-    peep_rows = valid_chart[valid_chart["itemid"].isin(PEEP_ITEMIDS)]
-    for (episode, step), group in peep_rows.groupby(["episode_idx", "bin"], observed=True):
-        peep[int(episode), int(step)] = float(group["value"].median()); peep_observed[int(episode), int(step)] = True
-    fio2_rows = valid_chart[valid_chart["itemid"].isin(FIO2_ITEMIDS)]
-    for (episode, step), group in fio2_rows.groupby(["episode_idx", "bin"], observed=True):
-        finite = group["value"].to_numpy(dtype=float)
-        finite = finite[np.isfinite(finite)]
-        if finite.size:
-            fio2_action[int(episode), int(step)] = float(np.median(finite))
-            fio2_action_observed[int(episode), int(step)] = True
+    action_bins = aggregate_respiratory_action_bins(chart)
+    for row in action_bins.itertuples(index=False):
+        episode, step = int(row.episode_idx), int(row.bin)
+        if row.legacy_peep_observed:
+            peep[episode, step] = float(row.legacy_peep); peep_observed[episode, step] = True
+        if row.legacy_fio2_observed:
+            fio2_action[episode, step] = float(row.legacy_fio2); fio2_action_observed[episode, step] = True
     gcs = valid_chart[valid_chart["itemid"].isin(GCS_ITEMIDS)].copy()
     gcs["feature_value"] = gcs["value"]
     for row in gcs_total_rows(gcs).itertuples(index=False):
         index = FEATURE_INDEX["gcs_proxy"]; values[int(row.episode_idx), int(row.bin), index] = float(row.feature_value); masks[int(row.episode_idx), int(row.bin), index] = True
+    pre_gcs = chart[np.isfinite(chart["pre_repair_value"]) & chart["itemid"].isin(GCS_ITEMIDS)].copy()
+    pre_gcs["feature_value"] = pre_gcs["pre_repair_value"]
+    for row in gcs_total_rows(pre_gcs).itertuples(index=False):
+        index = FEATURE_INDEX["gcs_proxy"]; pre_repair_values[int(row.episode_idx), int(row.bin), index] = float(row.feature_value); pre_repair_masks[int(row.episode_idx), int(row.bin), index] = True
     generic = valid_chart[~valid_chart["itemid"].isin(set(PEEP_ITEMIDS) | GCS_ITEMIDS)].copy()
     generic["feature"] = generic["itemid"].astype(int).map(CHART_ITEM_MAP)
     for (episode, step, feature), group in generic.groupby(["episode_idx", "bin", "feature"], observed=True):
@@ -677,6 +753,21 @@ def build_arrays(
         finite = cleaned[np.isfinite(cleaned)]
         if finite.size:
             index = FEATURE_INDEX[str(feature)]; values[int(episode), int(step), index] = float(np.median(finite)); masks[int(episode), int(step), index] = True
+    pre_generic = chart[np.isfinite(chart["pre_repair_value"]) & ~chart["itemid"].isin(set(PEEP_ITEMIDS) | GCS_ITEMIDS)].copy()
+    pre_generic["feature"] = pre_generic["itemid"].astype(int).map(CHART_ITEM_MAP).fillna(
+        pre_generic["itemid"].astype(int).map({item: "fio2" for item in LEGACY_ACTION_FIO2_ITEMIDS})
+    )
+    pre_generic["feature"] = pre_generic["feature"].fillna(
+        pre_generic["itemid"].astype(int).map({item: "mechanical_ventilation" for item in MECHVENT_ITEMIDS})
+    )
+    pre_generic = pre_generic[pre_generic["feature"].notna()]
+    for (episode, step, feature), group in pre_generic.groupby(["episode_idx", "bin", "feature"], observed=True):
+        finite = group["pre_repair_value"].to_numpy(float)
+        finite = finite[np.isfinite(finite)]
+        if finite.size:
+            index = FEATURE_INDEX[str(feature)]
+            pre_repair_values[int(episode), int(step), index] = float(np.median(finite))
+            pre_repair_masks[int(episode), int(step), index] = True
 
     hadm_bounds = candidates[["hadm_id", "episode_idx", "window_start", "window_end"]]
     labs = _stream_events(
@@ -693,12 +784,19 @@ def build_arrays(
     labs = labs[np.isfinite(labs["value"]) & ~labs["value"].isin((-9999, -999, -99))]
     labs["feature"] = labs["itemid"].astype(int).map(LAB_ITEM_MAP)
     for (episode, step, feature), group in labs.groupby(["episode_idx", "bin", "feature"], observed=True):
+        pre_group = group
         if feature in {"lactate", "ionized_calcium"}:
             group = group[group["valueuom"].astype("string").eq("mmol/L")]
         cleaned = clean_feature_values(str(feature), group["value"].to_numpy(float))
         finite = cleaned[np.isfinite(cleaned)]
         if finite.size:
             index = FEATURE_INDEX[str(feature)]; values[int(episode), int(step), index] = float(np.median(finite)); masks[int(episode), int(step), index] = True
+        pre_cleaned = clean_feature_values(str(feature), pre_group["value"].to_numpy(float))
+        pre_finite = pre_cleaned[np.isfinite(pre_cleaned)]
+        if pre_finite.size:
+            index = FEATURE_INDEX[str(feature)]
+            pre_repair_values[int(episode), int(step), index] = float(np.median(pre_finite))
+            pre_repair_masks[int(episode), int(step), index] = True
 
     outputs = _stream_events(
         paths["icu/outputevents"], table="icu/outputevents",
@@ -715,6 +813,7 @@ def build_arrays(
         cleaned = clean_feature_values("urine_output", np.asarray([group["numeric"].sum()], dtype=float))
         if np.isfinite(cleaned[0]):
             index = FEATURE_INDEX["urine_output"]; values[int(episode), int(step), index] = float(cleaned[0]); masks[int(episode), int(step), index] = True
+            pre_repair_values[int(episode), int(step), index] = float(cleaned[0]); pre_repair_masks[int(episode), int(step), index] = True
 
     items = _read(paths["icu/d_items"])[["itemid", "label"]]
     items = _filter_required_ids(items, ("itemid",), "icu/d_items", audit)
@@ -765,6 +864,7 @@ def build_arrays(
         for step in kdd097_interval_bins(start, end, row.window_start, bin_hours=BIN_HOURS, n_steps=steps):
             if int(row.itemid) in MECHVENT_ITEMIDS:
                 index = FEATURE_INDEX["mechanical_ventilation"]; values[episode, step, index] = 1; masks[episode, step, index] = True
+                pre_repair_values[episode, step, index] = 1; pre_repair_masks[episode, step, index] = True
             if re.search(RRT_PATTERN, str(row.label), re.I): rrt[episode, step] = 1
 
     rb = _stream_events(
@@ -784,14 +884,15 @@ def build_arrays(
             for step in kdd097_interval_bins(start, end, row.window_start, bin_hours=BIN_HOURS, n_steps=steps): diuretic[int(row.episode_idx), step] = 1
 
     compute_corrected_derived_features(values, masks, vaso, feature_index=FEATURE_INDEX, bin_hours=BIN_HOURS)
-    return {"values": values, "masks": masks, "fluid": fluid, "vaso": vaso, "peep": peep, "peep_observed": peep_observed, "fio2_action": fio2_action, "fio2_action_observed": fio2_action_observed, "diuretic": diuretic, "rrt": rrt}
+    compute_corrected_derived_features(pre_repair_values, pre_repair_masks, vaso, feature_index=FEATURE_INDEX, bin_hours=BIN_HOURS)
+    return {"values": values, "masks": masks, "pre_repair_values": pre_repair_values, "pre_repair_masks": pre_repair_masks, "fluid": fluid, "vaso": vaso, "peep": peep, "peep_observed": peep_observed, "fio2_action": fio2_action, "fio2_action_observed": fio2_action_observed, "diuretic": diuretic, "rrt": rrt}
 
 
 def finalize_sepsis_anchors(candidates: pd.DataFrame, arrays: dict[str, np.ndarray]) -> pd.DataFrame:
     return sepsis_sofa_filter(
         candidates,
-        arrays["values"],
-        arrays["masks"],
+        arrays["pre_repair_values"],
+        arrays["pre_repair_masks"],
         sofa_index=FEATURE_INDEX["sofa_proxy"],
         minimum=float(RUNTIME_CONFIG["cohort_parameters"]["sepsis"]["maximum_observed_sofa_min"]),
     )
@@ -801,13 +902,11 @@ def build_transitions(candidates: pd.DataFrame) -> pd.DataFrame:
     rows: list[dict[str, Any]] = []
     for candidate in candidates.itertuples(index=False):
         for relative in eligible_transition_indices(candidate.anchor_time, candidate.intime, candidate.outtime):
-            if not apply_kdd201_temporal_repair(candidate.anchor_source, [relative])[0]:
-                continue
             action_start = candidate.anchor_time + relative * pd.Timedelta(hours=BIN_HOURS)
             state = int((action_start - pd.Timedelta(hours=BIN_HOURS) - candidate.window_start) / pd.Timedelta(hours=BIN_HOURS))
             action = int((action_start - candidate.window_start) / pd.Timedelta(hours=BIN_HOURS))
             target = int((action_start + pd.Timedelta(hours=BIN_HOURS) - candidate.window_start) / pd.Timedelta(hours=BIN_HOURS))
-            rows.append({"task": candidate.task_id, "role": candidate.role, "episode_idx": int(candidate.episode_idx), "relative_transition": relative, "state_idx": state, "action_idx": action, "target_idx": target})
+            rows.append({"task": candidate.task_id, "role": candidate.role, "episode_idx": int(candidate.episode_idx), "anchor_source": candidate.anchor_source, "relative_transition": relative, "state_idx": state, "action_idx": action, "target_idx": target})
     return pd.DataFrame(rows)
 
 
@@ -873,8 +972,234 @@ def filter_target_observed_transitions(
         return transitions.copy()
     episode = transitions["episode_idx"].to_numpy(dtype=int)
     target = transitions["target_idx"].to_numpy(dtype=int)
-    observed = arrays["masks"][episode, target][:, SAFE_FEATURE_INDICES].astype(bool).any(axis=1)
+    observed = arrays["pre_repair_masks"][episode, target][:, SAFE_FEATURE_INDICES].astype(bool).any(axis=1)
     return transitions.loc[observed].reset_index(drop=True)
+
+
+def apply_kdd201_to_frozen_actions(
+    transitions: pd.DataFrame,
+    actions: np.ndarray,
+) -> tuple[pd.DataFrame, np.ndarray, int]:
+    """Subset rows and already-encoded actions with one identical frozen mask."""
+    actions = np.asarray(actions, dtype=np.int16)
+    if len(transitions) != len(actions):
+        raise ContractError("KDD201 transition/action length mismatch")
+    keep = np.concatenate([
+        apply_kdd201_temporal_repair(source, [relative])
+        for source, relative in zip(transitions["anchor_source"], transitions["relative_transition"])
+    ]) if len(transitions) else np.zeros(0, dtype=bool)
+    retained = transitions.loc[keep].reset_index(drop=True)
+    retained_actions = actions[keep].copy()
+    if not np.array_equal(retained_actions, actions[np.flatnonzero(keep)]):
+        raise ContractError("KDD201 changed a frozen action class")
+    return retained, retained_actions, int((~keep).sum())
+
+
+def frozen_action_and_membership_pipeline(
+    task: str,
+    candidates: pd.DataFrame,
+    arrays: dict[str, np.ndarray],
+) -> tuple[pd.DataFrame, np.ndarray, dict[str, Any], dict[str, Any]]:
+    """KDD097 -> KDD152 -> KDD201 ordering without cutpoint refitting."""
+    candidate = build_transitions(candidates)
+    candidate = candidate[candidate["task"].eq(task)].reset_index(drop=True)
+    if candidate.empty:
+        raise ContractError(f"no candidate transitions for {task}")
+    frozen_actions, action_contract = encode_actions(task, candidate, arrays)
+    target_episode = candidate["episode_idx"].to_numpy(int)
+    target_step = candidate["target_idx"].to_numpy(int)
+    original_target = arrays["pre_repair_masks"][target_episode, target_step][:, SAFE_FEATURE_INDICES].any(axis=1)
+    action_observed = frozen_actions >= 0
+    if task == "respiratory_support":
+        if not np.array_equal(action_observed, np.asarray(action_contract["valid_action_mask"], dtype=bool)):
+            raise ContractError("respiratory action mask differs from frozen action classes")
+    keep_kdd152 = original_target & action_observed
+    membership = candidate.loc[keep_kdd152].reset_index(drop=True)
+    actions = frozen_actions[keep_kdd152]
+    pre_kdd201 = membership.copy()
+    membership, actions, kdd201_removed = apply_kdd201_to_frozen_actions(membership, actions)
+    if membership.empty:
+        raise ContractError(f"no retained transitions for {task}")
+    if np.any(actions < 0):
+        raise ContractError(f"missing action observation for {task}")
+    stages = {
+        "candidate_transitions": int(len(candidate)),
+        "original_target_membership_transitions": int(original_target.sum()),
+        "action_observed_transitions": int(action_observed.sum()),
+        "kdd152_joint_retained_transitions": int(keep_kdd152.sum()),
+        "missing_action_exclusions": int((original_target & ~action_observed).sum()),
+        "original_target_exclusions": int((~original_target).sum()),
+        "kdd201_removed_transitions": kdd201_removed,
+        "final_transitions": int(len(membership)),
+    }
+    if task == "respiratory_support":
+        episode = candidate["episode_idx"].to_numpy(int)
+        step = candidate["action_idx"].to_numpy(int)
+        peep = arrays["peep_observed"][episode, step]
+        fio2 = arrays["fio2_action_observed"][episode, step]
+        stages.update({
+            "peep_observed_transitions": int(peep.sum()),
+            "legacy_fio2_observed_transitions": int(fio2.sum()),
+            "joint_action_observed_transitions": int((peep & fio2).sum()),
+        })
+    role_counts: list[dict[str, Any]] = []
+    for role in (*ROLE_ORDER, "all_roles"):
+        role_candidate = np.ones(len(candidate), dtype=bool) if role == "all_roles" else candidate["role"].eq(role).to_numpy(bool)
+        role_pre = np.ones(len(pre_kdd201), dtype=bool) if role == "all_roles" else pre_kdd201["role"].eq(role).to_numpy(bool)
+        role_final = np.ones(len(membership), dtype=bool) if role == "all_roles" else membership["role"].eq(role).to_numpy(bool)
+        role_row: dict[str, Any] = {
+            "role": role,
+            "candidate_transitions": int(role_candidate.sum()),
+            "original_target_membership_transitions": int((role_candidate & original_target).sum()),
+            "action_observed_transitions": int((role_candidate & action_observed).sum()),
+            "kdd152_joint_retained_transitions": int((role_candidate & keep_kdd152).sum()),
+            "kdd201_removed_transitions": int(role_pre.sum() - role_final.sum()),
+            "final_transitions": int(role_final.sum()),
+        }
+        if task == "respiratory_support":
+            role_row.update({
+                "peep_observed_transitions": int((role_candidate & peep).sum()),
+                "legacy_fio2_observed_transitions": int((role_candidate & fio2).sum()),
+                "joint_action_observed_transitions": int((role_candidate & peep & fio2).sum()),
+                "missing_action_transitions": int((role_candidate & ~(peep & fio2)).sum()),
+            })
+        role_counts.append(role_row)
+    stages["role_counts"] = role_counts
+    return membership, actions, action_contract, stages
+
+
+def _array_digest(values: np.ndarray) -> str:
+    array = np.ascontiguousarray(values)
+    header = hashlib.sha256(json.dumps(
+        {"shape": array.shape, "dtype": array.dtype.str},
+        sort_keys=True, separators=(",", ":"), default=str,
+    ).encode()).hexdigest().encode()
+    digest = hashlib.sha256(header)
+    digest.update(array.view(np.uint8))
+    return digest.hexdigest()
+
+
+def _full_past_only_arrays(
+    arrays: dict[str, np.ndarray], candidates: pd.DataFrame,
+) -> tuple[np.ndarray, np.ndarray]:
+    values = arrays["values"][:, :, SAFE_FEATURE_INDICES].astype(np.float32).copy()
+    masks = arrays["masks"][:, :, SAFE_FEATURE_INDICES].astype(bool)
+    filled = np.full_like(values, np.nan)
+    recency = np.ones_like(values, dtype=np.float32)
+    candidate = candidates.set_index("episode_idx")
+    bin_step = pd.Timedelta(hours=BIN_HOURS)
+    for episode in range(values.shape[0]):
+        if episode not in candidate.index:
+            continue
+        row = candidate.loc[episode]
+        last = np.full(values.shape[2], np.nan, dtype=np.float32)
+        since = np.full(values.shape[2], 6, dtype=np.int16)
+        for index in range(values.shape[1]):
+            bin_start = row.window_start + index * bin_step
+            if not (bin_start >= row.intime and (bin_start + bin_step) <= row.outtime):
+                continue
+            observed = masks[episode, index] & np.isfinite(values[episode, index])
+            since = np.minimum(since + 1, 6)
+            last[observed] = values[episode, index, observed]
+            since[observed] = 0
+            filled[episode, index] = last
+            recency[episode, index] = since.astype(np.float32) / 6.0
+    return filled, recency
+
+
+def _role_surface(
+    task: str,
+    role: str,
+    candidates: pd.DataFrame,
+    transitions: pd.DataFrame,
+    actions: np.ndarray,
+    arrays: dict[str, np.ndarray],
+    train_mean: np.ndarray,
+    train_scale: np.ndarray,
+    filled: np.ndarray,
+    full_recency: np.ndarray,
+) -> dict[str, Any]:
+    select = np.ones(len(transitions), dtype=bool) if role == "all_roles" else transitions["role"].eq(role).to_numpy(bool)
+    local_transitions = transitions.loc[select].reset_index(drop=True)
+    local_actions = np.asarray(actions)[select]
+    episode_ids = local_transitions["episode_idx"].drop_duplicates().to_numpy(int)
+    local_candidates = candidates[candidates["episode_idx"].isin(episode_ids)]
+    count = {"sepsis": 25, "respiratory_support": 25, "shock": 25, "aki": 4, "heart_failure": 2}[task]
+    action_counts = np.bincount(local_actions, minlength=count).astype(int) if len(local_actions) else np.zeros(count, dtype=int)
+    lengths = local_transitions.groupby("episode_idx", observed=True).size().to_numpy(int)
+    groups = list(local_transitions.groupby("episode_idx", sort=False, observed=True))
+    max_steps = max((len(group) for _, group in groups), default=0)
+    shape = (len(groups), max_steps, len(SAFE_FEATURE_INDICES))
+    state_values = np.full(shape, np.nan, dtype=np.float32)
+    state_masks = np.zeros(shape, dtype=bool)
+    recency = np.zeros(shape, dtype=np.float32)
+    raw_imputed = np.full(shape, np.nan, dtype=np.float32)
+    normalized = np.zeros(shape, dtype=np.float32)
+    target_values = np.full(shape, np.nan, dtype=np.float32)
+    target_masks = np.zeros(shape, dtype=bool)
+    padded_actions = np.full((len(groups), max_steps), -1, dtype=np.int16)
+    valid = np.zeros((len(groups), max_steps), dtype=bool)
+    terminal = np.zeros((len(groups), max_steps), dtype=bool)
+    order = np.full((len(groups), max_steps), -1, dtype=np.int16)
+    reward = np.zeros((len(groups), max_steps, 1), dtype=np.float32)
+    reward_mask = np.zeros_like(reward, dtype=bool)
+    candidate_index = candidates.set_index("episode_idx")
+    for row_index, (episode_id, group) in enumerate(groups):
+        group = group.reset_index()
+        length = len(group)
+        episode = group["episode_idx"].to_numpy(int)
+        state = group["state_idx"].to_numpy(int)
+        target = group["target_idx"].to_numpy(int)
+        state_values[row_index, :length] = arrays["values"][episode, state][:, SAFE_FEATURE_INDICES]
+        state_masks[row_index, :length] = arrays["masks"][episode, state][:, SAFE_FEATURE_INDICES]
+        target_values[row_index, :length] = arrays["values"][episode, target][:, SAFE_FEATURE_INDICES]
+        target_masks[row_index, :length] = arrays["masks"][episode, target][:, SAFE_FEATURE_INDICES]
+        local_imputed = filled[episode, state]
+        raw_imputed[row_index, :length] = local_imputed
+        local_imputed = np.where(np.isfinite(local_imputed), local_imputed, train_mean)
+        recency[row_index, :length] = np.nan_to_num(full_recency[episode, state], nan=18.0, posinf=18.0, neginf=0.0)
+        normalized[row_index, :length] = np.nan_to_num((local_imputed - train_mean) / train_scale, nan=0.0, posinf=0.0, neginf=0.0)
+        padded_actions[row_index, :length] = local_actions[group["index"].to_numpy(int)]
+        valid[row_index, :length] = True
+        terminal[row_index, length - 1] = True
+        order[row_index, :length] = group["relative_transition"].to_numpy(np.int16)
+        if task in {"sepsis", "aki", "heart_failure"}:
+            reward[row_index, length - 1, 0] = -1.0 if float(candidate_index.loc[int(episode_id), "mortality_90d"]) > 0.5 else 1.0
+            reward_mask[row_index, length - 1, 0] = True
+        elif task == "shock":
+            j = list(SAFE_FEATURE_INDICES).index(FEATURE_INDEX["mbp"])
+            reward_mask[row_index, :length, 0] = target_masks[row_index, :length, j]
+            reward[row_index, :length, 0] = np.clip((target_values[row_index, :length, j] - 65.0) / 25.0, -1.0, 1.0)
+        else:
+            safe = list(SAFE_FEATURE_INDICES)
+            s, m = safe.index(FEATURE_INDEX["spo2"]), safe.index(FEATURE_INDEX["mbp"])
+            reward_mask[row_index, :length, 0] = target_masks[row_index, :length, s] & target_masks[row_index, :length, m]
+            reward[row_index, :length, 0] = np.where((target_values[row_index, :length, s] >= 94) & (target_values[row_index, :length, s] <= 98), 1.0, -0.5)
+            reward[row_index, :length, 0] += np.where((target_values[row_index, :length, m] >= 70) & (target_values[row_index, :length, m] <= 80), 1.0, -0.5)
+    reward[~reward_mask] = 0.0
+    continuation = valid & ~terminal
+    transition_order = local_transitions[["relative_transition", "state_idx", "action_idx", "target_idx"]].to_numpy(np.int16) if len(local_transitions) else np.empty((0, 4), np.int16)
+    return {
+        "role": role,
+        "subjects": int(local_candidates["subject_id"].nunique()),
+        "episodes": int(len(episode_ids)),
+        "decisions": int(len(local_transitions)),
+        "action_counts": action_counts.tolist(),
+        "minimum_horizon": int(lengths.min()) if len(lengths) else 0,
+        "maximum_horizon": int(lengths.max()) if len(lengths) else 0,
+        "digests": {
+            "feature_digest": _array_digest(state_values), "mask_digest": _array_digest(state_masks),
+            "delta_digest": _array_digest(recency), "raw_imputed_history_digest": _array_digest(raw_imputed),
+            "imputed_history_digest": _array_digest(normalized), "action_digest": _array_digest(padded_actions),
+            "reward_digest": _array_digest(reward), "reward_mask_digest": _array_digest(reward_mask),
+            "termination_digest": _array_digest(terminal), "continuation_digest": _array_digest(continuation),
+            "valid_step_digest": _array_digest(valid), "target_digest": _array_digest(target_values),
+            "observed_target_mask_digest": _array_digest(target_masks), "episode_order_digest": _array_digest(order),
+            "preprocessing_mean_digest": _array_digest(train_mean.astype(np.float32)),
+            "preprocessing_scale_digest": _array_digest(train_scale.astype(np.float32)),
+            "transition_order_digest": _array_digest(transition_order),
+        },
+    }
 
 
 def task_aggregate(task: str, candidates: pd.DataFrame, transitions: pd.DataFrame, actions: np.ndarray, arrays: dict[str, np.ndarray]) -> dict[str, Any]:
@@ -895,7 +1220,23 @@ def task_aggregate(task: str, candidates: pd.DataFrame, transitions: pd.DataFram
         reward_contract = "strictly_post_action_next_SpO2_and_MBP_dense_reward"
         reward_observed = int((arrays["masks"][target_episode, target_step, FEATURE_INDEX["spo2"]] & arrays["masks"][target_episode, target_step, FEATURE_INDEX["mbp"]]).sum())
         terminal_rewards = 0
-    return {"subjects": int(local["subject_id"].nunique()), "episodes": int(len(episode_ids)), "decisions": int(len(transitions)), "action_counts": counts.astype(int).tolist(), "minimum_horizon": int(lengths.min()) if len(lengths) else 0, "maximum_horizon": int(lengths.max()) if len(lengths) else 0, "reward_contract": reward_contract, "reward_observed_decisions": reward_observed, "terminal_reward_count": terminal_rewards}
+    train = transitions["role"].eq("train").to_numpy(bool)
+    episode = transitions["episode_idx"].to_numpy(int)
+    state = transitions["state_idx"].to_numpy(int)
+    observed = arrays["values"][episode, state][:, SAFE_FEATURE_INDICES]
+    observed_mask = arrays["masks"][episode, state][:, SAFE_FEATURE_INDICES]
+    train_values = np.where(observed_mask[train], observed[train], 0.0)
+    train_counts = observed_mask[train].sum(axis=0)
+    train_mean = np.divide(train_values.sum(axis=0), train_counts, out=np.zeros(train_values.shape[1]), where=train_counts > 0)
+    centered = np.where(observed_mask[train], observed[train] - train_mean, 0.0)
+    train_scale = np.sqrt(np.divide((centered ** 2).sum(axis=0), train_counts, out=np.ones(train_values.shape[1]), where=train_counts > 0))
+    train_scale = np.where(np.isfinite(train_scale) & (train_scale >= 1.0e-6), train_scale, 1.0)
+    filled, full_recency = _full_past_only_arrays(arrays, candidates)
+    role_summaries = [
+        _role_surface(task, role, candidates, transitions, actions, arrays, train_mean, train_scale, filled, full_recency)
+        for role in (*ROLE_ORDER, "all_roles")
+    ]
+    return {"subjects": int(local["subject_id"].nunique()), "episodes": int(len(episode_ids)), "decisions": int(len(transitions)), "action_counts": counts.astype(int).tolist(), "minimum_horizon": int(lengths.min()) if len(lengths) else 0, "maximum_horizon": int(lengths.max()) if len(lengths) else 0, "reward_contract": reward_contract, "reward_observed_decisions": reward_observed, "terminal_reward_count": terminal_rewards, "role_summaries": role_summaries}
 
 
 def _runtime_resource_payload(started: float) -> dict[str, int | float]:
@@ -995,22 +1336,28 @@ def reconstruct(
             audit=ingestion_audit, streaming_audit=streaming_audit,
         )
         candidates = finalize_sepsis_anchors(candidates, arrays)
-        transitions = build_transitions(candidates)
         rows: dict[str, dict[str, Any]] = {}
         respiratory_filter: dict[str, int] | None = None
         for task in TASKS:
-            local = transitions[transitions["task"].eq(task)].reset_index(drop=True)
-            local = filter_target_observed_transitions(local, arrays)
-            if local.empty: raise ContractError(f"no valid transitions for {task}")
-            actions, contract = encode_actions(task, local, arrays)
+            local, actions, contract, stages = frozen_action_and_membership_pipeline(
+                task, candidates, arrays
+            )
             if task == "respiratory_support":
-                local, actions, respiratory_filter = filter_respiratory_action_transitions(
-                    local, actions, contract["valid_action_mask"], action_count=contract["K"]
-                )
-            elif np.any(actions < 0):
-                raise ContractError(f"missing action observation for {task}")
+                respiratory_filter = {
+                    "candidate_transitions": stages["candidate_transitions"],
+                    "retained_transitions": stages["final_transitions"],
+                    "excluded_missing_action_transitions": stages["missing_action_exclusions"],
+                    "candidate_episodes": int(build_transitions(candidates)[lambda x: x["task"].eq(task)]["episode_idx"].nunique()),
+                    "retained_episodes": int(local["episode_idx"].nunique()),
+                    "excluded_empty_episodes": int(build_transitions(candidates)[lambda x: x["task"].eq(task)]["episode_idx"].nunique() - local["episode_idx"].nunique()),
+                }
             row = task_aggregate(task, candidates, local, actions, arrays)
             row["action_count"] = contract["K"]
+            train_actions = actions[local["role"].eq("train").to_numpy(bool)]
+            train_support = np.bincount(train_actions, minlength=contract["K"]) > 0
+            row["support_mask_digest"] = _array_digest(train_support)
+            row["transition_stages"] = stages
+            row["cutpoints"] = [list(edge) for edge in contract["edges"]]
             row["cutpoint_hash"] = hashlib.sha256(
                 json.dumps(contract["edges"], sort_keys=True).encode()
             ).hexdigest()
@@ -1023,9 +1370,7 @@ def reconstruct(
         Draft202012Validator.check_schema(schema_object)
         Draft202012Validator(schema_object).validate(receipt)
         output.mkdir(parents=True)
-        (output / "aggregate_receipt.json").write_text(
-            json.dumps(receipt, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8"
-        )
+        write_canonical_json(output / "aggregate_receipt.json", receipt)
         with (output / "icu_time_order_eligibility_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
             writer = csv.DictWriter(handle, fieldnames=("category", "count", "precedence"), lineterminator="\n")
             writer.writeheader()

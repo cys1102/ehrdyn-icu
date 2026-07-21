@@ -62,10 +62,10 @@ class KDD220AR3AKIAndStreamingTests(unittest.TestCase):
             {"subject_id": 4, "hadm_id": 41, "charttime": pd.Timestamp("2020-01-02"), "value": 2.0, "__source_order": 7},
         ])
         events = kdigo_creatinine_events(rows)
-        self.assertEqual(events["anchor_source"].tolist(), ["creatinine_delta_48h", "creatinine_ratio_7d"])
-        self.assertEqual(events["hadm_id"].tolist(), [10, 21])
+        self.assertEqual(events["anchor_source"].tolist(), ["creatinine_delta_48h", "creatinine_ratio_7d", "creatinine_delta_48h"])
+        self.assertEqual(events["hadm_id"].tolist(), [10, 21, 41])
         self.assertNotIn(30, events["hadm_id"].tolist())
-        self.assertNotIn(41, events["hadm_id"].tolist())
+        self.assertIn(41, events["hadm_id"].tolist())
 
     def test_nullable_keys_chunk_boundary_and_ties_are_deterministic(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

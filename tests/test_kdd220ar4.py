@@ -50,7 +50,7 @@ class KDD220AR4RespiratoryAndStreamingTests(unittest.TestCase):
             self.assertEqual(respiratory["episodes"], 1)
             self.assertEqual(respiratory["decisions"], 6)
             audit = pd.read_csv(output / "respiratory_action_filter_aggregate.csv").iloc[0]
-            self.assertEqual(int(audit["candidate_transitions"]), 10)
+            self.assertEqual(int(audit["candidate_transitions"]), 11)
             self.assertEqual(int(audit["retained_transitions"]), 6)
             self.assertEqual(int(audit["excluded_missing_action_transitions"]), 4)
             self.assertEqual(int(audit["excluded_empty_episodes"]), 0)
@@ -179,7 +179,7 @@ class KDD220AR4RespiratoryAndStreamingTests(unittest.TestCase):
             receipt = reconstruct(root, output, SCHEMA, source_hashes={"fixture": "a" * 64}, chunk_rows=3)
             validator = Draft202012Validator(json.loads(SCHEMA.read_text()))
             validator.validate(receipt)
-            self.assertEqual(receipt["schema_version"], "1.1.0")
+            self.assertEqual(receipt["schema_version"], "1.2.0")
             self.assertEqual([row["table"] for row in receipt["streaming"]], list(HIGH_VOLUME_TABLE_ORDER))
             self.assertTrue(all(row["scan_count"] >= 1 for row in receipt["streaming"]))
             self.assertTrue(all(row["effective_chunk_size"] == 3 for row in receipt["streaming"]))

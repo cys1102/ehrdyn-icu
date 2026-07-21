@@ -113,7 +113,7 @@ class KDD220AR5CurrentLineagePortTests(unittest.TestCase):
         ])
         masks = np.zeros((1, 3, len(FEATURE_NAMES)), dtype=bool)
         masks[0, 2, FEATURE_INDEX["heart_rate"]] = True
-        retained = filter_target_observed_transitions(transitions, {"masks": masks})
+        retained = filter_target_observed_transitions(transitions, {"pre_repair_masks": masks})
         self.assertEqual(retained["target_idx"].tolist(), [2])
 
     def test_kdd201_removes_only_named_disposition_three_anchor_bins(self) -> None:

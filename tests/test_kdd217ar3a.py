@@ -167,8 +167,17 @@ class ContractTests(unittest.TestCase):
         schema = json.loads(SCHEMA.read_text())
         Draft202012Validator.check_schema(schema)
         task_rows = {}
+        digests = {name: "0" * 64 for name in (
+            "feature_digest", "mask_digest", "delta_digest", "raw_imputed_history_digest",
+            "imputed_history_digest", "action_digest", "reward_digest", "reward_mask_digest",
+            "termination_digest", "continuation_digest", "valid_step_digest", "target_digest",
+            "observed_target_mask_digest", "episode_order_digest", "preprocessing_mean_digest",
+            "preprocessing_scale_digest", "transition_order_digest",
+        )}
         for task, k in zip(("sepsis", "respiratory_support", "shock", "aki", "heart_failure"), (25, 25, 25, 4, 2)):
-            task_rows[task] = {"subjects": 1, "episodes": 1, "decisions": 1, "action_counts": [1] + [0] * (k - 1), "minimum_horizon": 1, "maximum_horizon": 1, "action_count": k, "cutpoint_hash": "0" * 64, "reward_contract": "synthetic", "reward_observed_decisions": 1, "terminal_reward_count": 0}
+            stages = {"candidate_transitions": 1, "original_target_membership_transitions": 1, "action_observed_transitions": 1, "kdd152_joint_retained_transitions": 1, "missing_action_exclusions": 0, "original_target_exclusions": 0, "kdd201_removed_transitions": 0, "final_transitions": 1}
+            stages["role_counts"] = [{"role": role, "candidate_transitions": 1, "original_target_membership_transitions": 1, "action_observed_transitions": 1, "kdd152_joint_retained_transitions": 1, "kdd201_removed_transitions": 0, "final_transitions": 1} for role in ("train", "validation", "historical_other", "all_roles")]
+            task_rows[task] = {"subjects": 1, "episodes": 1, "decisions": 1, "action_counts": [1] + [0] * (k - 1), "minimum_horizon": 1, "maximum_horizon": 1, "action_count": k, "cutpoints": [], "cutpoint_hash": "0" * 64, "support_mask_digest": "0" * 64, "transition_stages": stages, "role_summaries": [{"role": role, "subjects": 1, "episodes": 1, "decisions": 1, "action_counts": [1] + [0] * (k - 1), "minimum_horizon": 1, "maximum_horizon": 1, "digests": digests} for role in ("train", "validation", "historical_other", "all_roles")], "reward_contract": "synthetic", "reward_observed_decisions": 1, "terminal_reward_count": 0}
         streaming = [
             {
                 "table": table, "rows_read": 1, "rows_retained": 1,

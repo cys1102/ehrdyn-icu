@@ -11,6 +11,7 @@ from typing import Iterable, Mapping, Sequence
 
 import numpy as np
 import pandas as pd
+from kdd2027_benchmark.canonical import canonical_sha256
 
 from .runtime_config import RUNTIME_CONFIG
 
@@ -80,7 +81,8 @@ MBP_ITEMIDS = (220052, 220181)
 SBP_ITEMIDS = (220050, 220179, 225309)
 PEEP_ITEMIDS = (220339, 224700)
 MECHVENT_ITEMIDS = (225792, 225794)
-FIO2_ITEMIDS = (226754, 227010, 229280)
+LEGACY_ACTION_FIO2_ITEMIDS = (223835, 226754, 227010, 229280)
+SAFE_STATE_FIO2_ITEMIDS = (226754, 227010, 229280)
 URINE_ITEMIDS = (226566, 226627, 226631, 227489)
 VASO_ITEMIDS = (221289, 221653, 221662, 221749, 221906, 222315, 229617, 229630, 229631, 229632)
 FLUID_ITEMIDS = (225158, 225159, 225823, 225825, 225827, 225828, 225941, 226089, 226364, 226375)
@@ -284,10 +286,57 @@ def corrected_chart_value(itemid: int, value: object, unit: object = None) -> fl
         numeric = (numeric - 32.0) * 5.0 / 9.0
     if itemid == 228242 or itemid == 223835:
         return math.nan
+    if itemid in SAFE_STATE_FIO2_ITEMIDS and str(unit) != "%":
+        return math.nan
     feature = CHART_ITEM_MAP.get(itemid)
     support = {
         "fio2": (21, 100), "gcs_proxy": (1, 15), "mbp": (20, 200),
         "temperature_c": (25, 45), "sbp": (20, 300), "spo2": (0, 100),
+    }
+    if feature in support and not support[feature][0] <= numeric <= support[feature][1]:
+        return math.nan
+    return float(numeric)
+
+
+def legacy_action_fio2_value(itemid: int, value: object) -> float:
+    """KDD097 pre-repair FiO2 action value; units do not gate membership."""
+    if int(itemid) not in LEGACY_ACTION_FIO2_ITEMIDS:
+        return math.nan
+    numeric = pd.to_numeric(pd.Series([value]), errors="coerce").iloc[0]
+    if not np.isfinite(numeric):
+        return math.nan
+    numeric = float(numeric)
+    if 0.0 <= numeric <= 1.0:
+        numeric *= 100.0
+    return numeric if 21.0 <= numeric <= 100.0 else math.nan
+
+
+def legacy_action_peep_value(itemid: int, value: object) -> float:
+    """KDD097 directly observed PEEP action value without carry-forward."""
+    if int(itemid) not in PEEP_ITEMIDS:
+        return math.nan
+    numeric = pd.to_numeric(pd.Series([value]), errors="coerce").iloc[0]
+    return float(numeric) if np.isfinite(numeric) and 0.0 <= numeric <= 30.0 else math.nan
+
+
+def pre_repair_chart_value(itemid: int, value: object) -> float:
+    """Dense KDD097 chart surface before the additive KDD151 repairs."""
+    itemid = int(itemid)
+    if itemid in MECHVENT_ITEMIDS:
+        return 1.0
+    if itemid in LEGACY_ACTION_FIO2_ITEMIDS:
+        return legacy_action_fio2_value(itemid, value)
+    numeric = pd.to_numeric(pd.Series([value]), errors="coerce").iloc[0]
+    if not np.isfinite(numeric) or numeric in {-9999.0, -999.0, -99.0}:
+        return math.nan
+    numeric = float(numeric)
+    if itemid == 223761:
+        numeric = (numeric - 32.0) * 5.0 / 9.0
+    feature = CHART_ITEM_MAP.get(itemid)
+    support = {
+        "weight": (20, 300), "heart_rate": (20, 250), "sbp": (30, 300),
+        "mbp": (20, 200), "dbp": (10, 200), "respiratory_rate": (1, 80),
+        "temperature_c": (25, 45), "spo2": (1, 100), "gcs_proxy": (3, 15),
     }
     if feature in support and not support[feature][0] <= numeric <= support[feature][1]:
         return math.nan
@@ -347,8 +396,28 @@ def aggregate_receipt(
         raise ContractError("receipt task inventory or order mismatch")
     if len(streaming_rows) != 7:
         raise ContractError("streaming receipt must contain seven high-volume tables")
+    frozen_contracts = {
+        "feature_order_sha256": hashlib.sha256("\n".join(SAFE_FEATURE_NAMES).encode()).hexdigest(),
+        "role_assignment_sha256": hashlib.sha256((ROLE_SALT + "train:7000;validation:1500;historical_other:1500").encode()).hexdigest(),
+        "bin_hours": BIN_HOURS,
+        "pre_anchor_hours": PRE_ANCHOR_HOURS,
+        "post_anchor_hours": POST_ANCHOR_HOURS,
+        "episode_window_hours": EPISODE_WINDOW_HOURS,
+        "episode_bins": EPISODE_BINS,
+        "raw_extraction_post_base_anchor_hours": RAW_EXTRACTION_POST_HOURS,
+        "sepsis_max_base_to_final_anchor_shift_hours": SEPSIS_MAX_ANCHOR_SHIFT_HOURS,
+        "longest_recursive_target_hours": LONGEST_RECURSIVE_TARGET_HOURS,
+    }
+    frozen_tasks = [dict({"task_id": task}, **task_rows[task]) for task in TASKS]
+    frozen_streaming = [dict(row) for row in streaming_rows]
+    frozen_contracts["scientific_surface_sha256"] = canonical_sha256({
+        "release": RELEASE,
+        "source_hashes": dict(sorted(source_hashes.items())),
+        "contracts": frozen_contracts,
+        "tasks": frozen_tasks,
+    })
     return {
-        "schema_version": "1.1.0",
+        "schema_version": "1.2.0",
         "release": RELEASE,
         "candidate_status": "credentialed_parity_pending",
         "source_hashes": dict(sorted(source_hashes.items())),
@@ -359,20 +428,9 @@ def aggregate_receipt(
             "timezone": "UTC",
             "locale": locale.setlocale(locale.LC_ALL, None),
         },
-        "contracts": {
-            "feature_order_sha256": hashlib.sha256("\n".join(SAFE_FEATURE_NAMES).encode()).hexdigest(),
-            "role_assignment_sha256": hashlib.sha256((ROLE_SALT + "train:7000;validation:1500;historical_other:1500").encode()).hexdigest(),
-            "bin_hours": BIN_HOURS,
-            "pre_anchor_hours": PRE_ANCHOR_HOURS,
-            "post_anchor_hours": POST_ANCHOR_HOURS,
-            "episode_window_hours": EPISODE_WINDOW_HOURS,
-            "episode_bins": EPISODE_BINS,
-            "raw_extraction_post_base_anchor_hours": RAW_EXTRACTION_POST_HOURS,
-            "sepsis_max_base_to_final_anchor_shift_hours": SEPSIS_MAX_ANCHOR_SHIFT_HOURS,
-            "longest_recursive_target_hours": LONGEST_RECURSIVE_TARGET_HOURS,
-        },
-        "streaming": [dict(row) for row in streaming_rows],
-        "tasks": [dict({"task_id": task}, **task_rows[task]) for task in TASKS],
+        "contracts": frozen_contracts,
+        "streaming": frozen_streaming,
+        "tasks": frozen_tasks,
         "privacy": {
             "aggregate_only": True,
             "subgroup_cells_exported": False,

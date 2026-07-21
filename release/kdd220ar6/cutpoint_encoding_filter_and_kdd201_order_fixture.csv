@@ -1,0 +1,10 @@
+stage,operation,fixture_result,status
+1,KDD097_candidate_transition_surface,unfiltered_roles_and_rows_present,pass
+2,train_positive_PEEP_quartiles,1.75_2.5_3.25,pass
+2,train_positive_FiO2_quartiles,37.5_45_52.5,pass
+2,validation_outlier_effect,no_change,pass
+3,K25_encoding,missing_is_minus_one_never_zero,pass
+4,original_target_and_missing_action_filter,identical_boolean_membership_contract,pass
+5,KDD151_SAFE_repair,feature_channels_only_no_action_reencode,pass
+6,KDD201_disposition3_subset,relative_transition_zero_removed_with_same_action_mask,pass
+6,retained_action_identity,byte_equal_to_preexisting_selected_classes,pass

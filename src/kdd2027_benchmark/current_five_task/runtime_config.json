@@ -57,6 +57,18 @@
     "heart_failure": {
       "prior_diagnosis_required": false,
       "anchor": "first_current_stay_diuretic_or_vasodilator_event"
+    },
+    "respiratory_support": {
+      "legacy_action_fio2_itemids": [223835, 226754, 227010, 229280],
+      "safe_state_fio2_itemids": [226754, 227010, 229280],
+      "peep_itemids": [220339, 224700],
+      "cutpoint_fit_surface": "unfiltered_kdd097_train_positive_direct_observations",
+      "filter_order": [
+        "encode_kdd097_actions",
+        "original_target_membership_and_missing_action",
+        "repair_kdd151_safe_features",
+        "subset_kdd201_disposition3"
+      ]
     }
   },
   "runtime": {
@@ -64,6 +76,7 @@
     "locale": "C.UTF-8",
     "stable_sort_kind": "stable",
     "high_volume_chunk_rows": 250000,
+    "authoritative_kdd152_source_chunk_rows": 1000000,
     "float_comparison_rtol": 1e-12,
     "float_comparison_atol": 1e-12
   }

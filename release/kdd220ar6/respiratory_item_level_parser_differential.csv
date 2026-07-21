@@ -1,0 +1,8 @@
+fixture,itemid,value,unit,legacy_action_value,safe_state_value,status
+fraction_blank,223835,0.40,blank,40,missing,pass
+percent_blank,223835,40,blank,40,missing,pass
+explicit_percent,226754,40,%,40,40,pass
+documented_item_blank,226754,40,blank,40,missing,pass
+below_support,226754,20,%,missing,missing,pass
+above_support,227010,101,%,missing,missing,pass
+multi_item_median,223835_226754_229280,30_50_70,mixed,50,60,pass
