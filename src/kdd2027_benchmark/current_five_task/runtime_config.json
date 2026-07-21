@@ -1,6 +1,14 @@
 {
   "schema_version": "1.0.0",
   "mimiciv_version": "3.1",
+  "authoritative_source_commits": {
+    "kdd097_materialization": "d1b5215e",
+    "kdd121_large_lineage": "0ef40bb3",
+    "kdd151_feature_unit_repair": "57947251",
+    "kdd152_v2a_interface": "e3d30f1a",
+    "kdd184_dbp_correction": "90430855",
+    "kdd201_first_decision_repair": "c464ea89"
+  },
   "temporal": {
     "bin_hours": 4,
     "episode_pre_anchor_hours": 24,
@@ -36,10 +44,10 @@
   },
   "cohort_parameters": {
     "sepsis": {
-      "minimum_observed_sofa_domains": 2,
-      "sofa_increase_min": 2,
-      "baseline": "minimum_observed_proxy_sofa_in_fully_contained_preinfection_bins",
-      "current_action_vasopressor_in_state": false
+      "source": "blood_culture_suspected_infection_manifest",
+      "culture_scope": "blood",
+      "maximum_observed_sofa_min": 2,
+      "preserve_suspected_infection_onset": true
     },
     "aki": {
       "creatinine_absolute_delta_48h": 0.3,
@@ -47,8 +55,8 @@
       "urine_output_identity_enabled": false
     },
     "heart_failure": {
-      "icd9_prefix": ["428"],
-      "icd10_prefix": ["I50"]
+      "prior_diagnosis_required": false,
+      "anchor": "first_current_stay_diuretic_or_vasodilator_event"
     }
   },
   "runtime": {

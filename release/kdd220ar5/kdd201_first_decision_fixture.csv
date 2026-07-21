@@ -1,0 +1,11 @@
+anchor_source,disposition,relative_transition_0,relative_transition_1_plus,status
+structured_ventilation_chart_event,3,removed,retained,pass
+structured_respiratory_support_event,3,removed,retained,pass
+vasopressor_support,3,removed,retained,pass
+sustained_hypotension,1,retained,retained,pass
+time_stamped_rrt_start,3,removed,retained,pass
+creatinine_delta_48h,1,retained,retained,pass
+creatinine_ratio_7d,1,retained,retained,pass
+current_stay_decongestion_prescription,3,removed,retained,pass
+current_stay_decongestion_input,3,removed,retained,pass
+E060_suspected_infection_plus_SOFA_ge2_scaffold,unaffected,retained,retained,pass

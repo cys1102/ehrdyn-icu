@@ -87,9 +87,11 @@ FLUID_ITEMIDS = (225158, 225159, 225823, 225825, 225827, 225828, 225941, 226089,
 CREATININE_ITEMIDS = tuple(item for item, name in LAB_ITEM_MAP.items() if name == "creatinine")
 
 ANTIBIOTIC_PATTERN = (
-    r"cef|cillin|penem|azithro|clarithro|erythro|cipro|levo|moxi|vanco|linezolid|"
-    r"daptomycin|metronidazole|clindamycin|gentamicin|tobramycin|amikacin|aztreonam|"
-    r"tigecycline|colistin|polymyxin|doxycycline|minocycline|trimethoprim|sulfamethoxazole"
+    r"vancomycin|cefepime|ceftriaxone|cefazolin|ceftazidime|ceftaroline|cefotaxime|cefuroxime|"
+    r"piperacillin|tazobactam|meropenem|imipenem|ertapenem|aztreonam|ciprofloxacin|levofloxacin|"
+    r"moxifloxacin|metronidazole|clindamycin|linezolid|daptomycin|gentamicin|tobramycin|amikacin|"
+    r"ampicillin|amoxicillin|nafcillin|oxacillin|penicillin|doxycycline|minocycline|bactrim|"
+    r"sulfamethoxazole|trimethoprim|tigecycline"
 )
 DIURETIC_PATTERN = r"furosemide|bumetanide|torsemide|hydrochlorothiazide|metolazone|chlorothiazide|ethacrynic|spironolactone"
 RRT_PATTERN = r"dialysis|crrt|cvvh|hemofiltration|ultrafiltration"
@@ -193,7 +195,7 @@ def compact_lineage_role(subject_id: int) -> str:
 def extraction_post_hours(task: str) -> int:
     if task not in TASKS:
         raise ContractError(f"unknown task: {task}")
-    return RAW_EXTRACTION_POST_HOURS if task in {"sepsis", "respiratory_support", "shock", "aki"} else POST_ANCHOR_HOURS
+    return RAW_EXTRACTION_POST_HOURS if task in {"respiratory_support", "shock", "aki"} else POST_ANCHOR_HOURS
 
 
 def episode_interface_indices(base_anchor: pd.Timestamp, final_anchor: pd.Timestamp) -> tuple[int, ...]:
@@ -261,7 +263,6 @@ DISPOSITION3_ANCHORS = {
     "structured_respiratory_support_event",
     "vasopressor_support",
     "time_stamped_rrt_start",
-    "first_current_icu_diuretic_event",
     "current_stay_decongestion_prescription",
     "current_stay_decongestion_input",
 }

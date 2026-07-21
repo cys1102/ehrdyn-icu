@@ -24,9 +24,16 @@ from .authoritative_semantics import (
     compute_corrected_derived_features,
     gcs_total_rows,
     overlap_bin_amounts,
-    overlap_bins,
 )
 from .runtime_config import RUNTIME_CONFIG
+from .lineage_source_port import (
+    blood_culture_events,
+    compact_lineage_stays,
+    sepsis_sofa_filter,
+    kdd097_interval_bins,
+    large_lineage_stays,
+    match_suspected_infections,
+)
 
 from .contracts import (
     ANTIBIOTIC_PATTERN,
@@ -36,6 +43,7 @@ from .contracts import (
     DIURETIC_PATTERN,
     FEATURE_INDEX,
     FEATURE_NAMES,
+    SAFE_FEATURE_INDICES,
     FIO2_ITEMIDS,
     FLUID_ITEMIDS,
     LAB_ITEM_MAP,
@@ -61,7 +69,6 @@ from .contracts import (
     corrected_chart_value,
     eligible_transition_indices,
     encode_five_levels,
-    extraction_post_hours,
     fit_train_positive_edges,
     joint_codes,
     parse_times,
@@ -344,10 +351,6 @@ def kdigo_creatinine_events(creatinine: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(qualifying, columns=("subject_id", "hadm_id", "anchor_time", "anchor_source"))
 
 
-def _normal_icd(series: pd.Series) -> pd.Series:
-    return series.astype("string").str.upper().str.replace(".", "", regex=False)
-
-
 def _mortality_90d(frame: pd.DataFrame) -> pd.Series:
     dod = pd.to_datetime(frame["dod"], errors="coerce")
     discharge = pd.to_datetime(frame["dischtime"], errors="coerce")
@@ -404,13 +407,7 @@ def load_core_with_time_audit(
         .sort_values(["subject_id", "intime", "stay_id"], kind="stable")
     )
     base, time_audit = classify_icu_time_eligibility(base)
-    discharge = base["discharge_location"].fillna("").astype(str).str.upper()
-    base = base[
-        base["anchor_age"].ge(18)
-        & base["gender"].notna()
-        & base["dischtime"].notna()
-        & ~discharge.str.contains("HOSPICE")
-    ].copy()
+    base = compact_lineage_stays(base)
     time_audit["retained_after_existing_public_base_eligibility"] = int(len(base))
     base["mortality_90d"] = _mortality_90d(base)
     base["role"] = [subject_role(value) for value in base["subject_id"]]
@@ -451,60 +448,31 @@ def suspected_infection_anchors(
         & prescriptions["drug"].astype(str).str.contains(ANTIBIOTIC_PATTERN, case=False, regex=True, na=False)
     ].copy()
     antibiotics = antibiotics.merge(stays[["subject_id", "hadm_id", "stay_id"]], on=["subject_id", "hadm_id"], how="inner")
+    antibiotics = antibiotics.rename(columns={"starttime": "antibiotic_time"})
     cultures = _stream_events(
         paths["hosp/microbiologyevents"], table="hosp/microbiologyevents",
-        columns=("subject_id", "hadm_id", "chartdate", "charttime"),
+        columns=("micro_specimen_id", "subject_id", "hadm_id", "chartdate", "charttime", "spec_type_desc", "org_itemid", "org_name"),
         dates=("chartdate", "charttime"), required_ids=("subject_id",), required_times=(),
         audit=audit, chunk_rows=chunk_rows,
         key="subject_id", eligible_keys=set(stays["subject_id"].astype(int)), sort_by=("subject_id", "charttime", "chartdate"),
         streaming_audit=streaming_audit,
     )
-    cultures["culture_time"] = cultures["charttime"].fillna(cultures["chartdate"])
+    cultures = blood_culture_events(cultures)
     missing_culture_time = cultures["culture_time"].isna()
     _audit_add(audit, "hosp/microbiologyevents", "charttime_or_chartdate", "missing_required_event_timestamp", int(missing_culture_time.sum()))
-    cultures = cultures[~missing_culture_time].sort_values(["subject_id", "culture_time", "__source_order"], kind="stable")
-    rows: list[dict[str, Any]] = []
-    for antibiotic in antibiotics.sort_values(["subject_id", "stay_id", "starttime"], kind="stable").itertuples(index=False):
-        local = cultures[cultures["subject_id"].eq(antibiotic.subject_id)]
-        prior = local[(local["culture_time"] >= antibiotic.starttime - pd.Timedelta(hours=72)) & (local["culture_time"] < antibiotic.starttime)]
-        future = local[(local["culture_time"] > antibiotic.starttime) & (local["culture_time"] <= antibiotic.starttime + pd.Timedelta(hours=24))]
-        if not prior.empty:
-            onset = prior.iloc[0]["culture_time"]
-        elif not future.empty:
-            onset = antibiotic.starttime
-        else:
-            continue
-        rows.append({"stay_id": int(antibiotic.stay_id), "anchor_time": pd.Timestamp(onset)})
-    return _first_anchor(pd.DataFrame(rows), "antibiotic_culture_suspected_infection_pending_organ_dysfunction")
+    cultures = cultures[~missing_culture_time].sort_values(
+        ["subject_id", "culture_time", "micro_specimen_id"], kind="stable"
+    )
+    matches = match_suspected_infections(antibiotics, cultures)
+    if matches.empty:
+        return _first_anchor(pd.DataFrame(columns=("stay_id", "anchor_time")), "suspected_infection_plus_SOFA_ge2_scaffold")
+    matches = matches.rename(columns={"suspected_infection_time": "anchor_time"})
+    return _first_anchor(matches[["stay_id", "anchor_time"]], "suspected_infection_plus_SOFA_ge2_scaffold")
 
 
 def _interval_filter(events: pd.DataFrame, stays: pd.DataFrame, time: str) -> pd.DataFrame:
     merged = events.merge(stays[["stay_id", "intime", "outtime"]], on="stay_id", how="inner")
     return merged[(merged[time] >= merged["intime"]) & (merged[time] < merged["outtime"])].copy()
-
-
-def _prior_disease_stays(
-    stays: pd.DataFrame,
-    diagnoses: pd.DataFrame,
-    *,
-    icd9_prefix: tuple[str, ...],
-    icd10_prefix: tuple[str, ...],
-    audit: dict[tuple[str, str, str], int],
-) -> pd.DataFrame:
-    diagnoses = _filter_required_ids(diagnoses, ("subject_id", "hadm_id", "icd_version"), "hosp/diagnoses_icd", audit)
-    missing_code = diagnoses["icd_code"].isna() | diagnoses["icd_code"].astype("string").str.strip().eq("")
-    _audit_add(audit, "hosp/diagnoses_icd", "icd_code", "missing_required_code", int(missing_code.sum()))
-    diagnoses = diagnoses.loc[~missing_code].copy()
-    code = _normal_icd(diagnoses["icd_code"]); version = diagnoses["icd_version"].astype(int)
-    selected = diagnoses.loc[
-        (version.eq(9) & code.str.startswith(icd9_prefix, na=False))
-        | (version.eq(10) & code.str.startswith(icd10_prefix, na=False)),
-        ["subject_id", "hadm_id"],
-    ].drop_duplicates()
-    completed = selected.merge(stays[["subject_id", "hadm_id", "dischtime"]].drop_duplicates(), on=["subject_id", "hadm_id"], how="inner")
-    first = completed.dropna(subset=["dischtime"]).groupby("subject_id", observed=True)["dischtime"].min()
-    available = stays["subject_id"].map(first)
-    return stays[available.notna() & available.lt(stays["admittime"])].copy()
 
 
 def build_anchors(
@@ -517,6 +485,8 @@ def build_anchors(
     streaming_audit: dict[str, dict[str, int | str]] | None = None,
 ) -> pd.DataFrame:
     audit = audit if audit is not None else {}
+    compact_stays = compact_lineage_stays(stays)
+    large_stays = large_lineage_stays(stays)
     items = _read(paths["icu/d_items"])[["itemid", "label"]]
     items = _filter_required_ids(items, ("itemid",), "icu/d_items", audit)
     label = items.set_index("itemid")["label"]
@@ -553,20 +523,26 @@ def build_anchors(
     frames: list[pd.DataFrame] = []
 
     sepsis = suspected_infection_anchors(
-        paths, stays, chunk_rows=chunk_rows, audit=audit, streaming_audit=streaming_audit
+        paths, large_stays, chunk_rows=chunk_rows, audit=audit, streaming_audit=streaming_audit
     )
     if not sepsis.empty:
-        local = stays.merge(sepsis, on="stay_id", how="inner")
-        local = local[(local["anchor_time"] >= local["intime"]) & (local["anchor_time"] < local["outtime"])]
+        local = large_stays.merge(sepsis, on="stay_id", how="inner")
+        local = local[
+            (local["anchor_time"] + pd.Timedelta(hours=POST_ANCHOR_HOURS) > local["intime"])
+            & (local["anchor_time"] - pd.Timedelta(hours=PRE_ANCHOR_HOURS) < local["outtime"])
+        ]
         local["task_id"] = "sepsis"
         frames.append(local)
 
-    respiratory = chart[chart["itemid"].isin(MECHVENT_ITEMIDS)].dropna(subset=["charttime"])[["stay_id", "charttime"]].rename(columns={"charttime": "anchor_time"}); respiratory["anchor_source"] = "structured_ventilation_chart_event"
+    respiratory = _interval_filter(
+        chart[chart["itemid"].isin(MECHVENT_ITEMIDS)].dropna(subset=["charttime"]), compact_stays, "charttime"
+    )[["stay_id", "charttime"]].rename(columns={"charttime": "anchor_time"}); respiratory["anchor_source"] = "structured_ventilation_chart_event"
     p = procedures.copy(); p["label"] = p["itemid"].map(label).fillna("")
-    support = p[p["label"].astype(str).str.contains(r"oxygen|ventilat|intubat|bipap|cpap", case=False, regex=True)][["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); support["anchor_source"] = "structured_respiratory_support_event"
+    support = p[p["label"].astype(str).str.contains(r"oxygen|ventilat|intubat|bipap|cpap", case=False, regex=True)]
+    support = _interval_filter(support, compact_stays, "starttime")[["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); support["anchor_source"] = "structured_respiratory_support_event"
     respiratory = _first_anchor(pd.concat([respiratory, support], ignore_index=True))
     if not respiratory.empty:
-        local = stays.merge(respiratory, on="stay_id", how="inner"); local["task_id"] = "respiratory_support"; frames.append(local)
+        local = compact_stays.merge(respiratory, on="stay_id", how="inner"); local["task_id"] = "respiratory_support"; frames.append(local)
 
     bp = chart[chart["itemid"].isin(SBP_ITEMIDS + MBP_ITEMIDS)].dropna(subset=["charttime"]).copy()
     bp["value"] = pd.to_numeric(bp["valuenum"], errors="coerce")
@@ -577,28 +553,26 @@ def build_anchors(
     bp = bp[bp["event_count"].ge(2)][["stay_id", "anchor_time"]]; bp["anchor_source"] = "sustained_hypotension"
     vaso = inputs[inputs["itemid"].isin(VASO_ITEMIDS)].copy()
     positive = np.maximum(pd.to_numeric(vaso["amount"], errors="coerce").fillna(0), pd.to_numeric(vaso["rate"], errors="coerce").fillna(0)).gt(0)
-    vaso = vaso[positive][["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); vaso["anchor_source"] = "vasopressor_support"
+    vaso = _interval_filter(vaso[positive], compact_stays, "starttime")[["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); vaso["anchor_source"] = "vasopressor_support"
     shock = _first_anchor(pd.concat([bp, vaso], ignore_index=True))
     if not shock.empty:
-        local = stays.merge(shock, on="stay_id", how="inner"); local["task_id"] = "shock"; frames.append(local)
+        local = compact_stays.merge(shock, on="stay_id", how="inner"); local["task_id"] = "shock"; frames.append(local)
 
     creat = scan_creatinine(
         paths["hosp/labevents"], chunk_rows=chunk_rows, audit=audit, streaming_audit=streaming_audit
     )
     aki_lab = kdigo_creatinine_events(creat)
     if not aki_lab.empty:
-        aki_lab = aki_lab.merge(stays[["hadm_id", "stay_id", "intime", "outtime"]], on="hadm_id", how="inner")
+        aki_lab = aki_lab.merge(compact_stays[["hadm_id", "stay_id", "intime", "outtime"]], on="hadm_id", how="inner")
         aki_lab = aki_lab[(aki_lab["anchor_time"] >= aki_lab["intime"]) & (aki_lab["anchor_time"] < aki_lab["outtime"])][["stay_id", "anchor_time", "anchor_source"]]
     p["label"] = p["itemid"].map(label).fillna("")
-    rrt = p[p["label"].astype(str).str.contains(RRT_PATTERN, case=False, regex=True)][["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); rrt["anchor_source"] = "time_stamped_rrt_start"
+    rrt = p[p["label"].astype(str).str.contains(RRT_PATTERN, case=False, regex=True)]
+    rrt = _interval_filter(rrt, compact_stays, "starttime")[["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); rrt["anchor_source"] = "time_stamped_rrt_start"
     aki = _first_anchor(pd.concat([aki_lab, rrt], ignore_index=True))
     if not aki.empty:
-        local = stays.merge(aki, on="stay_id", how="inner"); local["task_id"] = "aki"; frames.append(local)
+        local = compact_stays.merge(aki, on="stay_id", how="inner"); local["task_id"] = "aki"; frames.append(local)
 
-    sepsis_stay_ids = set(sepsis["stay_id"].astype(int)) if not sepsis.empty else set()
-    hf_contract = RUNTIME_CONFIG["cohort_parameters"]["heart_failure"]
-    hf_stays = _prior_disease_stays(stays, diagnoses, icd9_prefix=tuple(hf_contract["icd9_prefix"]), icd10_prefix=tuple(hf_contract["icd10_prefix"]), audit=audit)
-    hf_stays = hf_stays[~hf_stays["stay_id"].isin(sepsis_stay_ids)].copy()
+    hf_stays = large_stays.copy()
     rx = _stream_events(
         paths["hosp/prescriptions"], table="hosp/prescriptions",
         columns=("subject_id", "hadm_id", "starttime", "stoptime", "drug"),
@@ -611,7 +585,9 @@ def build_anchors(
     hf_event = rx.merge(hf_stays[["hadm_id", "stay_id", "intime", "outtime"]], on="hadm_id")
     hf_event = hf_event[(hf_event["starttime"] >= hf_event["intime"]) & (hf_event["starttime"] < hf_event["outtime"])][["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); hf_event["anchor_source"] = "current_stay_decongestion_prescription"
     i = inputs.copy(); i["label"] = i["itemid"].map(label).fillna("")
-    hf_input = i[i["label"].astype(str).str.contains(f"{DIURETIC_PATTERN}|{VASODILATOR_PATTERN}", case=False, regex=True)][["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); hf_input["anchor_source"] = "current_stay_decongestion_input"
+    positive = np.maximum(pd.to_numeric(i["amount"], errors="coerce").fillna(0), pd.to_numeric(i["rate"], errors="coerce").fillna(0)).gt(0)
+    hf_input = i[positive & i["label"].astype(str).str.contains(f"{DIURETIC_PATTERN}|{VASODILATOR_PATTERN}", case=False, regex=True)]
+    hf_input = _interval_filter(hf_input, hf_stays, "starttime")[["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); hf_input["anchor_source"] = "current_stay_decongestion_input"
     hf = _first_anchor(pd.concat([hf_event, hf_input], ignore_index=True))
     if not hf.empty:
         local = hf_stays.merge(hf, on="stay_id", how="inner"); local["task_id"] = "heart_failure"; frames.append(local)
@@ -625,7 +601,7 @@ def build_anchors(
     candidates["base_anchor_time"] = candidates["anchor_time"]
     candidates["window_start"] = candidates["anchor_time"] - pd.Timedelta(hours=PRE_ANCHOR_HOURS)
     candidates["window_end"] = [
-        anchor + pd.Timedelta(hours=extraction_post_hours(task))
+        anchor + pd.Timedelta(hours=(RAW_EXTRACTION_BINS * BIN_HOURS - PRE_ANCHOR_HOURS) if task in {"respiratory_support", "shock", "aki"} else POST_ANCHOR_HOURS)
         for task, anchor in zip(candidates["task_id"], candidates["anchor_time"])
     ]
     candidates["episode_idx"] = np.arange(len(candidates), dtype=np.int64)
@@ -655,6 +631,7 @@ def build_arrays(
     values = np.full(shape, np.nan, dtype=np.float32); masks = np.zeros(shape, dtype=bool)
     fluid = np.zeros(shape[:2], dtype=np.float32); vaso = np.zeros(shape[:2], dtype=np.float32)
     peep = np.full(shape[:2], np.nan, dtype=np.float32); peep_observed = np.zeros(shape[:2], dtype=bool)
+    fio2_action = np.full(shape[:2], np.nan, dtype=np.float32); fio2_action_observed = np.zeros(shape[:2], dtype=bool)
     diuretic = np.zeros(shape[:2], dtype=np.float32); rrt = np.zeros(shape[:2], dtype=np.float32)
     for row in candidates.itertuples(index=False):
         values[row.episode_idx, :, FEATURE_INDEX["age"]] = float(row.anchor_age)
@@ -678,6 +655,13 @@ def build_arrays(
     peep_rows = valid_chart[valid_chart["itemid"].isin(PEEP_ITEMIDS)]
     for (episode, step), group in peep_rows.groupby(["episode_idx", "bin"], observed=True):
         peep[int(episode), int(step)] = float(group["value"].median()); peep_observed[int(episode), int(step)] = True
+    fio2_rows = valid_chart[valid_chart["itemid"].isin(FIO2_ITEMIDS)]
+    for (episode, step), group in fio2_rows.groupby(["episode_idx", "bin"], observed=True):
+        finite = group["value"].to_numpy(dtype=float)
+        finite = finite[np.isfinite(finite)]
+        if finite.size:
+            fio2_action[int(episode), int(step)] = float(np.median(finite))
+            fio2_action_observed[int(episode), int(step)] = True
     gcs = valid_chart[valid_chart["itemid"].isin(GCS_ITEMIDS)].copy()
     gcs["feature_value"] = gcs["value"]
     for row in gcs_total_rows(gcs).itertuples(index=False):
@@ -758,7 +742,7 @@ def build_arrays(
         if int(row.itemid) in FLUID_ITEMIDS and str(row.amountuom).lower() == "ml":
             for step, amount in overlap_bin_amounts(start, end, row.window_start, bin_hours=BIN_HOURS, n_steps=steps, amount=float(row.amount_value)):
                 fluid[episode, step] += amount
-        for step in overlap_bins(start, end, row.window_start, bin_hours=BIN_HOURS, n_steps=steps):
+        for step in kdd097_interval_bins(start, end, row.window_start, bin_hours=BIN_HOURS, n_steps=steps):
             if int(row.itemid) in VASO_ITEMIDS: vaso[episode, step] = max(vaso[episode, step], float(row.rate_value or row.amount_value))
             if re.search(DIURETIC_PATTERN, str(row.label), re.I): diuretic[episode, step] = 1
             if re.search(RRT_PATTERN, str(row.label), re.I): rrt[episode, step] = 1
@@ -778,7 +762,7 @@ def build_arrays(
     pb = pb[(pb["endtime"] > pb["window_start"]) & (pb["starttime"] < pb["window_end"]) & (pb["endtime"] > pb["starttime"])].copy()
     for row in pb.itertuples(index=False):
         episode = int(row.episode_idx); start = max(row.starttime, row.window_start); end = min(row.endtime, row.window_end)
-        for step in overlap_bins(start, end, row.window_start, bin_hours=BIN_HOURS, n_steps=steps):
+        for step in kdd097_interval_bins(start, end, row.window_start, bin_hours=BIN_HOURS, n_steps=steps):
             if int(row.itemid) in MECHVENT_ITEMIDS:
                 index = FEATURE_INDEX["mechanical_ventilation"]; values[episode, step, index] = 1; masks[episode, step, index] = True
             if re.search(RRT_PATTERN, str(row.label), re.I): rrt[episode, step] = 1
@@ -797,41 +781,20 @@ def build_arrays(
     for row in rb.itertuples(index=False):
         if re.search(DIURETIC_PATTERN, str(row.drug), re.I):
             start = max(row.starttime, row.window_start); end = min(max(row.stoptime, start + pd.Timedelta(minutes=1)), row.window_end)
-            for step in overlap_bins(start, end, row.window_start, bin_hours=BIN_HOURS, n_steps=steps): diuretic[int(row.episode_idx), step] = 1
+            for step in kdd097_interval_bins(start, end, row.window_start, bin_hours=BIN_HOURS, n_steps=steps): diuretic[int(row.episode_idx), step] = 1
 
     compute_corrected_derived_features(values, masks, vaso, feature_index=FEATURE_INDEX, bin_hours=BIN_HOURS)
-    return {"values": values, "masks": masks, "fluid": fluid, "vaso": vaso, "peep": peep, "peep_observed": peep_observed, "diuretic": diuretic, "rrt": rrt}
+    return {"values": values, "masks": masks, "fluid": fluid, "vaso": vaso, "peep": peep, "peep_observed": peep_observed, "fio2_action": fio2_action, "fio2_action_observed": fio2_action_observed, "diuretic": diuretic, "rrt": rrt}
 
 
 def finalize_sepsis_anchors(candidates: pd.DataFrame, arrays: dict[str, np.ndarray]) -> pd.DataFrame:
-    output = candidates.copy(); keep = np.ones(len(output), dtype=bool); step = pd.Timedelta(hours=BIN_HOURS)
-    mask = arrays["masks"]
-    sepsis = RUNTIME_CONFIG["cohort_parameters"]["sepsis"]
-    valid_domains = int(sepsis["minimum_observed_sofa_domains"])
-    domains = (
-        (mask[..., FEATURE_INDEX["pao2"]] & mask[..., FEATURE_INDEX["fio2"]]).astype(np.int8)
-        + mask[..., FEATURE_INDEX["platelet"]].astype(np.int8)
-        + mask[..., FEATURE_INDEX["total_bilirubin"]].astype(np.int8)
-        + (mask[..., FEATURE_INDEX["mbp"]] | (arrays["vaso"] > 0)).astype(np.int8)
-        + mask[..., FEATURE_INDEX["gcs_proxy"]].astype(np.int8)
-        + (mask[..., FEATURE_INDEX["creatinine"]] | mask[..., FEATURE_INDEX["urine_output"]]).astype(np.int8)
+    return sepsis_sofa_filter(
+        candidates,
+        arrays["values"],
+        arrays["masks"],
+        sofa_index=FEATURE_INDEX["sofa_proxy"],
+        minimum=float(RUNTIME_CONFIG["cohort_parameters"]["sepsis"]["maximum_observed_sofa_min"]),
     )
-    for row in output[output["task_id"].eq("sepsis")].itertuples(index=False):
-        index = int(row.episode_idx); scores = arrays["values"][index, :, FEATURE_INDEX["sofa_proxy"]]; observed = mask[index, :, FEATURE_INDEX["sofa_proxy"]]
-        pre: list[int] = []; post: list[int] = []
-        for bin_index in range(len(scores)):
-            start, end = row.window_start + bin_index * step, row.window_start + (bin_index + 1) * step
-            valid = start >= row.intime and end <= row.outtime and observed[bin_index] and domains[index, bin_index] >= valid_domains
-            if valid and end <= row.base_anchor_time: pre.append(bin_index)
-            elif valid and start >= row.base_anchor_time and end <= row.base_anchor_time + pd.Timedelta(hours=48): post.append(bin_index)
-        if not pre:
-            keep[index] = False; continue
-        baseline = float(np.nanmin(scores[pre])); qualifying = [item for item in post if float(scores[item]) - baseline >= float(sepsis["sofa_increase_min"])]
-        if not qualifying:
-            keep[index] = False; continue
-        organ = min(qualifying); output.loc[output["episode_idx"].eq(index), "anchor_time"] = row.window_start + (organ + 1) * step
-        output.loc[output["episode_idx"].eq(index), "anchor_source"] = "antibiotic_culture_plus_time_bounded_proxy_sofa_increase"
-    return output.loc[keep].copy()
 
 
 def build_transitions(candidates: pd.DataFrame) -> pd.DataFrame:
@@ -854,7 +817,7 @@ def encode_actions(task: str, transitions: pd.DataFrame, arrays: dict[str, np.nd
         left, right = arrays["fluid"][episode, step], arrays["vaso"][episode, step]; lo = ro = np.ones(len(step), bool)
     elif task == "respiratory_support":
         left, lo = arrays["peep"][episode, step], arrays["peep_observed"][episode, step]
-        index = FEATURE_INDEX["fio2"]; right, ro = arrays["values"][episode, step, index], arrays["masks"][episode, step, index]
+        right, ro = arrays["fio2_action"][episode, step], arrays["fio2_action_observed"][episode, step]
     elif task == "aki":
         return (arrays["diuretic"][episode, step] > 0).astype(np.int16) + 2 * (arrays["rrt"][episode, step] > 0).astype(np.int16), {"K": 4, "edges": []}
     elif task == "heart_failure":
@@ -900,6 +863,18 @@ def filter_respiratory_action_transitions(
         "retained_episodes": int(after_episodes),
         "excluded_empty_episodes": int(before_episodes - after_episodes),
     }
+
+
+def filter_target_observed_transitions(
+    transitions: pd.DataFrame,
+    arrays: dict[str, np.ndarray],
+) -> pd.DataFrame:
+    if transitions.empty:
+        return transitions.copy()
+    episode = transitions["episode_idx"].to_numpy(dtype=int)
+    target = transitions["target_idx"].to_numpy(dtype=int)
+    observed = arrays["masks"][episode, target][:, SAFE_FEATURE_INDICES].astype(bool).any(axis=1)
+    return transitions.loc[observed].reset_index(drop=True)
 
 
 def task_aggregate(task: str, candidates: pd.DataFrame, transitions: pd.DataFrame, actions: np.ndarray, arrays: dict[str, np.ndarray]) -> dict[str, Any]:
@@ -1025,6 +1000,7 @@ def reconstruct(
         respiratory_filter: dict[str, int] | None = None
         for task in TASKS:
             local = transitions[transitions["task"].eq(task)].reset_index(drop=True)
+            local = filter_target_observed_transitions(local, arrays)
             if local.empty: raise ContractError(f"no valid transitions for {task}")
             actions, contract = encode_actions(task, local, arrays)
             if task == "respiratory_support":

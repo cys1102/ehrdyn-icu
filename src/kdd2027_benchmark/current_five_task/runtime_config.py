@@ -40,6 +40,20 @@ def load_runtime_config(path: Path | None = None) -> dict[str, Any]:
     expected_tasks = {"sepsis", "respiratory_support", "shock", "aki", "heart_failure"}
     if set(config.get("lineage_router", {})) != expected_tasks:
         raise RuntimeConfigError("lineage router must contain exactly the retained five tasks")
+    expected_sepsis = {
+        "source": "blood_culture_suspected_infection_manifest",
+        "culture_scope": "blood",
+        "maximum_observed_sofa_min": 2,
+        "preserve_suspected_infection_onset": True,
+    }
+    if config.get("cohort_parameters", {}).get("sepsis") != expected_sepsis:
+        raise RuntimeConfigError("sepsis source contract must match the frozen manifest gate")
+    expected_hf = {
+        "prior_diagnosis_required": False,
+        "anchor": "first_current_stay_diuretic_or_vasodilator_event",
+    }
+    if config.get("cohort_parameters", {}).get("heart_failure") != expected_hf:
+        raise RuntimeConfigError("heart-failure source contract must match KDD121")
     if config.get("mimiciv_version") != "3.1":
         raise RuntimeConfigError("only MIMIC-IV 3.1 is supported")
     chunk_rows = config.get("runtime", {}).get("high_volume_chunk_rows")

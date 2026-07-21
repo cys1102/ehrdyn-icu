@@ -89,7 +89,11 @@ class KDD220AR4RespiratoryAndStreamingTests(unittest.TestCase):
                 counter += 1
         transitions = pd.DataFrame(rows)
         original = transitions.copy(deep=True)
-        arrays = {"values": values, "masks": masks, "peep": peep, "peep_observed": peep_observed}
+        arrays = {
+            "values": values, "masks": masks, "peep": peep, "peep_observed": peep_observed,
+            "fio2_action": values[..., FEATURE_INDEX["fio2"]].copy(),
+            "fio2_action_observed": masks[..., FEATURE_INDEX["fio2"]].copy(),
+        }
         actions, contract = encode_actions("respiratory_support", transitions, arrays)
         valid = np.asarray(expected_valid, dtype=bool)
         np.testing.assert_array_equal(contract["valid_action_mask"], valid)
@@ -164,10 +168,10 @@ class KDD220AR4RespiratoryAndStreamingTests(unittest.TestCase):
 
     def test_success_receipt_streaming_schema_and_nonrespiratory_nonregression(self) -> None:
         expected = {
-            "sepsis": (1, 1, 10, "3224ba7456ee7a4b650b0b06ba681c3861a26a530d84ad058012b74848f9ad4a"),
+            "sepsis": (1, 1, 11, "a9d4fbe870e5786c20d41903bd1de443768be5215f32d8d693435b2edcf972a7"),
             "shock": (5, 5, 49, "77b8b92ea7df8d4f9ecf8743e8cbad93b8379b13fc75fa05b8d75659a3080e3e"),
             "aki": (1, 1, 11, "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"),
-            "heart_failure": (1, 1, 10, "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"),
+            "heart_failure": (2, 2, 20, "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"),
         }
         with tempfile.TemporaryDirectory() as directory:
             root = make_fixture(Path(directory))

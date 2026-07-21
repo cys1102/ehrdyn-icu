@@ -1,0 +1,10 @@
+fixture_case,recorded_PEEP,recorded_FiO2,SAFE_FiO2_observed,action_valid,expected_disposition,status
+both_recorded_SAFE_unobserved,8,40,false,true,retain_recorded_action,pass
+PEEP_missing,NA,40,true,false,exclude_transition_not_class0,pass
+FiO2_missing,8,NA,true,false,exclude_transition_not_class0,pass
+both_missing,NA,NA,false,false,exclude_transition_not_class0,pass
+first_transition_missing,NA,NA,false,false,exclude_only_first_transition,pass
+middle_transition_missing,NA,NA,false,false,preserve_neighbor_alignment,pass
+last_transition_missing,NA,NA,false,false,exclude_only_last_transition,pass
+episode_all_missing,NA,NA,false,false,exclude_episode_after_transition_filter,pass
+train_cutpoints,positive_observed_train_only,positive_observed_train_only,NA,NA,validation_not_used,pass
