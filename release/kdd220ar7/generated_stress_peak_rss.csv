@@ -1,0 +1,4 @@
+input_rows,retained_rows,parser_chunk_rows,ar6_peak_rss_kib,ar7_peak_rss_kib,ar7_minus_ar6_kib,canonical_digest_equal,interpretation
+100000,100000,25000,93480,94232,752,true,fixed_spill_overhead_dominates_small_case
+500000,500000,25000,161540,137832,-23708,true,bounded_spill_reduces_retained_frame_copies
+1000000,1000000,25000,243184,200088,-43096,true,declared_stress_acceptance_pass

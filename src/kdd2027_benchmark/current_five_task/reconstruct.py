@@ -9,8 +9,11 @@ import math
 import os
 import re
 import resource
+import shutil
+import tempfile
 import time
 from collections import deque
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -100,6 +103,189 @@ HIGH_VOLUME_TABLE_ORDER = (
 )
 HIGH_VOLUME_TABLES = frozenset(HIGH_VOLUME_TABLE_ORDER)
 DEFAULT_CHUNK_ROWS = int(RUNTIME_CONFIG["runtime"]["high_volume_chunk_rows"])
+
+
+def _current_rss_kib() -> int:
+    try:
+        pages = int(Path("/proc/self/statm").read_text(encoding="utf-8").split()[1])
+        return pages * int(os.sysconf("SC_PAGE_SIZE")) // 1024
+    except (OSError, ValueError, IndexError):
+        return int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+
+
+def _directory_bytes(root: Path | None) -> int:
+    if root is None or not root.exists():
+        return 0
+    return sum(path.stat().st_size for path in root.rglob("*") if path.is_file())
+
+
+class _StageResourceAudit:
+    def __init__(self, temporary_directory: Path | None) -> None:
+        self.temporary_directory = temporary_directory
+        self.rows: list[dict[str, int | float | str]] = []
+        self.temporary_disk_high_water_bytes = _directory_bytes(temporary_directory)
+
+    def observe_temporary_disk(self) -> int:
+        observed = _directory_bytes(self.temporary_directory)
+        self.temporary_disk_high_water_bytes = max(
+            self.temporary_disk_high_water_bytes, observed
+        )
+        return observed
+
+    @contextmanager
+    def stage(self, name: str, *, chunk_size: int = 0) -> Any:
+        started = time.perf_counter()
+        entry_rss = _current_rss_kib()
+        entry_disk = _directory_bytes(self.temporary_directory)
+        counters: dict[str, int] = {"rows_read": 0, "rows_retained": 0}
+        try:
+            yield counters
+        finally:
+            exit_rss = _current_rss_kib()
+            exit_disk = _directory_bytes(self.temporary_directory)
+            self.rows.append({
+                "stage": name,
+                "elapsed_seconds": round(max(0.0, time.perf_counter() - started), 6),
+                "rows_read": int(counters["rows_read"]),
+                "rows_retained": int(counters["rows_retained"]),
+                "chunk_size": int(chunk_size),
+                "temporary_disk_high_water_bytes": int(max(entry_disk, exit_disk)),
+                "rss_entry_kib": int(entry_rss),
+                "rss_exit_kib": int(exit_rss),
+                "peak_rss_kib": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss),
+            })
+
+    def begin(self) -> tuple[float, int, int, int]:
+        disk = self.observe_temporary_disk()
+        return time.perf_counter(), _current_rss_kib(), disk, self.temporary_disk_high_water_bytes
+
+    def finish(
+        self,
+        name: str,
+        token: tuple[float, int, int, int],
+        *,
+        rows_read: int = 0,
+        rows_retained: int = 0,
+        chunk_size: int = 0,
+    ) -> None:
+        started, entry_rss, entry_disk, prior_global_high_water = token
+        exit_rss = _current_rss_kib()
+        exit_disk = self.observe_temporary_disk()
+        stage_high_water = max(entry_disk, exit_disk)
+        if self.temporary_disk_high_water_bytes > prior_global_high_water:
+            stage_high_water = max(stage_high_water, self.temporary_disk_high_water_bytes)
+        self.rows.append({
+            "stage": name,
+            "elapsed_seconds": round(max(0.0, time.perf_counter() - started), 6),
+            "rows_read": int(rows_read),
+            "rows_retained": int(rows_retained),
+            "chunk_size": int(chunk_size),
+            "temporary_disk_high_water_bytes": int(stage_high_water),
+            "rss_entry_kib": int(entry_rss),
+            "rss_exit_kib": int(exit_rss),
+            "peak_rss_kib": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss),
+        })
+
+
+_ACTIVE_TEMPORARY_DIRECTORY: Path | None = None
+_ACTIVE_STAGE_AUDIT: _StageResourceAudit | None = None
+
+
+def _working_array(
+    label: str,
+    shape: tuple[int, ...],
+    dtype: np.dtype[Any] | type[Any],
+    fill: int | float | bool,
+) -> np.ndarray:
+    if _ACTIVE_TEMPORARY_DIRECTORY is None:
+        return np.full(shape, fill, dtype=dtype)
+    safe = re.sub(r"[^a-zA-Z0-9_.-]+", "-", label)
+    path = _ACTIVE_TEMPORARY_DIRECTORY / f"work-{safe}-{time.monotonic_ns()}.bin"
+    array = np.memmap(path, mode="w+", dtype=dtype, shape=shape)
+    array[...] = fill
+    if _ACTIVE_STAGE_AUDIT is not None:
+        _ACTIVE_STAGE_AUDIT.observe_temporary_disk()
+    return array
+
+
+def _release_working_arrays(arrays: Iterable[np.ndarray]) -> None:
+    for array in arrays:
+        if isinstance(array, np.memmap):
+            path = Path(str(array.filename))
+            array.flush()
+            array._mmap.close()
+            path.unlink(missing_ok=True)
+
+
+class _PartitionStore:
+    """Private chunk spill with one bounded frame and no retained-frame list."""
+
+    def __init__(self, root: Path, name: str) -> None:
+        self.root = root / name
+        self.root.mkdir(parents=True, exist_ok=False, mode=0o700)
+        self.paths: list[Path] = []
+        self.rows = 0
+
+    def append(self, frame: pd.DataFrame) -> None:
+        path = self.root / f"part-{len(self.paths):08d}.pkl"
+        frame.to_pickle(path)
+        os.chmod(path, 0o600)
+        self.paths.append(path)
+        self.rows += len(frame)
+        if _ACTIVE_STAGE_AUDIT is not None:
+            _ACTIVE_STAGE_AUDIT.observe_temporary_disk()
+
+    def materialize(self, columns: list[str], sort_by: tuple[str, ...]) -> pd.DataFrame:
+        if not self.paths:
+            return pd.DataFrame(columns=columns)
+        first = pd.read_pickle(self.paths[0])
+        arrays: dict[str, np.ndarray] = {}
+        for column in first.columns:
+            dtype = first[column].to_numpy().dtype
+            if dtype.hasobject:
+                arrays[column] = np.empty(self.rows, dtype=object)
+            else:
+                path = self.root / f"column-{column}.bin"
+                arrays[column] = np.memmap(path, mode="w+", dtype=dtype, shape=(self.rows,))
+        if _ACTIVE_STAGE_AUDIT is not None:
+            _ACTIVE_STAGE_AUDIT.observe_temporary_disk()
+        offset = 0
+        for path in self.paths:
+            frame = pd.read_pickle(path)
+            end = offset + len(frame)
+            for column, target in arrays.items():
+                target[offset:end] = frame[column].to_numpy(copy=False)
+            offset = end
+            del frame
+        if offset != self.rows:
+            raise ContractError("partition row-count mismatch")
+        if sort_by:
+            order_columns = [*sort_by, "__source_order"]
+            key_frame = pd.DataFrame(
+                {column: pd.Series(arrays[column], copy=False) for column in order_columns},
+                copy=False,
+            )
+            order = key_frame.sort_values(
+                order_columns, kind="stable", na_position="last"
+            ).index.to_numpy(np.int64, copy=False)
+            del key_frame
+            if not np.array_equal(order, np.arange(self.rows)):
+                for column, source in list(arrays.items()):
+                    if source.dtype.hasobject:
+                        arrays[column] = source[order]
+                    else:
+                        destination = np.memmap(
+                            self.root / f"sorted-{column}.bin",
+                            mode="w+", dtype=source.dtype, shape=source.shape,
+                        )
+                        np.take(source, order, out=destination)
+                        arrays[column] = destination
+                if _ACTIVE_STAGE_AUDIT is not None:
+                    _ACTIVE_STAGE_AUDIT.observe_temporary_disk()
+        return pd.DataFrame({column: pd.Series(values, copy=False) for column, values in arrays.items()}, copy=False)
+
+    def cleanup(self) -> None:
+        shutil.rmtree(self.root, ignore_errors=True)
 
 
 def _streaming_rows(
@@ -204,7 +390,19 @@ def _stream_events(
         if stream_row["effective_chunk_size"] != int(chunk_rows) or stream_row["compression_encoding"] != encoding:
             raise ContractError(f"streaming contract drift for {table}")
         stream_row["scan_count"] = int(stream_row["scan_count"]) + 1
-    selected_frames: list[pd.DataFrame] = []
+    owned_temporary: tempfile.TemporaryDirectory[str] | None = None
+    temporary_root = _ACTIVE_TEMPORARY_DIRECTORY
+    if temporary_root is None:
+        owned_temporary = tempfile.TemporaryDirectory(prefix="ehrdyn-stream-")
+        temporary_root = Path(owned_temporary.name)
+    scan_number = int(stream_row["scan_count"]) if stream_row is not None else 1
+    store = _PartitionStore(
+        temporary_root,
+        f"{table.replace('/', '-')}-scan-{scan_number:04d}-{time.monotonic_ns()}",
+    )
+    stage_name = f"high_volume_scan:{table}:scan_{scan_number}"
+    stage_token = _ACTIVE_STAGE_AUDIT.begin() if _ACTIVE_STAGE_AUDIT is not None else None
+    stage_finished = False
     source_offset = 0
     chunks: Any | None = None
     source: Any | None = None
@@ -268,24 +466,45 @@ def _stream_events(
                         stream_row["maximum_retained_rows_per_chunk"] = max(
                             int(stream_row["maximum_retained_rows_per_chunk"]), len(chunk)
                         )
-                    selected_frames.append(chunk)
+                    store.append(chunk)
         finally:
             chunks.close()
             source.close()
-    except (UnicodeDecodeError, ValueError, OSError) as exc:
+    except Exception as exc:
+        if _ACTIVE_STAGE_AUDIT is not None and stage_token is not None:
+            _ACTIVE_STAGE_AUDIT.finish(
+                stage_name, stage_token,
+                rows_read=int(stream_row["rows_read"]) if stream_row is not None else source_offset,
+                rows_retained=int(stream_row["rows_retained"]) if stream_row is not None else store.rows,
+                chunk_size=chunk_rows,
+            )
+            stage_finished = True
+        if owned_temporary is not None:
+            owned_temporary.cleanup()
         if isinstance(exc, ContractError):
             raise
-        raise ContractError(f"unsupported or malformed high-volume source: {table}") from exc
+        if isinstance(exc, (UnicodeDecodeError, ValueError, OSError)):
+            raise ContractError(f"unsupported or malformed high-volume source: {table}") from exc
+        raise
     output_columns = list(columns) + ["__source_order"]
     if bounds is not None:
         output_columns += [column for column in bounds.columns if column != key]
-    if not selected_frames:
-        return pd.DataFrame(columns=list(dict.fromkeys(output_columns)))
-    output = pd.concat(selected_frames, ignore_index=True)
-    order = [column for column in sort_by if column in output] + ["__source_order"]
-    if order:
-        output = output.sort_values(order, kind="stable")
-    return output.reset_index(drop=True)
+    output_columns = list(dict.fromkeys(output_columns))
+    if not store.paths:
+        output = pd.DataFrame(columns=output_columns)
+    else:
+        order = tuple(column for column in sort_by if column in output_columns)
+        output = store.materialize(output_columns, order).reset_index(drop=True)
+    if _ACTIVE_STAGE_AUDIT is not None and stage_token is not None and not stage_finished:
+        _ACTIVE_STAGE_AUDIT.finish(
+            stage_name, stage_token,
+            rows_read=int(stream_row["rows_read"]) if stream_row is not None else source_offset,
+            rows_retained=int(stream_row["rows_retained"]) if stream_row is not None else store.rows,
+            chunk_size=chunk_rows,
+        )
+    if owned_temporary is not None:
+        owned_temporary.cleanup()
+    return output
 
 
 def scan_creatinine(
@@ -1082,25 +1301,27 @@ def _array_digest(values: np.ndarray) -> str:
 def _full_past_only_arrays(
     arrays: dict[str, np.ndarray], candidates: pd.DataFrame,
 ) -> tuple[np.ndarray, np.ndarray]:
-    values = arrays["values"][:, :, SAFE_FEATURE_INDICES].astype(np.float32).copy()
-    masks = arrays["masks"][:, :, SAFE_FEATURE_INDICES].astype(bool)
-    filled = np.full_like(values, np.nan)
-    recency = np.ones_like(values, dtype=np.float32)
+    safe_count = len(SAFE_FEATURE_INDICES)
+    shape = (arrays["values"].shape[0], arrays["values"].shape[1], safe_count)
+    filled = _working_array("past-filled", shape, np.float32, np.nan)
+    recency = _working_array("past-recency", shape, np.float32, 1.0)
     candidate = candidates.set_index("episode_idx")
     bin_step = pd.Timedelta(hours=BIN_HOURS)
-    for episode in range(values.shape[0]):
+    for episode in range(shape[0]):
         if episode not in candidate.index:
             continue
         row = candidate.loc[episode]
-        last = np.full(values.shape[2], np.nan, dtype=np.float32)
-        since = np.full(values.shape[2], 6, dtype=np.int16)
-        for index in range(values.shape[1]):
+        episode_values = arrays["values"][episode][:, SAFE_FEATURE_INDICES].astype(np.float32, copy=False)
+        episode_masks = arrays["masks"][episode][:, SAFE_FEATURE_INDICES].astype(bool, copy=False)
+        last = np.full(safe_count, np.nan, dtype=np.float32)
+        since = np.full(safe_count, 6, dtype=np.int16)
+        for index in range(shape[1]):
             bin_start = row.window_start + index * bin_step
             if not (bin_start >= row.intime and (bin_start + bin_step) <= row.outtime):
                 continue
-            observed = masks[episode, index] & np.isfinite(values[episode, index])
+            observed = episode_masks[index] & np.isfinite(episode_values[index])
             since = np.minimum(since + 1, 6)
-            last[observed] = values[episode, index, observed]
+            last[observed] = episode_values[index, observed]
             since[observed] = 0
             filled[episode, index] = last
             recency[episode, index] = since.astype(np.float32) / 6.0
@@ -1122,34 +1343,44 @@ def _role_surface(
     select = np.ones(len(transitions), dtype=bool) if role == "all_roles" else transitions["role"].eq(role).to_numpy(bool)
     local_transitions = transitions.loc[select].reset_index(drop=True)
     local_actions = np.asarray(actions)[select]
-    episode_ids = local_transitions["episode_idx"].drop_duplicates().to_numpy(int)
+    episode_vector = local_transitions["episode_idx"].to_numpy(int)
+    if len(episode_vector):
+        starts = np.r_[0, np.flatnonzero(episode_vector[1:] != episode_vector[:-1]) + 1]
+        ends = np.r_[starts[1:], len(episode_vector)]
+        episode_ids = episode_vector[starts]
+        if len(np.unique(episode_ids)) != len(episode_ids):
+            raise ContractError("episode transitions are not contiguous in canonical order")
+    else:
+        starts = ends = episode_ids = np.empty(0, dtype=int)
     local_candidates = candidates[candidates["episode_idx"].isin(episode_ids)]
     count = {"sepsis": 25, "respiratory_support": 25, "shock": 25, "aki": 4, "heart_failure": 2}[task]
     action_counts = np.bincount(local_actions, minlength=count).astype(int) if len(local_actions) else np.zeros(count, dtype=int)
-    lengths = local_transitions.groupby("episode_idx", observed=True).size().to_numpy(int)
-    groups = list(local_transitions.groupby("episode_idx", sort=False, observed=True))
-    max_steps = max((len(group) for _, group in groups), default=0)
-    shape = (len(groups), max_steps, len(SAFE_FEATURE_INDICES))
-    state_values = np.full(shape, np.nan, dtype=np.float32)
-    state_masks = np.zeros(shape, dtype=bool)
-    recency = np.zeros(shape, dtype=np.float32)
-    raw_imputed = np.full(shape, np.nan, dtype=np.float32)
-    normalized = np.zeros(shape, dtype=np.float32)
-    target_values = np.full(shape, np.nan, dtype=np.float32)
-    target_masks = np.zeros(shape, dtype=bool)
-    padded_actions = np.full((len(groups), max_steps), -1, dtype=np.int16)
-    valid = np.zeros((len(groups), max_steps), dtype=bool)
-    terminal = np.zeros((len(groups), max_steps), dtype=bool)
-    order = np.full((len(groups), max_steps), -1, dtype=np.int16)
-    reward = np.zeros((len(groups), max_steps, 1), dtype=np.float32)
-    reward_mask = np.zeros_like(reward, dtype=bool)
+    lengths = (ends - starts).astype(int)
+    max_steps = int(lengths.max()) if len(lengths) else 0
+    shape = (len(episode_ids), max_steps, len(SAFE_FEATURE_INDICES))
+    prefix = f"{task}-{role}"
+    state_values = _working_array(f"{prefix}-state-values", shape, np.float32, np.nan)
+    state_masks = _working_array(f"{prefix}-state-masks", shape, bool, False)
+    recency = _working_array(f"{prefix}-recency", shape, np.float32, 0.0)
+    raw_imputed = _working_array(f"{prefix}-raw-imputed", shape, np.float32, np.nan)
+    normalized = _working_array(f"{prefix}-normalized", shape, np.float32, 0.0)
+    target_values = _working_array(f"{prefix}-target-values", shape, np.float32, np.nan)
+    target_masks = _working_array(f"{prefix}-target-masks", shape, bool, False)
+    padded_actions = _working_array(f"{prefix}-actions", (len(episode_ids), max_steps), np.int16, -1)
+    valid = _working_array(f"{prefix}-valid", (len(episode_ids), max_steps), bool, False)
+    terminal = _working_array(f"{prefix}-terminal", (len(episode_ids), max_steps), bool, False)
+    order = _working_array(f"{prefix}-order", (len(episode_ids), max_steps), np.int16, -1)
+    reward = _working_array(f"{prefix}-reward", (len(episode_ids), max_steps, 1), np.float32, 0.0)
+    reward_mask = _working_array(f"{prefix}-reward-mask", (len(episode_ids), max_steps, 1), bool, False)
     candidate_index = candidates.set_index("episode_idx")
-    for row_index, (episode_id, group) in enumerate(groups):
-        group = group.reset_index()
-        length = len(group)
-        episode = group["episode_idx"].to_numpy(int)
-        state = group["state_idx"].to_numpy(int)
-        target = group["target_idx"].to_numpy(int)
+    state_vector = local_transitions["state_idx"].to_numpy(int)
+    target_vector = local_transitions["target_idx"].to_numpy(int)
+    relative_vector = local_transitions["relative_transition"].to_numpy(np.int16)
+    for row_index, (episode_id, start, end) in enumerate(zip(episode_ids, starts, ends)):
+        length = int(end - start)
+        episode = episode_vector[start:end]
+        state = state_vector[start:end]
+        target = target_vector[start:end]
         state_values[row_index, :length] = arrays["values"][episode, state][:, SAFE_FEATURE_INDICES]
         state_masks[row_index, :length] = arrays["masks"][episode, state][:, SAFE_FEATURE_INDICES]
         target_values[row_index, :length] = arrays["values"][episode, target][:, SAFE_FEATURE_INDICES]
@@ -1159,10 +1390,10 @@ def _role_surface(
         local_imputed = np.where(np.isfinite(local_imputed), local_imputed, train_mean)
         recency[row_index, :length] = np.nan_to_num(full_recency[episode, state], nan=18.0, posinf=18.0, neginf=0.0)
         normalized[row_index, :length] = np.nan_to_num((local_imputed - train_mean) / train_scale, nan=0.0, posinf=0.0, neginf=0.0)
-        padded_actions[row_index, :length] = local_actions[group["index"].to_numpy(int)]
+        padded_actions[row_index, :length] = local_actions[start:end]
         valid[row_index, :length] = True
         terminal[row_index, length - 1] = True
-        order[row_index, :length] = group["relative_transition"].to_numpy(np.int16)
+        order[row_index, :length] = relative_vector[start:end]
         if task in {"sepsis", "aki", "heart_failure"}:
             reward[row_index, length - 1, 0] = -1.0 if float(candidate_index.loc[int(episode_id), "mortality_90d"]) > 0.5 else 1.0
             reward_mask[row_index, length - 1, 0] = True
@@ -1177,9 +1408,10 @@ def _role_surface(
             reward[row_index, :length, 0] = np.where((target_values[row_index, :length, s] >= 94) & (target_values[row_index, :length, s] <= 98), 1.0, -0.5)
             reward[row_index, :length, 0] += np.where((target_values[row_index, :length, m] >= 70) & (target_values[row_index, :length, m] <= 80), 1.0, -0.5)
     reward[~reward_mask] = 0.0
-    continuation = valid & ~terminal
+    continuation = _working_array(f"{prefix}-continuation", valid.shape, bool, False)
+    continuation[...] = valid & ~terminal
     transition_order = local_transitions[["relative_transition", "state_idx", "action_idx", "target_idx"]].to_numpy(np.int16) if len(local_transitions) else np.empty((0, 4), np.int16)
-    return {
+    result = {
         "role": role,
         "subjects": int(local_candidates["subject_id"].nunique()),
         "episodes": int(len(episode_ids)),
@@ -1200,6 +1432,12 @@ def _role_surface(
             "transition_order_digest": _array_digest(transition_order),
         },
     }
+    _release_working_arrays((
+        state_values, state_masks, recency, raw_imputed, normalized,
+        target_values, target_masks, padded_actions, valid, terminal,
+        order, reward, reward_mask, continuation,
+    ))
+    return result
 
 
 def task_aggregate(task: str, candidates: pd.DataFrame, transitions: pd.DataFrame, actions: np.ndarray, arrays: dict[str, np.ndarray]) -> dict[str, Any]:
@@ -1236,14 +1474,20 @@ def task_aggregate(task: str, candidates: pd.DataFrame, transitions: pd.DataFram
         _role_surface(task, role, candidates, transitions, actions, arrays, train_mean, train_scale, filled, full_recency)
         for role in (*ROLE_ORDER, "all_roles")
     ]
-    return {"subjects": int(local["subject_id"].nunique()), "episodes": int(len(episode_ids)), "decisions": int(len(transitions)), "action_counts": counts.astype(int).tolist(), "minimum_horizon": int(lengths.min()) if len(lengths) else 0, "maximum_horizon": int(lengths.max()) if len(lengths) else 0, "reward_contract": reward_contract, "reward_observed_decisions": reward_observed, "terminal_reward_count": terminal_rewards, "role_summaries": role_summaries}
+    result = {"subjects": int(local["subject_id"].nunique()), "episodes": int(len(episode_ids)), "decisions": int(len(transitions)), "action_counts": counts.astype(int).tolist(), "minimum_horizon": int(lengths.min()) if len(lengths) else 0, "maximum_horizon": int(lengths.max()) if len(lengths) else 0, "reward_contract": reward_contract, "reward_observed_decisions": reward_observed, "terminal_reward_count": terminal_rewards, "role_summaries": role_summaries}
+    _release_working_arrays((filled, full_recency))
+    return result
 
 
 def _runtime_resource_payload(started: float) -> dict[str, int | float]:
+    temporary_disk_bytes = (
+        _ACTIVE_STAGE_AUDIT.temporary_disk_high_water_bytes
+        if _ACTIVE_STAGE_AUDIT is not None else 0
+    )
     return {
         "wall_seconds": round(max(0.0, time.perf_counter() - started), 6),
         "maximum_resident_set_size_kib": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss),
-        "temporary_disk_bytes": 0,
+        "temporary_disk_bytes": int(temporary_disk_bytes),
     }
 
 
@@ -1266,12 +1510,39 @@ def _write_runtime_resource(output: Path, started: float, status: str) -> None:
     )
 
 
+def _write_stage_resource_instrumentation(
+    output: Path,
+    rows: list[dict[str, int | float | str]],
+    status: str,
+    schema_directory: Path,
+) -> None:
+    payload = {
+        "schema_version": "1.0.0",
+        "status": status,
+        "stages": rows,
+        "privacy": {
+            "aggregate_only": True,
+            "row_level_fields_exported": False,
+            "private_paths_exported": False,
+        },
+    }
+    schema_path = schema_directory / "stage_resource_instrumentation.schema.json"
+    schema_object = json.loads(schema_path.read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema_object)
+    Draft202012Validator(schema_object).validate(payload)
+    (output / "stage_resource_instrumentation_aggregate.json").write_text(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+
+
 def _write_controlled_stop(
     output: Path,
     started: float,
     rows: list[dict[str, int | str]],
     error: BaseException,
     schema_directory: Path,
+    stage_rows: list[dict[str, int | float | str]],
 ) -> None:
     if isinstance(error, ContractError):
         failure_code = "contract_error"
@@ -1302,6 +1573,9 @@ def _write_controlled_stop(
     )
     _write_streaming_instrumentation(output, rows)
     _write_runtime_resource(output, started, "controlled_stop")
+    _write_stage_resource_instrumentation(
+        output, stage_rows, "controlled_stop", schema_directory
+    )
 
 
 def reconstruct(
@@ -1313,6 +1587,8 @@ def reconstruct(
     runtime_config: Path | None = None,
     chunk_rows: int | None = None,
 ) -> dict[str, Any]:
+    global _ACTIVE_STAGE_AUDIT, _ACTIVE_TEMPORARY_DIRECTORY
+
     from .runtime_config import load_runtime_config
 
     config = load_runtime_config(runtime_config)
@@ -1320,93 +1596,152 @@ def reconstruct(
     if effective_chunk_rows <= 0:
         raise ContractError("chunk_rows must be positive")
     if output.exists(): raise FileExistsError(output)
+    output.parent.mkdir(parents=True, exist_ok=True)
     started = time.perf_counter()
     paths: dict[str, Path] | None = None
     streaming_audit: dict[str, dict[str, int | str]] = {}
+    temporary = tempfile.TemporaryDirectory(prefix=".kdd220ar7-", dir=output.parent)
+    temporary_directory = Path(temporary.name)
+    os.chmod(temporary_directory, 0o700)
+    stage_audit = _StageResourceAudit(temporary_directory)
+    _ACTIVE_TEMPORARY_DIRECTORY = temporary_directory
+    _ACTIVE_STAGE_AUDIT = stage_audit
+    run_binding = {
+        "release": RELEASE,
+        "runtime_config_sha256": hashlib.sha256(
+            json.dumps(config, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest(),
+        "aggregate_schema_sha256": hashlib.sha256(schema.read_bytes()).hexdigest(),
+        "chunk_rows": effective_chunk_rows,
+    }
+    binding_path = temporary_directory / "frozen-run-binding.json"
+    binding_path.write_text(
+        json.dumps(run_binding, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    os.chmod(binding_path, 0o600)
+    stage_audit.observe_temporary_disk()
     try:
-        paths = validate_layout(root)
         ingestion_audit: dict[tuple[str, str, str], int] = {}
-        stays, diagnoses, time_audit = load_core_with_time_audit(paths, ingestion_audit)
-        candidates = build_anchors(
-            paths, stays, diagnoses, chunk_rows=effective_chunk_rows,
-            audit=ingestion_audit, streaming_audit=streaming_audit,
-        )
-        arrays = build_arrays(
-            paths, candidates, chunk_rows=effective_chunk_rows,
-            audit=ingestion_audit, streaming_audit=streaming_audit,
-        )
-        candidates = finalize_sepsis_anchors(candidates, arrays)
+        with stage_audit.stage("core_loading", chunk_size=effective_chunk_rows) as counters:
+            paths = validate_layout(root)
+            stays, diagnoses, time_audit = load_core_with_time_audit(paths, ingestion_audit)
+            counters["rows_read"] = int(time_audit["total_merged_icu_stays_considered"])
+            counters["rows_retained"] = int(len(stays))
+        with stage_audit.stage("anchor_construction", chunk_size=effective_chunk_rows) as counters:
+            candidates = build_anchors(
+                paths, stays, diagnoses, chunk_rows=effective_chunk_rows,
+                audit=ingestion_audit, streaming_audit=streaming_audit,
+            )
+            counters["rows_read"] = int(len(stays))
+            counters["rows_retained"] = int(len(candidates))
+        with stage_audit.stage("array_construction", chunk_size=effective_chunk_rows) as counters:
+            arrays = build_arrays(
+                paths, candidates, chunk_rows=effective_chunk_rows,
+                audit=ingestion_audit, streaming_audit=streaming_audit,
+            )
+            counters["rows_read"] = int(len(candidates))
+            counters["rows_retained"] = int(np.asarray(arrays["masks"]).sum())
+        with stage_audit.stage("sepsis_anchor_finalization") as counters:
+            before = len(candidates)
+            candidates = finalize_sepsis_anchors(candidates, arrays)
+            counters["rows_read"] = int(before)
+            counters["rows_retained"] = int(len(candidates))
         rows: dict[str, dict[str, Any]] = {}
         respiratory_filter: dict[str, int] | None = None
         for task in TASKS:
-            local, actions, contract, stages = frozen_action_and_membership_pipeline(
-                task, candidates, arrays
-            )
-            if task == "respiratory_support":
-                respiratory_filter = {
-                    "candidate_transitions": stages["candidate_transitions"],
-                    "retained_transitions": stages["final_transitions"],
-                    "excluded_missing_action_transitions": stages["missing_action_exclusions"],
-                    "candidate_episodes": int(build_transitions(candidates)[lambda x: x["task"].eq(task)]["episode_idx"].nunique()),
-                    "retained_episodes": int(local["episode_idx"].nunique()),
-                    "excluded_empty_episodes": int(build_transitions(candidates)[lambda x: x["task"].eq(task)]["episode_idx"].nunique() - local["episode_idx"].nunique()),
-                }
-            row = task_aggregate(task, candidates, local, actions, arrays)
-            row["action_count"] = contract["K"]
-            train_actions = actions[local["role"].eq("train").to_numpy(bool)]
-            train_support = np.bincount(train_actions, minlength=contract["K"]) > 0
-            row["support_mask_digest"] = _array_digest(train_support)
-            row["transition_stages"] = stages
-            row["cutpoints"] = [list(edge) for edge in contract["edges"]]
-            row["cutpoint_hash"] = hashlib.sha256(
-                json.dumps(contract["edges"], sort_keys=True).encode()
-            ).hexdigest()
-            rows[task] = row
+            with stage_audit.stage(f"task_aggregation:{task}") as counters:
+                task_candidates = candidates["task_id"].eq(task)
+                counters["rows_read"] = int(task_candidates.sum())
+                local, actions, contract, stages = frozen_action_and_membership_pipeline(
+                    task, candidates, arrays
+                )
+                if task == "respiratory_support":
+                    task_transitions = build_transitions(candidates)
+                    task_transitions = task_transitions[task_transitions["task"].eq(task)]
+                    candidate_episode_count = int(task_transitions["episode_idx"].nunique())
+                    respiratory_filter = {
+                        "candidate_transitions": stages["candidate_transitions"],
+                        "retained_transitions": stages["final_transitions"],
+                        "excluded_missing_action_transitions": stages["missing_action_exclusions"],
+                        "candidate_episodes": candidate_episode_count,
+                        "retained_episodes": int(local["episode_idx"].nunique()),
+                        "excluded_empty_episodes": int(candidate_episode_count - local["episode_idx"].nunique()),
+                    }
+                    del task_transitions
+                row = task_aggregate(task, candidates, local, actions, arrays)
+                row["action_count"] = contract["K"]
+                train_actions = actions[local["role"].eq("train").to_numpy(bool)]
+                train_support = np.bincount(train_actions, minlength=contract["K"]) > 0
+                row["support_mask_digest"] = _array_digest(train_support)
+                row["transition_stages"] = stages
+                row["cutpoints"] = [list(edge) for edge in contract["edges"]]
+                row["cutpoint_hash"] = hashlib.sha256(
+                    json.dumps(contract["edges"], sort_keys=True).encode()
+                ).hexdigest()
+                rows[task] = row
+                counters["rows_retained"] = int(len(local))
+                del local, actions, train_actions, train_support, row
         if respiratory_filter is None:
             raise ContractError("respiratory action filter did not execute")
         streaming_rows = _streaming_rows(streaming_audit, chunk_rows=effective_chunk_rows, paths=paths)
         receipt = aggregate_receipt(rows, source_hashes or {}, streaming_rows)
-        schema_object = json.loads(schema.read_text(encoding="utf-8"))
-        Draft202012Validator.check_schema(schema_object)
-        Draft202012Validator(schema_object).validate(receipt)
+        with stage_audit.stage("schema_validation") as counters:
+            schema_object = json.loads(schema.read_text(encoding="utf-8"))
+            Draft202012Validator.check_schema(schema_object)
+            Draft202012Validator(schema_object).validate(receipt)
+            counters["rows_read"] = int(len(rows))
+            counters["rows_retained"] = int(len(rows))
         output.mkdir(parents=True)
-        write_canonical_json(output / "aggregate_receipt.json", receipt)
-        with (output / "icu_time_order_eligibility_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
-            writer = csv.DictWriter(handle, fieldnames=("category", "count", "precedence"), lineterminator="\n")
-            writer.writeheader()
-            precedence = {
-                "total_merged_icu_stays_considered": "denominator",
-                "valid_time_order_stays": "after_all_invalid_categories",
-                "missing_intime": "first",
-                "missing_outtime": "second_only_when_intime_present",
-                "equal_intime_outtime": "third_only_when_both_present",
-                "reversed_time_order": "fourth_only_when_both_present",
-                "retained_after_existing_public_base_eligibility": "after_time_filter_and_unchanged_existing_base_filters",
-            }
-            writer.writerows({"category": key, "count": value, "precedence": precedence[key]} for key, value in time_audit.items())
-        with (output / "nullable_key_and_timestamp_exclusion_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
-            writer = csv.DictWriter(handle, fieldnames=("table", "field", "reason", "excluded_count"), lineterminator="\n")
-            writer.writeheader()
-            writer.writerows(
-                {"table": table, "field": field, "reason": reason, "excluded_count": count}
-                for (table, field, reason), count in sorted(ingestion_audit.items())
-            )
-        with (output / "respiratory_action_filter_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
-            writer = csv.DictWriter(handle, fieldnames=tuple(respiratory_filter), lineterminator="\n")
-            writer.writeheader()
-            writer.writerow(respiratory_filter)
-        _write_streaming_instrumentation(output, streaming_rows)
-        _write_runtime_resource(output, started, "complete")
+        with stage_audit.stage("receipt_writing") as counters:
+            write_canonical_json(output / "aggregate_receipt.json", receipt)
+            with (output / "icu_time_order_eligibility_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=("category", "count", "precedence"), lineterminator="\n")
+                writer.writeheader()
+                precedence = {
+                    "total_merged_icu_stays_considered": "denominator",
+                    "valid_time_order_stays": "after_all_invalid_categories",
+                    "missing_intime": "first",
+                    "missing_outtime": "second_only_when_intime_present",
+                    "equal_intime_outtime": "third_only_when_both_present",
+                    "reversed_time_order": "fourth_only_when_both_present",
+                    "retained_after_existing_public_base_eligibility": "after_time_filter_and_unchanged_existing_base_filters",
+                }
+                writer.writerows({"category": key, "count": value, "precedence": precedence[key]} for key, value in time_audit.items())
+            with (output / "nullable_key_and_timestamp_exclusion_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=("table", "field", "reason", "excluded_count"), lineterminator="\n")
+                writer.writeheader()
+                writer.writerows(
+                    {"table": table, "field": field, "reason": reason, "excluded_count": count}
+                    for (table, field, reason), count in sorted(ingestion_audit.items())
+                )
+            with (output / "respiratory_action_filter_aggregate.csv").open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=tuple(respiratory_filter), lineterminator="\n")
+                writer.writeheader()
+                writer.writerow(respiratory_filter)
+            _write_streaming_instrumentation(output, streaming_rows)
+            _write_runtime_resource(output, started, "complete")
+            counters["rows_read"] = 1
+            counters["rows_retained"] = 1
+        _write_stage_resource_instrumentation(
+            output, stage_audit.rows, "complete", schema.parent
+        )
         return receipt
     except Exception as error:
         streaming_rows = _streaming_rows(
             streaming_audit, chunk_rows=effective_chunk_rows, paths=paths
         )
         try:
-            _write_controlled_stop(output, started, streaming_rows, error, schema.parent)
+            _write_controlled_stop(
+                output, started, streaming_rows, error, schema.parent, stage_audit.rows
+            )
         except Exception as receipt_error:
             raise ContractError("controlled stop receipt failure") from receipt_error
         raise
+    finally:
+        _ACTIVE_STAGE_AUDIT = None
+        _ACTIVE_TEMPORARY_DIRECTORY = None
+        temporary.cleanup()
 
 
 def main() -> None:

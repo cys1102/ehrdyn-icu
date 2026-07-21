@@ -1,0 +1,16 @@
+gate,command_or_contract,observed,status
+focused_ar7,.venv/bin/python_-m_unittest_tests.test_kdd220ar7,5_of_5_pass,pass
+preserved_ar6,.venv/bin/python_-m_unittest_tests.test_kdd220ar6,7_of_7_pass,pass
+full_public_suite,.venv/bin/python_-m_unittest_discover_-s_tests,119_of_119_pass,pass
+python_compile,.venv/bin/python_-m_compileall_-q_src_scripts_tests,pass,pass
+released_schema_positive,ehrdyn-icu_validate-schemas,7_of_7_Draft_2020_12,pass
+stage_schema_negative,unknown_patient_id_field,rejected_additionalProperties,pass
+checksum,ehrdyn-icu_verify-checksums,manifest_exact,pass
+privacy,ehrdyn-icu_scan-release,zero_findings,pass
+hidden_path,restricted_path_and_secret_scan,zero_findings,pass
+diff_hygiene,git_diff_--check,pass,pass
+clean_install,uv_sync_--frozen_--extra_credentialed_--python_3.11,pass,pass
+clean_clone_cli,documented_reconstruction_module_on_synthetic_fixture,five_tasks_24_resource_stages_zero_temporary_workspaces,pass
+clean_clone_ar6_parity_fixture,focused_test_with_frozen_fixture_source_identity,scientific_hash_f412a1c03d2325339543628384c4aad14dd0ffbf92160a4d51d11c4c42b750a3,pass
+python_portability,isolated_3.11_3.12_3.13,scientific_hash_exact_all_versions,pass
+restricted_data_access,KDD220AR7_code_only,none,pass

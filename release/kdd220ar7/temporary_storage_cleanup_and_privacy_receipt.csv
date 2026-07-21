@@ -1,0 +1,10 @@
+gate,expected,observed,status
+workspace_mode,0700,0700,pass
+partition_mode,0600,0600,pass
+run_binding,release_config_schema_chunk_only,release_config_schema_chunk_only,pass
+cross_run_resume,prohibited,not_implemented,pass
+success_cleanup,no_private_workspace_remaining,no_private_workspace_remaining,pass
+controlled_stop_cleanup,no_private_workspace_remaining,no_private_workspace_remaining,pass
+release_row_level_content,none,none,pass
+release_identifiers_timestamps_paths_arrays,none,none,pass
+prior_receipt_modification,none,none,pass
