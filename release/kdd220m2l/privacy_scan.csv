@@ -1,0 +1,8 @@
+check,observed,status
+exact_contract_paths_inspected,14,pass
+recursive_discovery,false,pass
+constructor_invocations,0,pass
+clinical_files_copied_or_modified,0,pass
+private_root_exported,false,pass
+row_or_identifier_exported,false,pass
+patient_level_hash_exported,false,pass

@@ -1,0 +1,15 @@
+table,plain_exists,compressed_exists,duplicate_stream_equal,selected_encoding,required_header_valid
+hosp/patients,true,true,true,csv.gz,true
+hosp/admissions,true,true,true,csv.gz,true
+hosp/diagnoses_icd,true,true,true,csv.gz,true
+hosp/procedures_icd,true,true,true,csv.gz,true
+hosp/prescriptions,true,true,true,csv.gz,true
+hosp/microbiologyevents,true,true,true,csv.gz,true
+hosp/labevents,true,true,true,csv.gz,true
+hosp/d_labitems,true,true,true,csv.gz,true
+icu/icustays,true,true,true,csv.gz,true
+icu/d_items,true,true,true,csv.gz,true
+icu/chartevents,true,true,true,csv.gz,true
+icu/inputevents,true,true,true,csv.gz,true
+icu/procedureevents,true,true,true,csv.gz,true
+icu/outputevents,true,true,true,csv.gz,true

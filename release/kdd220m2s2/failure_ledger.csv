@@ -1,0 +1,2 @@
+failure_id,stage,description,scientific_impact,resolution,status
+KDD220M2S2-F001,candidate_identity,"Seven-file path-plus-bytes SHA-256 differs from the mandatory KDD220M1 candidate-tree identity.","None observed: scientific surface and 100 scientific comparisons are exact.","Preserve stop; do not authorize M2R or M1R under this contract.",unresolved

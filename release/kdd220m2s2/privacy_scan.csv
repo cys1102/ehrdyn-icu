@@ -1,0 +1,7 @@
+scope,check,observed,status
+candidate,aggregate_schema_valid,true,pass
+candidate,aggregate_only,true,pass
+candidate,private_paths_exported,false,pass
+candidate,row_level_fields_exported,false,pass
+candidate,forbidden_path_credential_exact_timestamp_findings,0,pass
+release_package,patient_rows_identifiers_membership_or_private_paths,none,pass

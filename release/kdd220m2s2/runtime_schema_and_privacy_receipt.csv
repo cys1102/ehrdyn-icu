@@ -1,0 +1,11 @@
+check,observed,status
+candidate_file_count,7,pass
+candidate_status,credentialed_parity_pending,pass
+aggregate_schema,Draft_2020-12_valid,pass
+privacy_aggregate_only,true,pass
+private_paths_exported,false,pass
+row_level_fields_exported,false,pass
+forbidden_path_or_credential_or_exact_timestamp_findings,0,pass
+wall_seconds,7620.508935,observed
+peak_rss_kib,81134816,observed_high_memory
+temporary_disk_bytes,34548412988,observed
