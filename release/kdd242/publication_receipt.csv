@@ -1,0 +1,12 @@
+field,value,status
+release_commit,3175349e2e922e6b352ac3fa7674537a810560bd,verified
+annotated_tag_object,875273ba3db3bf2ac6fa2995cc90cc3ffd444221,verified
+peeled_tag_commit,3175349e2e922e6b352ac3fa7674537a810560bd,verified
+public_tag_url,https://github.com/cys1102/ehrdyn-icu/tree/v1.3.0,published
+public_release_url,https://github.com/cys1102/ehrdyn-icu/releases/tag/v1.3.0,published
+release_name,EHRDyn-ICU v1.3.0 - Recursive Constructed Benchmark Entrant,verified
+archive_sha256,cbbdf99e5af7ff0bfeca320f723bcb09d413ee1e42c6acbf385ab5e645dd2ccd,verified
+published_archive_manifest_files,558,pass
+published_archive_privacy_files,559,pass
+published_archive_quickstart_metrics_sha256,3644a183d421d2403a867221fb95eb401cd89d2b8847124850f2c7abc879c30e,pass
+published_archive_policy_probability_sha256,192948f22e46b030ee1f102ec663fd502141d93edc2f36000a2ec79ae4370735,pass
