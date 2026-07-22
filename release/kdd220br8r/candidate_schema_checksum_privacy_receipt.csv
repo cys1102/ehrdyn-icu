@@ -1,0 +1,8 @@
+gate,observed,status
+aggregate_schema_validation,pass,pass
+candidate_file_count,7,pass
+candidate_tree_sha256,49380616f17f58b6e2cb384bde5760f3349b9769a0f4772cb90a19ad22a5be19,pass
+candidate_privacy_scan,zero_findings,pass
+public_release_checksum,512_files_zero_mismatches,pass
+credentialed_input_identity,synthetic_fixture,fail
+reference_opening,not_run,pass
