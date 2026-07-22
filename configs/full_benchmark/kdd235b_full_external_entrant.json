@@ -1,0 +1,27 @@
+{
+  "schema_version": "kdd235b.full.external.v1",
+  "base_public_commit": "4739d59392a660cf215c29ebca02fb2f52cd7804",
+  "entrant": "recursive_world_model_entrant/entrant.json",
+  "profiles": ["sepsis", "respiratory", "shock", "aki", "heart_failure"],
+  "environment_seeds": [171901, 171902, 171903, 171904, 171905, 171906, 171907, 171908],
+  "forecast_episodes_per_environment": 32,
+  "forecast_horizons": 11,
+  "direct_return_episodes_per_environment": 512,
+  "ope_datasets_per_environment": 64,
+  "ope_episodes_per_dataset": 256,
+  "ope_estimators": ["IS", "WIS", "CWPDIS", "DR", "WDR", "FQE"],
+  "ope_denominator": "crossfit_stronger",
+  "ope_clipping": "none",
+  "planner": {
+    "name": "H4_support_only_sequence_categorical_CEM",
+    "horizon": 4,
+    "candidates": 64,
+    "iterations": 3,
+    "elites": 8,
+    "smoothing": 0.2,
+    "support_only": true,
+    "execute_first_action": true,
+    "planner_seed": 1903408
+  },
+  "claim_boundary": "constructed_benchmark_interface_usability_only"
+}

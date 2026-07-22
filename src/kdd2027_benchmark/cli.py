@@ -24,6 +24,7 @@ from .public_ope import run_public_ope_smoke
 from .public_pomdp import run_public_pomdp_smoke
 from .transition_entrant import validate_transition_submission
 from .world_model_smoke import run_world_model_smoke
+from .world_model_full import run_world_model_full
 from .full_suite import (
     generate_full_suite,
     run_component_forecasting,
@@ -68,6 +69,10 @@ class CliArgs(argparse.Namespace):
     workers: int = 1
     cache_dir: Path | None = None
     entrants: list[Path] | None = None
+    forecast_episodes: int = 32
+    direct_episodes: int = 512
+    ope_datasets: int = 64
+    ope_episodes: int = 256
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -176,6 +181,18 @@ def build_parser() -> argparse.ArgumentParser:
     _ = world_model.add_argument("--entrant", dest="entrants", action="append", type=Path, required=True)
     _ = world_model.add_argument("--episodes", type=int, default=8)
     _ = world_model.add_argument("--output", type=Path, required=True)
+    world_model_full = commands.add_parser(
+        "evaluate-world-model-full",
+        help="Run the KDD235B recursive entrant over all 40 constructed environments.",
+    )
+    _ = world_model_full.add_argument("--manifest", type=Path, required=True)
+    _ = world_model_full.add_argument("--entrant", type=Path, required=True)
+    _ = world_model_full.add_argument("--output", type=Path, required=True)
+    _ = world_model_full.add_argument("--forecast-episodes", type=int, default=32)
+    _ = world_model_full.add_argument("--direct-episodes", type=int, default=512)
+    _ = world_model_full.add_argument("--ope-datasets", type=int, default=64)
+    _ = world_model_full.add_argument("--ope-episodes", type=int, default=256)
+    _ = world_model_full.add_argument("--workers", type=int, default=1)
     return parser
 
 
@@ -254,6 +271,17 @@ def _dispatch(args: CliArgs) -> int:
         _print_json({"rows": len(summarize_ope(args.input, args.output))})
     elif args.command == "evaluate-world-model-smoke":
         _print_json(run_world_model_smoke(args.manifest, args.entrants or [], args.output, args.episodes))
+    elif args.command == "evaluate-world-model-full":
+        _print_json(run_world_model_full(
+            args.manifest,
+            args.entrant,
+            args.output,
+            args.forecast_episodes,
+            args.direct_episodes,
+            args.ope_datasets,
+            args.ope_episodes,
+            args.workers,
+        ))
     return 0
 
 

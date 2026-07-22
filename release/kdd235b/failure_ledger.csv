@@ -1,0 +1,2 @@
+stage,status,reason,disposition
+preflight,documented_nonfatal,previously reported KDD235B terminal package not recoverable from local paths or public Git refs,reexecute frozen public protocol from KDD235A commit 4739d59
