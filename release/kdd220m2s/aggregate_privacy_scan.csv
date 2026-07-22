@@ -1,0 +1,8 @@
+scope,check,status,detail
+controlled_stop_receipt,JSON Schema,pass,Draft 2020-12 valid
+controlled_stop_receipt,aggregate_only,pass,true
+controlled_stop_receipt,private_paths_exported,pass,false
+controlled_stop_receipt,row_level_fields_exported,pass,false
+release_package,identifiers_rows_timestamps_credentials_private_paths,pass,none detected
+constructor_telemetry,high_volume_rows_read,pass,zero
+comparison,patient_membership_or_row_hashes_exported,pass,false

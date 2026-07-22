@@ -1,0 +1,10 @@
+fixture,expected,observed,status
+valid_string_plus_null,valid organism retained,valid organism retained,pass
+all_null_group,organism remains missing and culture negative,organism missing and culture negative,pass
+multiple_strings_permuted,deterministic null-aware lexical max,deterministic null-aware lexical max,pass
+chartdate_fallback,missing charttime uses valid chartdate,valid fallback used,pass
+nonblood_exclusion,nonblood group excluded,excluded,pass
+excluded_item_rule,item 90856 cannot create positive culture,excluded from positivity,pass
+csv_gzip_typed_parity,identical canonical output,identical canonical output,pass
+stable_output_permutation,identical frozen order,identical frozen order,pass
+focused_suite,6 tests,6 passed,pass

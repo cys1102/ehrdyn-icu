@@ -1,0 +1,8 @@
+gate,command_summary,observed,status
+focused_tests,Python 3.11 unittest tests.test_kdd220m2s,6 of 6 passed,pass
+public_tests,Python 3.11 unittest discovery,127 of 127 passed,pass
+schema_validation,ehrdyn-icu validate-schemas,7 of 7 valid,pass
+compile,Python compileall src and tests,no errors,pass
+pre_access_frozen_manifest,sha256sum check,513 of 513 entries valid,pass
+final_packaged_manifest,sha256sum check,525 of 525 entries valid,pass
+diff_check,git diff --check,no errors,pass

@@ -1,0 +1,16 @@
+field,value
+invocation_count,1
+input_release,MIMIC-IV-3.1
+input_root_exported,false
+output_directory_preexisting,false
+candidate_status,controlled_stop
+failure_code,contract_error
+failure_stage,input_layout_resolution
+failure_summary,required table exposed more than one CSV or CSV.GZ encoding
+high_volume_rows_read,0
+complete_candidate_file_count,0
+controlled_stop_file_count,4
+controlled_stop_path_plus_bytes_sha256,4a02d7890d77570f3e2afff2a6983e7b802465f7bce2e0872acfa33d71536e96
+controlled_stop_schema_valid,true
+rerun_attempted,false
+m1_reference_opened_after_stop,false

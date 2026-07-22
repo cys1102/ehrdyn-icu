@@ -1,0 +1,2 @@
+failure_id,stage,description,impact,resolution,status
+KDD220M2S-F001,credentialed_constructor_input_layout,"A required table resolved to more than one CSV or CSV.GZ encoding.","Constructor stopped before candidate creation; M1 equivalence cannot be evaluated.","Preserve this stop; a future separately authorized execution must supply a documented single-encoding read-only view.",unresolved

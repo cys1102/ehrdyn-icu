@@ -1,0 +1,11 @@
+item,before,after,scientific_contract_changed,status
+organism_dtype,"object with mixed strings and floating nulls","pandas nullable string",false,implemented
+specimen_dtype,"object","pandas nullable string",false,implemented
+nullable_numeric_fields,"implicit mixed/object representation","explicit numeric coercion with nullable Int64",false,implemented
+group_aggregate,max,max,false,preserved
+missing_organism,"max raised on mixed object values","missing remains missing",false,implemented
+blood_filter,case-insensitive contains blood,case-insensitive contains blood,false,preserved
+culture_time,charttime then chartdate fallback,charttime then chartdate fallback,false,preserved
+excluded_item,90856,90856,false,preserved
+positive_rule,nonmissing and nonempty organism,nonmissing and nonempty organism,false,preserved
+stable_order,"subject admission culture time specimen","subject admission culture time specimen",false,preserved
