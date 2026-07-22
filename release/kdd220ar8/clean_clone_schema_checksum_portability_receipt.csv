@@ -1,0 +1,13 @@
+gate,command_or_contract,observed,status
+focused_AR8,.venv/bin/python_-m_unittest_tests.test_kdd220ar8,2_of_2_pass,pass
+focused_lineage_AR2_to_AR8,.venv/bin/python_-m_unittest_selected_modules,all_selected_tests_pass,pass
+full_public_suite,.venv/bin/python_-m_unittest_discover_-s_tests,121_of_121_pass_after_manifest_refresh,pass
+compile,.venv/bin/python_-m_compileall_-q_src_scripts_tests,pass,pass
+schema_positive,ehrdyn-icu_validate-schemas,all_released_schemas_pass,pass
+schema_negative,full_public_invalid_fixture_suite,all_invalid_fixtures_rejected,pass
+checksum,ehrdyn-icu_verify-checksums,manifest_exact_after_refresh,pass
+python_portability,uv_run_frozen_credentialed_Python_3.11_3.12_3.13,scientific_surface_hash_exact,pass
+clean_install,uv_sync_frozen_credentialed_Python_3.11,pass,pass
+clean_clone,isolated_candidate_patch_and_documented_synthetic_smoke,pass,pass
+privacy,ehrdyn-icu_scan-release,zero_findings,pass
+restricted_data_access,KDD220AR8_code_only,none,pass

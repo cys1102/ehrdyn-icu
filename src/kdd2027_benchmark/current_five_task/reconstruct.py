@@ -61,6 +61,7 @@ from .contracts import (
     RELEASE,
     ROLE_ORDER,
     RRT_PATTERN,
+    RESPIRATORY_PATTERN,
     SBP_ITEMIDS,
     TASKS,
     URINE_ITEMIDS,
@@ -747,7 +748,7 @@ def build_anchors(
         key="stay_id", eligible_keys=stay_ids, sort_by=("stay_id", "charttime", "itemid"),
         streaming_audit=streaming_audit,
     )
-    input_label_ids = set(label[label.astype(str).str.contains(f"{DIURETIC_PATTERN}|{VASODILATOR_PATTERN}|{RRT_PATTERN}", case=False, regex=True, na=False)].index.astype(int))
+    input_label_ids = set(label[label.astype(str).str.contains(f"{DIURETIC_PATTERN}|{VASODILATOR_PATTERN}|{RRT_PATTERN}|{RESPIRATORY_PATTERN}", case=False, regex=True, na=False)].index.astype(int))
     inputs = _stream_events(
         paths["icu/inputevents"], table="icu/inputevents",
         columns=("stay_id", "starttime", "endtime", "itemid", "amount", "rate"),
@@ -757,7 +758,7 @@ def build_anchors(
         key="stay_id", eligible_keys=stay_ids, sort_by=("stay_id", "starttime", "itemid"),
         streaming_audit=streaming_audit,
     )
-    procedure_label_ids = set(label[label.astype(str).str.contains(f"oxygen|ventilat|intubat|bipap|cpap|{RRT_PATTERN}", case=False, regex=True, na=False)].index.astype(int))
+    procedure_label_ids = set(label[label.astype(str).str.contains(f"{RESPIRATORY_PATTERN}|{RRT_PATTERN}", case=False, regex=True, na=False)].index.astype(int))
     procedures = _stream_events(
         paths["icu/procedureevents"], table="icu/procedureevents",
         columns=("stay_id", "starttime", "endtime", "itemid"),
@@ -785,9 +786,19 @@ def build_anchors(
         chart[chart["itemid"].isin(MECHVENT_ITEMIDS)].dropna(subset=["charttime"]), compact_stays, "charttime"
     )[["stay_id", "charttime"]].rename(columns={"charttime": "anchor_time"}); respiratory["anchor_source"] = "structured_ventilation_chart_event"
     p = procedures.copy(); p["label"] = p["itemid"].map(label).fillna("")
-    support = p[p["label"].astype(str).str.contains(r"oxygen|ventilat|intubat|bipap|cpap", case=False, regex=True)]
+    support = p[p["label"].astype(str).str.contains(RESPIRATORY_PATTERN, case=False, regex=True)]
     support = _interval_filter(support, compact_stays, "starttime")[["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); support["anchor_source"] = "structured_respiratory_support_event"
-    respiratory = _first_anchor(pd.concat([respiratory, support], ignore_index=True))
+    respiratory_input = inputs.copy(); respiratory_input["label"] = respiratory_input["itemid"].map(label).fillna("")
+    respiratory_input_value = np.maximum(
+        pd.to_numeric(respiratory_input["amount"], errors="coerce").fillna(0),
+        pd.to_numeric(respiratory_input["rate"], errors="coerce").fillna(0),
+    )
+    respiratory_input = respiratory_input[
+        respiratory_input_value.gt(0)
+        & respiratory_input["label"].astype(str).str.contains(RESPIRATORY_PATTERN, case=False, regex=True)
+    ]
+    respiratory_input = _interval_filter(respiratory_input, compact_stays, "starttime")[["stay_id", "starttime"]].rename(columns={"starttime": "anchor_time"}); respiratory_input["anchor_source"] = "structured_respiratory_support_event"
+    respiratory = _first_anchor(pd.concat([respiratory, support, respiratory_input], ignore_index=True))
     if not respiratory.empty:
         local = compact_stays.merge(respiratory, on="stay_id", how="inner"); local["task_id"] = "respiratory_support"; frames.append(local)
 

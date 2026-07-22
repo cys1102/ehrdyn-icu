@@ -1,0 +1,9 @@
+check,findings,status
+raw_clinical_rows,0,pass
+patient_admission_stay_identifiers,0,pass
+exact_clinical_timestamps,0,pass
+membership_or_row_hashes,0,pass
+restricted_arrays_trajectories_checkpoints,0,pass
+credentials_tokens_private_paths,0,pass
+aggregate_only_outputs,0,pass
+MIMIC_access,0,pass

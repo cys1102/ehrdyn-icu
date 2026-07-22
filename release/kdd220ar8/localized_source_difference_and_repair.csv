@@ -1,0 +1,7 @@
+difference_id,canonical_behavior,ar7_public_behavior,ar8_repair,scientific_contract_changed,status
+KDD220AR8-D001,scan positive respiratory-support inputevents using the frozen oxygenation-support label pattern,inputevents respiratory-support labels were not scanned for anchors,add RESPIRATORY_PATTERN item IDs and positive max_amount_rate gate before interval anchoring,no,repaired
+KDD220AR8-D002,use the complete oxygen high-flow HFNC BiPAP CPAP noninvasive ventilation intubation respirator pattern for procedure anchors,use a shortened oxygen ventilation intubation BiPAP CPAP expression,use the existing exact RESPIRATORY_PATTERN,no,repaired
+KDD220AR8-D003,half-open ICU event eligibility start_at_or_after_intime_and_before_outtime,same,same,no,unchanged_exact
+KDD220AR8-D004,stable earliest anchor after chart_procedure_input concatenation,chart_then_procedure_without_input,chart_then_procedure_then_input with stable earliest selection,no,repaired
+KDD220AR8-D005,pre-repair action cutpoints and membership precede SAFE repair and KDD201 subsetting,same,same,no,unchanged_exact
+KDD220AR8-D006,BR7 aggregate counts are post-construction evaluator evidence,not a constructor input,not opened or used by KDD220AR8,no,pass
