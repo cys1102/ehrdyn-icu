@@ -1,0 +1,5 @@
+field,value,status
+branch,kdd220br8r2-respiratory-parity-stop,prepared
+scope,release/kdd220br8r2_only,prepared
+commit,self_git_commit_containing_receipt,resolved_after_push
+tag,none,pass

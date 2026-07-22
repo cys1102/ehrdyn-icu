@@ -1,0 +1,13 @@
+role,axis,candidate,reference,difference,status
+train,subjects,14524,14516,8,fail
+train,episodes,16845,16836,9,fail
+train,decisions,97928,97861,67,fail
+validation,subjects,2988,2985,3,fail
+validation,episodes,3475,3471,4,fail
+validation,decisions,20231,20222,9,fail
+historical_other,subjects,3092,3091,1,fail
+historical_other,episodes,3608,3607,1,fail
+historical_other,decisions,21026,21015,11,fail
+all_roles,subjects,20604,20592,12,fail
+all_roles,episodes,23928,23914,14,fail
+all_roles,decisions,139185,139098,87,fail

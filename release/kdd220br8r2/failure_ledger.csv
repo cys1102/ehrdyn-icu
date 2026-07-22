@@ -1,0 +1,4 @@
+failure_id,stage,classification,status,disposition
+KDD220BR8R2-F001,respiratory_role_counts,exact_parity_mismatch,unresolved,localized_source_repair_required
+KDD220BR8R2-F002,later_task_parity,blocked_by_resp_first_contract,closed,not_opened
+KDD220BR8R2-F003,kdd220c8_handoff,not_authorized,closed,no_tag

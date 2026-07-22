@@ -1,0 +1,11 @@
+field,value,status
+constructor_invocations,1,pass
+exit_status,0,pass
+wall_time,2:05:51,observed
+peak_rss_kib,81061232,named_high_memory_accessibility_limitation
+candidate_files,7,pass
+candidate_tree_sha256,8b6ecaab4ae4a42c387f3f34612f9cb0135b10e29bcd3a7e95b83056dca25d29,pass
+schema_validation,pass,pass
+privacy_scan,zero_findings,pass
+reference_opened,respiratory_only,pass
+later_task_references_opened,no,pass
