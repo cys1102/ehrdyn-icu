@@ -1,0 +1,7 @@
+suite,tests,passed,failed,status
+KDD220M2I_canonical_identity,5,5,0,pass
+allowed_telemetry_preserves_identity,1,1,0,pass
+scientific_or_unclassified_change_breaks_identity,1,1,0,pass
+missing_file_and_schema_change_stop,1,1,0,pass
+unknown_runtime_field_stop,1,1,0,pass
+encoding_requires_valid_KDD220M2L,1,1,0,pass

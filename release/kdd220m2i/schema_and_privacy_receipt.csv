@@ -1,0 +1,11 @@
+gate,expected,observed,status
+aggregate_schema_sha256,1f229de694f995b9a500270f3e411dab8bddfee46b15ac038bdb1a21b561f117,1f229de694f995b9a500270f3e411dab8bddfee46b15ac038bdb1a21b561f117,pass
+stage_schema_sha256,e5ae77679ccd52e0616f3d0a4d8694e0fac4da8c1a55491042f5bad610573119,e5ae77679ccd52e0616f3d0a4d8694e0fac4da8c1a55491042f5bad610573119,pass
+M1_aggregate_schema,valid,valid,pass
+M2S2_aggregate_schema,valid,valid,pass
+M1_stage_schema,valid,valid,pass
+M2S2_stage_schema,valid,valid,pass
+aggregate_only,true,true,pass
+row_level_fields_exported,false,false,pass
+private_paths_exported,false,false,pass
+release_forbidden_findings,0,0,pass

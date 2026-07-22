@@ -1,0 +1,9 @@
+scope,check,observed,status
+candidate_inputs,aggregate_files_only,7_each,pass
+constructor_invocations,required_zero,0,pass
+MIMIC_or_clinical_row_access,prohibited,0,pass
+private_candidate_paths_exported,prohibited,0,pass
+differing_values_exported,prohibited,0,pass
+patient_identifiers_or_membership,prohibited,0,pass
+exact_clinical_timestamps,prohibited,0,pass
+credentials_or_secrets,prohibited,0,pass
