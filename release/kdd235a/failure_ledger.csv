@@ -1,0 +1,5 @@
+failure_id,gate,status,disposition
+KDD235A-F001,public_source_and_repaired_mechanism_identity,resolved,exact identities frozen before editing
+KDD235A-F002,recursive_schema_and_semantics,resolved,focused positive and negative tests pass
+KDD235A-F003,constructed_two_profile_smoke,resolved,point and Gaussian end-to-end outputs complete
+KDD235A-F004,final_selective_test_invocation,resolved,corrected module path from test_release to tests.test_release; no code or contract change

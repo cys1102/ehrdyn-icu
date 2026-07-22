@@ -26,8 +26,8 @@ class ResourceContract:
     max_output_bytes: int = 32_000_000
 
 
-def load_entrant(path: Path) -> dict[str, Any]:
-    value = validate_json_document(path, "entrant_protocol")
+def load_entrant(path: Path, schema_name: str = "entrant_protocol") -> dict[str, Any]:
+    value = validate_json_document(path, schema_name)
     return dict(value)
 
 
@@ -41,10 +41,13 @@ def _limits(contract: ResourceContract) -> None:
 class IsolatedEntrant:
     """Persistent JSONL subprocess with a read-only, network-free bwrap sandbox."""
 
-    def __init__(self, declaration_path: Path, contract: ResourceContract | None = None):
+    def __init__(self, declaration_path: Path, contract: ResourceContract | None = None,
+                 declaration_schema: str = "entrant_protocol",
+                 protocol_version: str = PROTOCOL_VERSION):
         self.declaration_path = declaration_path.resolve()
-        self.declaration = load_entrant(self.declaration_path)
+        self.declaration = load_entrant(self.declaration_path, declaration_schema)
         self.contract = contract or ResourceContract()
+        self.protocol_version = protocol_version
         self.process: subprocess.Popen[str] | None = None
         self.stderr = ""
 
@@ -81,7 +84,7 @@ class IsolatedEntrant:
     def request(self, operation: str, payload: dict[str, Any], seed: int) -> dict[str, Any]:
         if self.process is None or self.process.stdin is None or self.process.stdout is None:
             raise ReleaseContractError("entrant process is not running")
-        message = {"protocol_version": PROTOCOL_VERSION, "operation": operation, "seed": int(seed), "payload": payload}
+        message = {"protocol_version": self.protocol_version, "operation": operation, "seed": int(seed), "payload": payload}
         encoded = json.dumps(message, sort_keys=True, separators=(",", ":"), allow_nan=False)
         started = time.monotonic()
         try:
@@ -104,7 +107,7 @@ class IsolatedEntrant:
             response = json.loads(line)
         except json.JSONDecodeError as error:
             raise ReleaseContractError("entrant_malformed_json") from error
-        if not isinstance(response, dict) or response.get("protocol_version") != PROTOCOL_VERSION:
+        if not isinstance(response, dict) or response.get("protocol_version") != self.protocol_version:
             raise ReleaseContractError("entrant_protocol_version_mismatch")
         if response.get("status") != "ok" or not isinstance(response.get("result"), dict):
             raise ReleaseContractError(f"entrant_failure:{response.get('error', 'unspecified')}")

@@ -1,0 +1,13 @@
+metric,point,independent_gaussian,definition_status
+observed_cell_one_step_rmse,computed,computed,frozen
+common_origin_recursive_rmse_h1_h4,computed,computed,frozen
+crps,structural_na,computed,frozen
+coverage_50_80_90_95,structural_na,computed,frozen
+interval_width_50_80_90_95,structural_na,computed,frozen
+mace,structural_na,computed,frozen
+risk_coverage_area,structural_na,computed,frozen
+support_only_h4_planning,computed,computed,frozen_kdd224_kdd232
+full_episode_direct_return_crn,computed,computed,kdd199_public_evaluator
+learned_model_return,computed,computed,entrant_recursive_surface
+absolute_return_gap,computed,computed,derived
+ope_ready_policy_probabilities,computed,computed,existing_full_policy_schema_semantics

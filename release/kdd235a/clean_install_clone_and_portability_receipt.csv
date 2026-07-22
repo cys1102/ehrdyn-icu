@@ -1,0 +1,10 @@
+gate,runtime,command,status,detail
+locked_install,Python_3.11,uv sync --locked --python 3.11,pass,isolated editable package installation
+focused_tests,Python_3.11,python -m unittest tests.test_kdd235a -v,pass,11 of 11
+full_public_tests,Python_3.11,uv run --frozen --extra credentialed python -m unittest discover -s tests -q,pass,130 of 130
+schema_inventory,Python_3.11,ehrdyn-icu validate-schemas --schema-dir schemas,pass,11 Draft 2020-12 schemas including recursively bound request
+compile,Python_3.11,python -m compileall -q src world_model_entrant_example tests/test_kdd235a.py,pass,no syntax errors
+canonical_hash,Python_3.11,canonical planner and float fixture,pass,c5ef848c2c8f738b4a2db1b343d287c9c51518c1d8abb3c21884bd0fe0e06356
+canonical_hash,Python_3.12,canonical planner and float fixture,pass,c5ef848c2c8f738b4a2db1b343d287c9c51518c1d8abb3c21884bd0fe0e06356
+canonical_hash,Python_3.13,canonical planner and float fixture,pass,c5ef848c2c8f738b4a2db1b343d287c9c51518c1d8abb3c21884bd0fe0e06356
+clean_source_install,Python_3.11,isolated candidate copy and documented smoke,pass,11 focused tests and two-profile end-to-end command pass

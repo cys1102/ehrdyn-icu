@@ -23,6 +23,7 @@ from .public_bundle import rebuild_public_bundle
 from .public_ope import run_public_ope_smoke
 from .public_pomdp import run_public_pomdp_smoke
 from .transition_entrant import validate_transition_submission
+from .world_model_smoke import run_world_model_smoke
 from .full_suite import (
     generate_full_suite,
     run_component_forecasting,
@@ -66,6 +67,7 @@ class CliArgs(argparse.Namespace):
     direct_returns: Path = Path()
     workers: int = 1
     cache_dir: Path | None = None
+    entrants: list[Path] | None = None
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -169,6 +171,11 @@ def build_parser() -> argparse.ArgumentParser:
     summarize = commands.add_parser("summarize-submission", help="Summarize full-suite entrant OPE results.")
     _ = summarize.add_argument("--input", type=Path, required=True)
     _ = summarize.add_argument("--output", type=Path, required=True)
+    world_model = commands.add_parser("evaluate-world-model-smoke", help="Run the KDD235A recursive world-model entrant smoke.")
+    _ = world_model.add_argument("--manifest", type=Path, required=True)
+    _ = world_model.add_argument("--entrant", dest="entrants", action="append", type=Path, required=True)
+    _ = world_model.add_argument("--episodes", type=int, default=8)
+    _ = world_model.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -245,6 +252,8 @@ def _dispatch(args: CliArgs) -> int:
         _print_json({"rows": len(run_full_ope(args.entrant, args.manifest, args.direct_returns, args.output, args.workers)), "dataset_count": 320})
     elif args.command == "summarize-submission":
         _print_json({"rows": len(summarize_ope(args.input, args.output))})
+    elif args.command == "evaluate-world-model-smoke":
+        _print_json(run_world_model_smoke(args.manifest, args.entrants or [], args.output, args.episodes))
     return 0
 
 

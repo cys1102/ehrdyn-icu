@@ -1,0 +1,5 @@
+scan,scope,status,matches,disposition
+raw_clinical_or_identifier_content,release/kdd235a,pass,0,aggregate-only contract outputs
+private_absolute_paths,release/kdd235a,pass,0,no private path present
+credentials_or_secrets,release/kdd235a,pass,0,no secret present
+entrant_payload_boundary,src/kdd2027_benchmark/world_model_entrant.py,pass,0,observable history only
