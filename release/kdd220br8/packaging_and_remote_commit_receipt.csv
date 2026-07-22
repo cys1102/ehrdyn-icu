@@ -1,0 +1,7 @@
+field,value,status
+source_commit,0331aa36e5b09824d5a1a04dc5b189976458ddaa,pass
+packaging_branch,kdd220br8-author-reconstruction-stop,prepared
+commit_scope,release/kdd220br8_only,prepared
+packaging_commit,self_git_commit_containing_this_receipt,resolved_by_remote_branch_after_push
+handoff_tag,none,pass
+kdd220c8_authorized,no,pass

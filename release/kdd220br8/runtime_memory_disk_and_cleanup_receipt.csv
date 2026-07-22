@@ -1,0 +1,17 @@
+measure,value,unit,status
+constructor_invocations,1,count,frozen_no_retry
+constructor_exit_status,1,code,stop
+failure_stage,output_path_precondition,category,stop
+restricted_input_opened,no,boolean,pass
+authoritative_reference_opened,no,boolean,pass
+candidate_files_written,0,count,stop
+elapsed_wall_time,0:00.56,h_mm_ss,observed
+user_time,5.74,seconds,observed
+system_time,0.06,seconds,observed
+peak_rss,78848,KiB,descriptive
+filesystem_inputs,44480,blocks,descriptive
+filesystem_outputs,19648,blocks,descriptive
+private_runtime_disk,8,KiB,descriptive
+experiment_rss_stop,none,category,pass
+temporary_constructor_partitions_created,0,count,pass
+private_paths_exported,0,count,pass
