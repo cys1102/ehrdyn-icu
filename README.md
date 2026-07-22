@@ -75,6 +75,19 @@ is in [entrant_protocol.md](entrant_protocol.md). The older `pomdp-smoke` and
 
 The historical `kdd2027` command remains available as a compatibility alias.
 
+## Recursive constructed world-model entrant
+
+Version 1.3.0 adds the full recursive constructed-environment entrant path:
+entrant-owned point, independent-Gaussian, and Gaussian-ensemble schemas;
+one-step and 11-step recursive scoring; uncertainty metrics; frozen support-only
+H4 planning with full-episode direct return; and repeated-dataset OPE over all
+40 public environments. See
+[RECURSIVE_WORLD_MODEL_ENTRANT.md](RECURSIVE_WORLD_MODEL_ENTRANT.md) and the
+aggregate-only [KDD235B receipt](release/kdd235b/result_audit.md).
+
+The demonstration entrant is an interface example only and is not included in
+the scientific leaderboard.
+
 Submission documents are bound to their released Draft 2020-12 schemas; see
 [SCHEMA_VALIDATION.md](SCHEMA_VALIDATION.md). Generated aggregate JSON uses the
 portable byte contract in [CANONICAL_SERIALIZATION.md](CANONICAL_SERIALIZATION.md).

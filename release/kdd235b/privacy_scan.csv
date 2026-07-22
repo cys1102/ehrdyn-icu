@@ -1,0 +1,8 @@
+check,status,evidence
+patient identifiers,pass,no identifier columns or values exported
+row-level trajectories,pass,only environment-level and horizon-level aggregate metrics exported
+clinical timestamps,pass,no date or timestamp fields exported
+private paths,pass,no author workstation paths exported
+credentials and secrets,pass,no credential token cookie or key material exported
+checkpoints and tensors,pass,only checkpoint identifiers and SHA-256 hashes exported
+restricted EHR data,pass,constructed environments only

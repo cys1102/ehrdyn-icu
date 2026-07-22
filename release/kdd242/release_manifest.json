@@ -1,0 +1,41 @@
+{
+  "artifacts": {
+    "capability_matrix": {
+      "path": "release/kdd242/capability_matrix.csv",
+      "sha256": "3876d5322223667ce43770e455fad5c489c87cf283193ed409d1f201ae62cc99"
+    },
+    "checkpoint_inventory": {
+      "path": "release/kdd235b/clean_clone_and_external_package_identity.csv",
+      "sha256": "2ac1e30e2ddec99385f58ef9d6be3a76fc9a9f710137187d396e3d65a15661cd"
+    },
+    "citation_metadata": {
+      "path": "CITATION.cff",
+      "sha256": "b00cd96a38999c6df3d67d586d280459f4663fe7591adca6765eceeef05961ae"
+    },
+    "direct_return_summary": {
+      "path": "release/kdd235b/entrant_planner_direct_return_summary.csv",
+      "sha256": "edb50d4ea8813aa6eb7b8288b4c8d10af45db7231b6f4cafed48fafcb3893bb8"
+    },
+    "forecast_horizon_metrics": {
+      "path": "release/kdd235b/entrant_forecasting_and_uncertainty_summary.csv",
+      "sha256": "73f9f1101ba31adcab289c452aee446579edcb15919d429aaaf2fe9c3f6998ea"
+    },
+    "repeated_ope_summary": {
+      "path": "release/kdd235b/entrant_repeated_ope_summary.csv",
+      "sha256": "995f88165121387fa416e6273e77ed90d6d39d206eb3883e4eafe94031164a41"
+    }
+  },
+  "claim_boundary": "constructed_benchmark_interface_usability_only",
+  "counts": {
+    "direct_return_rows": 40,
+    "environment_count": 40,
+    "forecast_horizon_rows": 440,
+    "ope_summary_rows": 240
+  },
+  "frozen_prerun_commit": "5e6cbd7",
+  "leaderboard_status": "demonstration_entrant_not_eligible",
+  "name": "EHRDyn-ICU v1.3.0 - Recursive Constructed Benchmark Entrant",
+  "public_base_commit": "4739d59392a660cf215c29ebca02fb2f52cd7804",
+  "release": "v1.3.0",
+  "schema_version": "kdd242.release.v1"
+}

@@ -1,0 +1,4 @@
+stage,command,wall_time_seconds,peak_rss_kib,artifact_bytes,status
+focused_tests,uv run --frozen python -m unittest tests.test_kdd235a tests.test_kdd235b,12.307,,0,pass
+full_run,uv run --frozen ehrdyn-icu evaluate-world-model-full --manifest configs/full_benchmark/kdd198_v2_generator_contract.json --entrant recursive_world_model_entrant/entrant.json --output build/kdd235b-full --forecast-episodes 32 --direct-episodes 512 --ope-datasets 64 --ope-episodes 256 --workers 4,45.334478122066,76680,222000,pass
+overlap_rerun,run_world_model_full sepsis 171901 with frozen full counts,9.70776350388769,63488,0,pass

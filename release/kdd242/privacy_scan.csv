@@ -1,0 +1,7 @@
+check,status,evidence
+private path,pass,no author-local absolute path in release package
+credential or secret,pass,no token cookie password API key or credential value
+PHI or patient identifier,pass,constructed aggregate outputs only
+raw row or trajectory,pass,no row-level clinical or simulator trajectory exported
+checkpoint or tensor,pass,hash and identifier receipts only
+historical hidden dependency,pass,entrant source uses public JSONL interface only
