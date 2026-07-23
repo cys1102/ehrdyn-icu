@@ -88,6 +88,26 @@ aggregate-only [KDD235B receipt](release/kdd235b/result_audit.md).
 The demonstration entrant is an interface example only and is not included in
 the scientific leaderboard.
 
+## Canonical-v2 credentialed EHR component scorer
+
+Version 2.0.0 adds a local, aggregate-only scorer for the five canonical-v2 EHR
+tasks. It accepts typed one-step and recursive point, independent-Gaussian, or
+Gaussian-ensemble predictions and reports forecasting, calibration, interval,
+termination, and retrospective support/evaluability diagnostics. Start with
+[EHR_COMPONENT_SCORER.md](EHR_COMPONENT_SCORER.md) and the synthetic command:
+
+```bash
+ehrdyn-icu score-ehr-components \
+  --submission fixtures/kdd245v2r/gaussian.json \
+  --output /tmp/ehrdyn_ehr_component_score.json
+```
+
+This command runs locally where credentialed inputs reside. Its output is
+aggregate-only. Real-EHR planning, direct return, known policy value, treatment
+benefit, clinical utility, and deployment remain unsupported or Structural N/A.
+The lineage change from v1.3.0 is documented in
+[MIGRATION_V2.md](MIGRATION_V2.md).
+
 Submission documents are bound to their released Draft 2020-12 schemas; see
 [SCHEMA_VALIDATION.md](SCHEMA_VALIDATION.md). Generated aggregate JSON uses the
 portable byte contract in [CANONICAL_SERIALIZATION.md](CANONICAL_SERIALIZATION.md).

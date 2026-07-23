@@ -1,0 +1,2 @@
+failure_id,stage,status,reason
+KDD245V2-F001,prerequisite,blocking,KDD220M2_did_not_return_a_complete_canonical_v2_refresh_decision

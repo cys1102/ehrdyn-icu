@@ -12,6 +12,7 @@ from .canonical import canonical_bytes, write_canonical_json
 from .config import validate_config_directory, validate_task_config
 from .errors import ReleaseContractError
 from .evaluator import evaluate_fixture, evaluate_predictions
+from .ehr_component_scorer import score_submission
 from .fixture import generate_fixture
 from .manifest import validate_paper_manifests
 from .privacy import scan_release, verify_checksums
@@ -193,6 +194,12 @@ def build_parser() -> argparse.ArgumentParser:
     _ = world_model_full.add_argument("--ope-datasets", type=int, default=64)
     _ = world_model_full.add_argument("--ope-episodes", type=int, default=256)
     _ = world_model_full.add_argument("--workers", type=int, default=1)
+    ehr_components = commands.add_parser(
+        "score-ehr-components",
+        help="Score local canonical-v2 EHR component predictions and write aggregate-only metrics.",
+    )
+    _ = ehr_components.add_argument("--submission", type=Path, required=True)
+    _ = ehr_components.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -282,6 +289,8 @@ def _dispatch(args: CliArgs) -> int:
             args.ope_episodes,
             args.workers,
         ))
+    elif args.command == "score-ehr-components":
+        _write_json(args.output, score_submission(args.submission))
     return 0
 
 

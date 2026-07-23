@@ -1,0 +1,37 @@
+{
+  "schema_version": "ehr-component-submission-v2.0.0",
+  "benchmark_version": "ehrdyn-icu-canonical-v2.0.0",
+  "evaluator_version": "ehr-component-scorer-v2.0.0",
+  "task_id": "sepsis",
+  "prediction_type": "independent_gaussian",
+  "synthetic": true,
+  "aggregate_context": {"distinct_subjects": 2, "episodes": 2},
+  "records": [
+    {
+      "horizon_step": 1,
+      "target": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "target_mask": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "mean": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "scale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      "termination_target": 0,
+      "termination_probability": 0.2,
+      "action": 0,
+      "action_supported": true,
+      "behavior_probability": 0.5,
+      "target_probability": 0.5
+    },
+    {
+      "horizon_step": 2,
+      "target": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "target_mask": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "mean": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "scale": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      "termination_target": 1,
+      "termination_probability": 0.8,
+      "action": 24,
+      "action_supported": false,
+      "behavior_probability": 0.25,
+      "target_probability": 0.5
+    }
+  ]
+}

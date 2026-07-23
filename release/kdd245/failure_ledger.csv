@@ -1,0 +1,3 @@
+failure_id,stage,status,disposition
+KDD245-F001,BR8R2_accepted_parity,fail,separate_localized_source_repair
+KDD245-F002,v1.4.0_release,not_run,no_tag_or_release

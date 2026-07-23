@@ -1,0 +1,14 @@
+scope,affected_tasks,consumer,refresh_requirement,reason
+real_EHR_interface,all_five,credentialed aggregate receipt and v2 numeric-summary reducer,recompute_from_frozen_v2_inputs,all task interfaces changed
+forecasting,all_five,tables/five_cohort_transition_uncertainty.csv and .tex,retrain and reevaluate named transition and uncertainty models,feature mask target recency normalization or row set changed
+forecasting,all_five,figures/five_cohort_uncertainty_atlas.pdf and .png,regenerate from refreshed forecasting aggregates,forecasting consumers affected
+policy_diagnostics,all_five,tables/current_five_cohort_real_ehr_policy_diagnostics.csv and .tex,retrain or reevaluate named behavior and policy methods under frozen v2 inputs,action support reward or row set changed
+policy_diagnostics,all_five,figures/five_cohort_real_ehr_policy_diagnostics.pdf and .png,regenerate from refreshed policy diagnostics,policy consumer affected
+retrospective_OPE,all_five,tables/complete_real_ehr_ope_by_method.csv and .tex,recompute estimator outputs and intervals under frozen v2 inputs,behavior denominator support reward or row set changed
+retrospective_OPE,all_five,tables/current_real_ehr_ope_by_estimator.csv and .tex plus long CSV,recompute estimator summaries and diagnostics under frozen v2 inputs,OPE inputs changed
+retrospective_OPE,all_five,figures/complete_real_ehr_ope_by_method.pdf and .png,regenerate from refreshed OPE aggregates,OPE consumer affected
+cohort_description,all_five,tables/five_cohort_formation_behavior.csv,replace counts action proportions horizons and support summaries,all task aggregate counts changed
+contracts,all_five,appendix task transition reward termination and cohort sections,synchronize definitions and v2 aggregate values after M2,versioned lineage changed
+claims_and_numbers,all_five,manuscript real-EHR RQ1 RQ2 results and limitations plus current number-source audit,replace only with terminal M2 evidence,all real-EHR numerical evidence affected
+source_manifests,all_five,table figure provenance checksum and claim-evidence manifests,regenerate after refreshed outputs,source identities and hashes change
+constructed_environments,none,constructed POMDP direct return repeated OPE and entrant results,no_refresh,constructed mechanisms and inputs are unchanged

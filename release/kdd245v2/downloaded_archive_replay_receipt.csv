@@ -1,0 +1,4 @@
+artifact,status,reason
+v2_0_0_archive,not_created,publication_prerequisite_blocked
+independent_download,not_run,no_archive_exists
+archive_install_and_quickstart,not_run,no_archive_exists

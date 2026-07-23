@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ehrdyn-icu.org/schemas/ehr-component-result-v2.0.0.json",
+  "title": "Canonical-v2 aggregate-only EHR component score",
+  "$defs": {
+    "nullable_number": {"type": ["number", "null"]},
+    "capability": {"enum": ["Yes", "No", "Structural N/A"]}
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "benchmark_version", "evaluator_version", "task_id",
+    "prediction_type", "synthetic", "records_scored", "observed_cells",
+    "one_step_rmse", "recursive_rmse_by_horizon", "probabilistic_metrics",
+    "termination_metrics", "support_diagnostics", "suppression", "capabilities",
+    "claim_boundary"
+  ],
+  "properties": {
+    "schema_version": {"const": "ehr-component-result-v2.0.0"},
+    "benchmark_version": {"const": "ehrdyn-icu-canonical-v2.0.0"},
+    "evaluator_version": {"const": "ehr-component-scorer-v2.0.0"},
+    "task_id": {
+      "enum": ["sepsis", "respiratory_support", "shock", "aki", "heart_failure"]
+    },
+    "prediction_type": {
+      "enum": ["point", "independent_gaussian", "gaussian_ensemble"]
+    },
+    "synthetic": {"type": "boolean"},
+    "records_scored": {"type": "integer", "minimum": 1},
+    "observed_cells": {"type": "integer", "minimum": 1},
+    "one_step_rmse": {"$ref": "#/$defs/nullable_number"},
+    "recursive_rmse_by_horizon": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["horizon_step", "observed_cells", "rmse"],
+        "properties": {
+          "horizon_step": {"type": "integer", "minimum": 1, "maximum": 11},
+          "observed_cells": {"type": "integer", "minimum": 1},
+          "rmse": {"type": "number", "minimum": 0}
+        }
+      }
+    },
+    "probabilistic_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status", "crps", "coverage_50", "coverage_80", "coverage_90",
+        "coverage_95", "interval_width_50", "interval_width_80",
+        "interval_width_90", "interval_width_95", "mace", "risk_coverage_area"
+      ],
+      "properties": {
+        "status": {"enum": ["available", "structural_na_point_only"]},
+        "crps": {"$ref": "#/$defs/nullable_number"},
+        "coverage_50": {"$ref": "#/$defs/nullable_number"},
+        "coverage_80": {"$ref": "#/$defs/nullable_number"},
+        "coverage_90": {"$ref": "#/$defs/nullable_number"},
+        "coverage_95": {"$ref": "#/$defs/nullable_number"},
+        "interval_width_50": {"$ref": "#/$defs/nullable_number"},
+        "interval_width_80": {"$ref": "#/$defs/nullable_number"},
+        "interval_width_90": {"$ref": "#/$defs/nullable_number"},
+        "interval_width_95": {"$ref": "#/$defs/nullable_number"},
+        "mace": {"$ref": "#/$defs/nullable_number"},
+        "risk_coverage_area": {"$ref": "#/$defs/nullable_number"}
+      }
+    },
+    "termination_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["brier", "log_loss", "accuracy_at_0_5", "positive_count"],
+      "properties": {
+        "brier": {"type": "number", "minimum": 0},
+        "log_loss": {"type": "number", "minimum": 0},
+        "accuracy_at_0_5": {"type": "number", "minimum": 0, "maximum": 1},
+        "positive_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "support_diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status", "records", "supported_fraction", "overlap_fraction",
+        "unsupported_target_mass", "behavior_denominator_nll",
+        "importance_weight_ess", "importance_weight_ess_fraction", "claim"
+      ],
+      "properties": {
+        "status": {"enum": ["diagnostic_only", "suppressed_minimum_cell"]},
+        "records": {"type": "integer", "minimum": 1},
+        "supported_fraction": {"$ref": "#/$defs/nullable_number"},
+        "overlap_fraction": {"$ref": "#/$defs/nullable_number"},
+        "unsupported_target_mass": {"$ref": "#/$defs/nullable_number"},
+        "behavior_denominator_nll": {"$ref": "#/$defs/nullable_number"},
+        "importance_weight_ess": {"$ref": "#/$defs/nullable_number"},
+        "importance_weight_ess_fraction": {"$ref": "#/$defs/nullable_number"},
+        "claim": {"const": "retrospective_diagnostic_only"}
+      }
+    },
+    "suppression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applied", "minimum_distinct_subjects", "minimum_episodes"],
+      "properties": {
+        "applied": {"type": "boolean"},
+        "minimum_distinct_subjects": {"const": 100},
+        "minimum_episodes": {"const": 100}
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "one_step_forecasting", "recursive_forecasting", "uncertainty",
+        "termination", "support_diagnostics", "planning", "direct_return",
+        "known_policy_value", "treatment_benefit", "clinical_utility"
+      ],
+      "properties": {
+        "one_step_forecasting": {"$ref": "#/$defs/capability"},
+        "recursive_forecasting": {"$ref": "#/$defs/capability"},
+        "uncertainty": {"$ref": "#/$defs/capability"},
+        "termination": {"$ref": "#/$defs/capability"},
+        "support_diagnostics": {"$ref": "#/$defs/capability"},
+        "planning": {"$ref": "#/$defs/capability"},
+        "direct_return": {"$ref": "#/$defs/capability"},
+        "known_policy_value": {"$ref": "#/$defs/capability"},
+        "treatment_benefit": {"$ref": "#/$defs/capability"},
+        "clinical_utility": {"$ref": "#/$defs/capability"}
+      }
+    },
+    "claim_boundary": {"type": "string", "minLength": 1}
+  }
+}

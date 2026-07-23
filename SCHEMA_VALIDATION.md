@@ -8,6 +8,8 @@ All released schemas use JSON Schema Draft 2020-12 and are validated by
 | `schemas/leaderboard_submission.schema.json` | `validate-submission` | `validate_submission` |
 | `schemas/transition_submission.schema.json` | `validate-transition-submission` | `validate_transition_submission` |
 | `schemas/aggregate_metrics.schema.json` | `aggregate-report` | `write_aggregate_report` |
+| `schemas/ehr_component_submission.schema.json` | `score-ehr-components` | `score_submission` |
+| `schemas/ehr_component_result.schema.json` | scorer output validation | `validate_instance` |
 
 The entire document is schema-validated before semantic evaluation. Schema
 rules are authoritative for required properties, types, enums, constants,
@@ -26,4 +28,7 @@ uv run ehrdyn-icu validate-submission \
 uv run ehrdyn-icu validate-transition-submission \
   --submission fixtures/transition_submission_small.json \
   --config-dir configs/tasks
+uv run ehrdyn-icu score-ehr-components \
+  --submission fixtures/kdd245v2r/gaussian.json \
+  --output /tmp/ehrdyn_ehr_component_score.json
 ```

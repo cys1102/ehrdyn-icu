@@ -48,8 +48,13 @@ def blood_culture_events(events: pd.DataFrame) -> pd.DataFrame:
             "micro_specimen_id", "subject_id", "hadm_id", "culture_time",
             "spec_type_desc", "org_itemid", "org_name", "positive_culture",
         ))
-    selected = events[
-        events["spec_type_desc"].astype(str).str.contains("blood", case=False, na=False)
+    selected = events.copy()
+    for column in ("spec_type_desc", "org_name"):
+        selected[column] = selected[column].astype("string")
+    for column in ("micro_specimen_id", "subject_id", "hadm_id", "org_itemid"):
+        selected[column] = pd.to_numeric(selected[column], errors="coerce").astype("Int64")
+    selected = selected[
+        selected["spec_type_desc"].str.contains("blood", case=False, na=False)
     ].copy()
     if selected.empty:
         return blood_culture_events(events.iloc[0:0])
@@ -67,7 +72,7 @@ def blood_culture_events(events: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
     )
     grouped["culture_time"] = grouped["charttime"].fillna(grouped["chartdate"])
-    positive = grouped["org_name"].notna() & grouped["org_name"].astype(str).ne("")
+    positive = grouped["org_name"].notna() & grouped["org_name"].ne("")
     grouped["positive_culture"] = (positive & grouped["org_itemid"].ne(90856)).astype(np.int8)
     return grouped.loc[grouped["culture_time"].notna()].sort_values(
         ["subject_id", "culture_time", "micro_specimen_id"], kind="stable"

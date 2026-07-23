@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ehrdyn-icu.org/schemas/leaderboard_submission.schema.json",
+  "title": "EHRDyn-ICU leaderboard submission",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "benchmark_version", "submission_id", "claim_boundary_acknowledged", "rows"],
+  "properties": {
+    "schema_version": {"const": "kdd214-leaderboard-submission-v1"},
+    "benchmark_version": {"const": "KDD2027-E060-4H-v1.0.0+KDD089"},
+    "submission_id": {"type": "string", "minLength": 1},
+    "claim_boundary_acknowledged": {"const": true},
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/row"}
+    }
+  },
+  "$defs": {
+    "point_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["one_step_rmse", "one_step_mae", "open_loop_rmse", "open_loop_mae"],
+      "properties": {
+        "one_step_rmse": {"type": "number", "minimum": 0},
+        "one_step_mae": {"type": "number", "minimum": 0},
+        "open_loop_rmse": {"type": "number", "minimum": 0},
+        "open_loop_mae": {"type": "number", "minimum": 0}
+      }
+    },
+    "uncertainty_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nll", "cov90", "width90"],
+      "properties": {
+        "nll": {"type": "number"},
+        "cov90": {"type": "number", "minimum": 0, "maximum": 1},
+        "width90": {"type": "number", "minimum": 0}
+      }
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id", "task_config_sha256", "feature_order_sha256", "track",
+        "implementation_fidelity", "model_id", "metrics", "action_view",
+        "timing_view", "horizon", "seed_count", "evaluator_version",
+        "training_budget", "source_commit"
+      ],
+      "properties": {
+        "task_id": {"type": "string", "minLength": 1},
+        "task_config_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "feature_order_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "track": {"enum": ["point_transition", "uncertainty"]},
+        "implementation_fidelity": {"enum": ["exact", "adapted", "proxy", "local_control"]},
+        "model_id": {"type": "string", "minLength": 1},
+        "metrics": {"type": "object"},
+        "action_view": {"type": "string", "minLength": 1},
+        "timing_view": {"type": "string", "minLength": 1},
+        "horizon": {"enum": ["one_step", "conditional_recursive_17"]},
+        "seed_count": {"type": "integer", "minimum": 1},
+        "evaluator_version": {"const": "KDD2027-E060-4H-v1.0.0+KDD089"},
+        "training_budget": {"type": "string", "minLength": 1},
+        "source_commit": {"type": "string", "pattern": "^[0-9a-fA-F]{7,40}$"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"track": {"const": "point_transition"}}, "required": ["track"]},
+          "then": {"properties": {"metrics": {"$ref": "#/$defs/point_metrics"}}}
+        },
+        {
+          "if": {"properties": {"track": {"const": "uncertainty"}}, "required": ["track"]},
+          "then": {"properties": {"metrics": {"$ref": "#/$defs/uncertainty_metrics"}}}
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+gate,expected,observed,status
+anonymous_asset_download,success,verified_in_PUBLICATION_VERIFICATION_csv,pass
+uploaded_vs_downloaded_sha256,exact,verified_in_PUBLICATION_VERIFICATION_csv,pass
+fresh_install,success,verified_in_PUBLICATION_VERIFICATION_csv,pass
+schema_validation,pass,13_of_13,pass
+focused_tests,pass,14_of_14,pass
+synthetic_quickstart,pass,gaussian_fixture,pass
+aggregate_privacy,pass,zero_findings,pass

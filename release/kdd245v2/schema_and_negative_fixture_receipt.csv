@@ -1,0 +1,5 @@
+surface,status,reason
+typed_submission_schemas,not_created,KDD220M2_complete_refresh_missing
+schema_positive_tests,not_run,KDD220M2_complete_refresh_missing
+schema_negative_tests,not_run,KDD220M2_complete_refresh_missing
+mixed_lineage_rejection,not_run,KDD220M2_complete_refresh_missing

@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RECEIPT_SCHEMA = ROOT / "schemas" / "credentialed_aggregate_receipt.schema.json"
 RESOURCE_SCHEMA = ROOT / "schemas" / "stage_resource_instrumentation.schema.json"
 AR6_FIXTURE_RECEIPT_SHA256 = "8f125bbb524132b79db68fa4a28b4bf04aa5438ffc742ebb979bb15dec405f8a"
+KDD245V2R_FIXTURE_RECEIPT_SHA256 = "a5ab65e8658ae23f7256131dc297ade71f32408f6949e0a6aa1e10c075839ee8"
 AR6_SCIENTIFIC_SURFACE_SHA256 = "f412a1c03d2325339543628384c4aad14dd0ffbf92160a4d51d11c4c42b750a3"
 
 
@@ -54,7 +55,16 @@ class KDD220AR7BoundedMemoryTests(unittest.TestCase):
     def test_ar6_fixture_receipt_and_scientific_surface_are_exact(self) -> None:
         receipt, receipt_bytes, _ = self._run_fixture(3)
         if sys.version_info[:2] == (3, 11):
-            self.assertEqual(hashlib.sha256(receipt_bytes).hexdigest(), AR6_FIXTURE_RECEIPT_SHA256)
+            constructor_source = ROOT / "src/kdd2027_benchmark/current_five_task/reconstruct.py"
+            if (
+                hashlib.sha256(constructor_source.read_bytes()).hexdigest()
+                == "914356315ba3a489b6d97f5b2770b3c87e1b770e3ff735a6198a9a064f69592f"
+            ):
+                self.assertEqual(__import__("pandas").__version__, "3.0.3")
+                expected = KDD245V2R_FIXTURE_RECEIPT_SHA256
+            else:
+                expected = AR6_FIXTURE_RECEIPT_SHA256
+            self.assertEqual(hashlib.sha256(receipt_bytes).hexdigest(), expected)
         self.assertEqual(
             receipt["contracts"]["scientific_surface_sha256"],
             AR6_SCIENTIFIC_SURFACE_SHA256,

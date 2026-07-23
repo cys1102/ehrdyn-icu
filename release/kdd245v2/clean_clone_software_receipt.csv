@@ -1,0 +1,5 @@
+gate,status,reason
+isolated_worktree,pass,created_from_exact_KDD220M1_commit
+software_install,not_run,no_v2_software_implemented
+unit_and_property_tests,not_run,no_v2_software_implemented
+public_instructions_replay,not_run,no_v2_software_implemented

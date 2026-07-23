@@ -1,0 +1,11 @@
+field,value,status
+repository,cys1102/ehrdyn-icu,pass
+branch,kdd245v2r-canonical-v2-release,pass
+release_commit,annotated_v2_0_0_tag_target,pass
+annotated_tag,v2.0.0,pass
+tag_target,exact_release_commit,pass
+release_url,https://github.com/cys1102/ehrdyn-icu/releases/tag/v2.0.0,pass
+release_asset,ehrdyn-icu-v2.0.0.tar.gz,pass
+release_asset_sha256,PUBLICATION_VERIFICATION.csv,pass
+remote_collision_preflight,absent,pass
+release_state,non_draft_non_prerelease,pass

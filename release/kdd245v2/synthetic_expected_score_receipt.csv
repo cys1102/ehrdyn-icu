@@ -1,0 +1,4 @@
+fixture,status,reason
+deterministic_point,not_run,release_prerequisite_blocked
+single_gaussian,not_run,release_prerequisite_blocked
+ensemble_within_between_variance,not_run,release_prerequisite_blocked
