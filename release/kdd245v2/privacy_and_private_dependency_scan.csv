@@ -1,6 +1,0 @@
-surface,status,reason
-KDD245V2_receipt_package,pass,aggregate_only_no_restricted_data_access
-private_paths,pass,none_recorded
-credentials_or_tokens,pass,none_recorded
-patient_rows_identifiers_or_times,pass,none_accessed_or_recorded
-cache_logs_or_differencing,pass,none_created

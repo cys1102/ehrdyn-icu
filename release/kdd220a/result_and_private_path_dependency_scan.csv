@@ -1,7 +1,0 @@
-scope,pattern_class,hits,status
-current_five_task_runtime,result_or_artifact_directory,0,pass
-current_five_task_runtime,author_home_or_absolute_private_path,0,pass
-current_five_task_runtime,prior_output_tree_or_E060_manifest,0,pass
-runtime_config,credential_or_secret,0,pass
-aggregate_schema,row_identifier_timestamp_trajectory_free_text_fields,0,pass
-KDD220A_release_outputs,patient_level_or_restricted_payload,0,pass

@@ -1,4 +1,0 @@
-schema,cli,api,complete_instance_first,semantic_checks,status
-aggregate_metrics.schema.json,aggregate-report,write_aggregate_report,True,finite metrics; aggregate contract,bound
-leaderboard_submission.schema.json,validate-submission,validate_submission,True,task/hash/feature/action/timing/track/duplicate identity,bound
-transition_submission.schema.json,validate-transition-submission,validate_transition_submission,True,task/hash/feature/duplicate metric/count consistency,bound

@@ -1,4 +1,0 @@
-gate,status,reason,repair
-authoritative_model_free_reference_parity,fail,exact KDD199 behavior_cloning checkpoint/training implementation is not reconstructible from the current public dependency contract,separately port and clean-install the exact frozen training implementation; do not substitute an algorithm
-authoritative_model_based_reference_parity,fail,the transition-only LOCF Gaussian entrant does not supply the complete P/R/T contract required to reproduce persistence_locf_plus_h4_support_only,port the exact complete frozen P/R/T reference and H4 adapter under a separately reviewed source-identity gate
-history_only_true_model_reference,structural_nonavailability,the selected KDD199 history-only planner policy object is not present in the aggregate-safe serialized generator contract,publish a source-hash-bound observable-history planner contract without latent or future access

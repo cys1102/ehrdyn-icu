@@ -1,2 +1,0 @@
-experiment_id,version,source,steps,bin_hours,seeds,device,mimic_v1_modified,claim_boundary
-KDD086,KDD086-eICU-CRD-2.0-portability-v1,eICU-CRD-2.0,18,4,3408;3411;3414,cuda,False,"External recorded-trajectory forecasting portability only; eICU mappings are not phenotype identity. EHRDyn-ICU v1.0 remains unchanged. Treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, and autonomous-decision claims remain blocked."

@@ -1,5 +1,0 @@
-failure_id,stage,status,detail
-KDD220AR5-F001,authoritative_source_mapping,resolved,old public reduced sepsis and HF diagnosis semantics replaced by pinned source behavior
-KDD220AR5-F002,respiratory_action_identity,resolved,recorded FiO2 action surface separated from SAFE forecasting mask
-KDD220AR5-F003,target_observation_filter,resolved,KDD152 any-SAFE-target observation filter restored
-KDD220AR5-F004,schema_test_privacy_clean_install,resolved,schemas privacy scan isolated install and synthetic smoke passed; final manifest verified

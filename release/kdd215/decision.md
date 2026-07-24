@@ -1,3 +1,0 @@
-# KDD215 decision
-
-`stop_generator_parity_role_isolation_or_reference_parity_failure`

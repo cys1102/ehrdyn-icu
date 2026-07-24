@@ -1,0 +1,9 @@
+capability,status,boundary
+installation,Yes,public minimal runtime
+synthetic_ehr_component_scoring,Yes,canonical-v2 synthetic fixtures
+constructed_environment_entrant,Yes,released constructed mechanisms
+recursive_prediction,Yes,synthetic and constructed inputs
+repeated_dataset_ope,Yes,constructed environments only
+mimic_result_regeneration,No,credentialed workflow excluded
+mimic_derived_result_bundle,No,all 97 frozen source objects withheld
+clinical_utility,Structural N/A,not evaluated

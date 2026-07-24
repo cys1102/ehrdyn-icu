@@ -1,2 +1,0 @@
-failure_id,gate,status,detail,disposition
-KDD220AR2-F000,all_frozen_gates,none,all_preservation_authoritative_mapping_fixture_nonregression_schema_privacy_and_clean_install_gates_passed,authorize_KDD220BR_only

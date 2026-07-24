@@ -1,2 +1,0 @@
-failure_id,stage,status,disposition
-KDD220M1-F001,per_feature_numeric_migration_summary,closed_by_refresh_router,BR8R2_candidate_did_not_emit_rates_or_quantiles_require_M2_v2_aggregate_reducer

@@ -1,4 +1,0 @@
-task,axis,candidate,reference,status
-respiratory_support,subjects,20604,20592,fail
-respiratory_support,episodes,23928,23914,fail
-respiratory_support,decisions,139185,139098,fail

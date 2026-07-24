@@ -1,2 +1,0 @@
-experiment_id,candidate_variables,directly_mapped,excluded,mapping_coverage,forced_equivalences,claim_boundary
-KDD086,22,17,5,0.7727272727272727,0,"External recorded-trajectory forecasting portability only; eICU mappings are not phenotype identity. EHRDyn-ICU v1.0 remains unchanged. Treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, and autonomous-decision claims remain blocked."

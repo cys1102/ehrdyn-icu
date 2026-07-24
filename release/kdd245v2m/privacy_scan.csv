@@ -1,0 +1,3 @@
+scan,matches,status,notes
+released_runtime_tree,0,pass,177 files scanned before generated receipts
+public_bundle_and_mimic_result_patterns,0,pass,scope-bound prohibited artifact scan

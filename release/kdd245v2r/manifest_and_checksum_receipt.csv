@@ -1,8 +1,0 @@
-gate,expected,observed,status
-manifest_inventory,complete,658_files,pass
-manifest_checksum,all_exact,all_exact,pass
-source_schema_fixture_hashes,bound,bound_and_tested,pass
-license_inventory,complete,mit_source_and_documented_asset_classes,pass
-documentation_links,all_local_targets_exist,16_of_16,pass
-citation_metadata,valid,CITATION_cff_v2_0_0,pass
-git_diff_check,pass,pass,pass

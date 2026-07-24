@@ -1,8 +1,0 @@
-task_id,review_specialty,status,decision,review_date,packet_path,reviewer_response_path,adjudication_commit
-kdd2027_sepsis_vasopressor_3bin,ICU,pending,,,clinical_review/core_task_packets/kdd2027_sepsis_vasopressor_3bin.md,,
-kdd2027_respiratory_peep_5bin,ICU,pending,,,clinical_review/core_task_packets/kdd2027_respiratory_peep_5bin.md,,
-kdd2027_aki_diuretic_rrt_factorized_3bin,ICU_nephrology,pending,,,clinical_review/core_task_packets/kdd2027_aki_diuretic_rrt_factorized_3bin.md,,
-kdd2027_af_rate_anticoag_compact_3bin,cardiology,pending,,,clinical_review/core_task_packets/kdd2027_af_rate_anticoag_compact_3bin.md,,
-kdd2027_hf_diuretic_binary,cardiology,pending,,,clinical_review/core_task_packets/kdd2027_hf_diuretic_binary.md,,
-kdd2027_ami_hemodynamic_compact_3bin,cardiology,pending,,,clinical_review/core_task_packets/kdd2027_ami_hemodynamic_compact_3bin.md,,
-kdd2027_shock_fluid_bolus_binary,ICU_cardiology,pending,,,clinical_review/core_task_packets/kdd2027_shock_fluid_bolus_binary.md,,

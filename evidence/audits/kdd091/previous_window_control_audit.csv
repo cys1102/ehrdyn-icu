@@ -1,5 +1,0 @@
-experiment_id,check,status,evidence,blocking_if_fail,claim_boundary
-KDD091,contract_rows_complete,pass,rows=41,True,"Aggregate recorded-trajectory forecasting rank audit only. No retraining, retuning, task selection, treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, or autonomous-decision claim."
-KDD091,frozen_spec_control,pass,deterministic_control,True,"Aggregate recorded-trajectory forecasting rank audit only. No retraining, retuning, task selection, treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, or autonomous-decision claim."
-KDD091,name_consistent,pass,Previous-window distinct,True,"Aggregate recorded-trajectory forecasting rank audit only. No retraining, retuning, task selection, treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, or autonomous-decision claim."
-KDD091,set_membership,pass,C only plus A,True,"Aggregate recorded-trajectory forecasting rank audit only. No retraining, retuning, task selection, treatment, causal, counterfactual, policy-improvement, clinical-utility, deployment, or autonomous-decision claim."

@@ -11,4 +11,4 @@ planner score is an action-cost proxy; it is not an EHR reward model or a
 clinical objective.
 
 The package demonstrates interface usability and is not part of the scientific
-leaderboard. See `release/kdd235b/` for the aggregate full-scale validation.
+leaderboard.

@@ -1,0 +1,3 @@
+gate,detail,status
+archive_build_metadata,generated egg-info excluded before final archive,resolved_prepublication
+archive_executable_mode,entrant executable modes preserved from source before final archive,resolved_prepublication

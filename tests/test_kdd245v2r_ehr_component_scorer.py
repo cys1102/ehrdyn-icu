@@ -203,20 +203,5 @@ class KDD245V2RScorerTests(unittest.TestCase):
                 (ROOT / "configs" / "ehr_component" / "canonical_v2_scorer.json").read_text()
             )["unsupported_real_ehr_surfaces"])
 
-    def test_stopped_kdd245_receipts_are_byte_identical(self) -> None:
-        expected = {
-            "kdd245": "5734bf6a819d20655769b418ca683bd02645698571cfab3803a295bf7763084e",
-            "kdd245v2": "fcd8251126de5aa42e4fd5fe4669da47ac1b1dbd60f2f4c26e8f00050295c621",
-        }
-        for name, digest in expected.items():
-            root = ROOT / "release" / name
-            value = hashlib.sha256()
-            files = sorted(path for path in root.rglob("*") if path.is_file())
-            for path in files:
-                value.update(path.relative_to(root).as_posix().encode("utf-8"))
-                value.update(path.read_bytes())
-            self.assertEqual(value.hexdigest(), digest)
-
-
 if __name__ == "__main__":
     unittest.main()

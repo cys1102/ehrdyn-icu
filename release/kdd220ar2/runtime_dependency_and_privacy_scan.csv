@@ -1,5 +1,0 @@
-scope,result_or_artifact_dependency,author_home_dependency,prior_output_dependency,credential_or_secret,patient_identifier_timestamp_or_row,restricted_array_checkpoint,status
-current_five_task_runtime,0,0,0,0,0,0,pass
-KDD220AR2_tests,0,0,0,0,0,0,pass
-KDD220AR2_receipts,0,0,0,0,0,0,pass
-preserved_KDD220B_receipt,not_runtime_input,0,stopped_evidence_only,0,0,0,preserved

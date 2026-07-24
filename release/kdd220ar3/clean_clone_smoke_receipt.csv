@@ -1,9 +1,0 @@
-gate,expected,observed,status
-candidate_identity,exact_candidate_content_then_SELF_commit_postverified,exact_content_snapshot,pass_precommit
-clean_install,credentialed_extra_from_public_source,pass,pass
-focused_tests,pass,8_pass,pass
-full_suite,pass,90_pass,pass
-five_task_synthetic_reconstruction,pass,pass,pass
-checksum_and_privacy,pass,431_checksum_0_mismatch_and_432_privacy_0_findings,pass
-MIMIC_access,none,none,pass
-KDD152_access,none,none,pass

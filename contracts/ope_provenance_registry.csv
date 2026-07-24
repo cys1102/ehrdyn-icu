@@ -1,4 +1,0 @@
-surface,status,target_policy_probabilities,public_replay,allowed_use,blocked_use
-KDD078,quarantined,unavailable,false,aggregate estimator stress-test context,policy ranking or value claim
-KDD079,diagnostic_aggregate_only,not exported,false,denominator and estimator sensitivity summary,clinical policy leaderboard
-known_value_controls,available_aggregate,synthetic,true,software and estimator diagnostics,validation of MIMIC policy value

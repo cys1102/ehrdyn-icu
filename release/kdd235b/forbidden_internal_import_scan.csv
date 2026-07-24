@@ -1,5 +1,0 @@
-file,pattern,status,evidence
-recursive_world_model_entrant/entrant.py,kdd2027_benchmark,pass,zero matches
-recursive_world_model_entrant/entrant.py,full_pomdp,pass,zero matches
-recursive_world_model_entrant/entrant.py,private config or checkpoint import,pass,zero imports
-recursive_world_model_entrant/entrant.py,network access,pass,zero imports

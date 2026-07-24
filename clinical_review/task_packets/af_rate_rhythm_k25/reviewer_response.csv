@@ -1,2 +1,0 @@
-task_id,review_decision,allowed_decisions,rationale,requested_change,unresolved_concern,review_status,clinical_approval
-af_rate_rhythm_k25,,approve;approve_with_change;disagree,,,,pending_independent_review,False

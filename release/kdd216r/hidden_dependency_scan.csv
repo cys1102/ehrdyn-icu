@@ -1,8 +1,0 @@
-check,finding_count,status,disposition
-runtime_package_world_ehr_import,0,pass,no runtime import or filesystem dependency
-runtime_package_researchwiki_import,0,pass,no runtime import or filesystem dependency
-developer_import_utility_text_reference,1,documented_nonruntime_reference,hash-gated developer utility not invoked by clean-clone workflow
-quarantined_provenance_text_references,9,documented_nonruntime_reference,aggregate quarantine metadata only
-git_submodules,0,pass,none
-external_symlinks,0,pass,none
-fresh_entrant_private_or_author_input,0,pass,public protocol and schema only

@@ -1,5 +1,0 @@
-failure_id,stage,status,detail,consequence
-KDD220B-F001,input_layout_preflight,resolved_local_only,local source contained both supported encodings; read-only single-encoding official-file view used,no scientific contract change
-KDD220B-F002,public_cohort_construction,failed_blocking,public load_core rejected malformed ICU time order before applying authoritative eligibility filtering,no cohort materialized and no parity references opened
-KDD220B-F003,required_parity_layers,not_run_blocked,construction prerequisite failed,no interface conclusion or scientific rerun authorization
-KDD220B-F004,KDD220C_handoff,not_authorized,only exact or resolved metadata/order decisions may publish a handoff,no commit push or tag

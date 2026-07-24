@@ -1,6 +1,0 @@
-layer,comparison_attempted,compared_dimensions,maximum_absolute_difference,status,reason
-cohort_contract,false,0,NA,not_run,public construction stopped during ICU time-order validation
-transition_preprocessing,false,0,NA,not_run,construction prerequisite not met
-decision_interface,false,0,NA,not_run,construction prerequisite not met
-historical_aggregate_receipt,false,0,NA,not_opened,reference access prohibited before completed construction
-restricted_row_aligned_arrays,false,0,NA,not_opened,reference access prohibited before completed construction

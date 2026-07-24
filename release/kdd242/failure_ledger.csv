@@ -1,4 +1,0 @@
-stage,status,reason,disposition
-KDD235B recovery,documented_nonfatal,previously reported terminal package was absent from local paths and public refs,reexecuted exact frozen public protocol from commit 4739d59
-publication,pass,no tag or release collision,created immutable annotated v1.3.0 tag and public release
-archive replay,pass,published archive installed and reproduced frozen quickstart hashes,no follow-up required

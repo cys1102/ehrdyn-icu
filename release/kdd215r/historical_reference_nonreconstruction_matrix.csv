@@ -1,4 +1,0 @@
-reference,status,reason,substitute_allowed
-KDD199_behavior_cloning,unavailable_exact_identity,exact training implementation and checkpoint are absent,False
-persistence_prt_plus_h4_support_only,unavailable_incomplete_component_contract,public LOCF component is transition-only and lacks R/T and frozen H4 planner,False
-history_only_true_model_reference,structural_nonavailability,policy object is absent from the public serialized generator contract,False

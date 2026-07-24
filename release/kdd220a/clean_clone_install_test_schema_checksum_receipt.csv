@@ -1,9 +1,0 @@
-gate,status,detail
-isolated_install,pass,wheel_install_in_isolated_venv_from_clean_source_copy
-full_public_tests,pass,77_tests
-focused_kdd220a_tests,pass,6_tests
-five_task_source_differential,pass,5_of_5_tasks
-schema_positive_negative,pass,Draft_2020_12_and_forbidden_fields
-py_compile,pass,current_five_task_modules_and_KDD220A_tests
-manifest_checksum,pass,384_files_verified_after_refresh
-privacy_hidden_path,pass,384_files_scanned_zero_findings

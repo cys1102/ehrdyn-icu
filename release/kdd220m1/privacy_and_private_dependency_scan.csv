@@ -1,8 +1,0 @@
-scan,scope,findings,status
-candidate_schema_validation,seven_file_BR8R2_candidate,0,pass
-candidate_privacy_freeze,seven_file_BR8R2_candidate,0,pass
-release_forbidden_identifier_and_timestamp_fields,release/kdd220m1,0,pass
-release_private_absolute_paths,release/kdd220m1,0,pass
-release_credentials_and_secrets,release/kdd220m1,0,pass
-release_patient_rows_membership_and_row_hashes,release/kdd220m1,0,pass
-constructor_runtime_private_result_dependency,public source and config,0,pass

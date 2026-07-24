@@ -1,0 +1,3 @@
+scan,matches,status,scope
+prohibited_binary_and_machine_readable_result_patterns,0,pass,retained_runtime_inventory
+KDDG020S2_97_mimic_source_objects,0,pass,all remain withheld; no ledger included

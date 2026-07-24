@@ -1,6 +1,0 @@
-task,inclusion,role,dense_safe_surface,ordered_transitions,final_status
-sepsis,pass,pass,pass,incomplete_source_closed_extraction_horizon,fail_blocking
-respiratory_support,pass,pass,pass,incomplete_source_closed_extraction_horizon,fail_blocking
-shock,pass,pass,pass,incomplete_source_closed_extraction_horizon,fail_blocking
-aki,pass,pass,pass,incomplete_source_closed_extraction_horizon,fail_blocking
-heart_failure,pass,pass,pass,incomplete_source_closed_extraction_horizon,fail_blocking

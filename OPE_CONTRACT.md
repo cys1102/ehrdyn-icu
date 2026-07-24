@@ -30,11 +30,11 @@ reuse the current diagnostics.
 
 ## Policies And Behavior Denominators
 
-`evidence/quarantine/policy/baseline_catalog.csv` is a policy-family catalog, not an exact
-registry of KDD078 probability surfaces. KDD078 reconstructs policy IDs,
-configurations, and seeds, but the original probability surfaces were not
-retained. KDD079 fits and freezes its own rows. Learned policies use seeds
-`3408`, `3411`, and `3414`; fidelity labels are never pooled.
+The historical aggregate policy-family catalog was not an exact registry of
+KDD078 probability surfaces and is intentionally excluded from this
+minimal-runtime release. The original probability surfaces were not retained.
+Learned policies used seeds `3408`, `3411`, and `3414`; fidelity labels were
+never pooled.
 
 Two behavior denominators are fit on training data and evaluated separately:
 
@@ -89,9 +89,7 @@ Every row should identify task, action contract, reward, policy ID, policy seed,
 behavior denominator, horizon, clipping, estimator, bootstrap unit, ESS, weight
 concentration, and fidelity label. Exact KDD078 policy-specific attribution is
 blocked where probability provenance is unavailable. Denominator or estimator
-rank disagreement blocks a policy-winner declaration. See
-`evidence/audits/kdd094/` for the authoritative mismatch matrix.
-
-The machine-readable status is in `contracts/ope_provenance_registry.csv`.
+rank disagreement blocks a policy-winner declaration. Historical
+machine-readable result and provenance tables are excluded from this release.
 Missing probability provenance is an availability block, not a negative
 policy-performance result.

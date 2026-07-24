@@ -1,9 +1,0 @@
-gate,status,evidence
-remote v1.3.0 tag absent,pass,git ls-remote returned no tag
-GitHub v1.3.0 release absent,pass,gh release view returned release not found
-KDD235A base identity,pass,4739d59392a660cf215c29ebca02fb2f52cd7804
-KDD235B source frozen before final access,pass,5e6cbd7
-KDD235B complete inventory,pass,40 checkpoints 440 forecast rows 40 direct rows 240 OPE summaries
-deterministic overlap,pass,19 of 19 sepsis 171901 rows identical
-forbidden internal model imports,pass,zero benchmark model imports
-aggregate privacy boundary,pass,no restricted or row-level artifact

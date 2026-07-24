@@ -1,7 +1,0 @@
-surface,fixture_scope,status,maximum_absolute_difference
-fluid_amount,three_overlapped_bins_proportional_allocation,pass,0
-vasopressor_rate,all_overlapped_bins_max_rate,pass,0
-mechanical_ventilation,all_overlapped_bins_half_open_interval,pass,0
-diuretic,ICU_and_prescription_intervals,pass,0
-rrt,procedure_interval,pass,0
-peep,observed_chart_bin,pass,0

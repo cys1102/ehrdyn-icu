@@ -1,7 +1,0 @@
-task,anchor_and_inclusion,ordered_transitions,safe_values_masks,action_classes,reward_values_masks,termination_continuation,temporal_contract,status
-sepsis,exact,exact,exact,exact,exact,exact,24h_pre_48h_post_72h_18bins_96h_raw,pass
-respiratory_support,exact,exact,exact,exact,exact,exact,24h_pre_48h_post_72h_18bins_96h_raw,pass
-shock,exact,exact,exact,exact,exact,exact,24h_pre_48h_post_72h_18bins_96h_raw,pass
-aki,exact,exact,exact,exact,exact,exact,24h_pre_48h_post_72h_18bins_96h_raw,pass
-heart_failure,exact,exact,exact,exact,exact,exact,24h_pre_48h_post_72h_18bins_96h_raw,pass
-aggregate_receipt,fc408923d7d2e0f3bd9f7e40418f6957ddd4fc4c96b48b26650f280a3abadb80,fc408923d7d2e0f3bd9f7e40418f6957ddd4fc4c96b48b26650f280a3abadb80,exact,exact,exact,exact,KDD220A_byte_identity,pass

@@ -1,8 +1,0 @@
-table,required_columns_only,chunked,early_item_filter,early_key_filter,chunk_local_time_filter,stable_tie_order,unbounded_read_fallback,status
-icu/chartevents,yes,yes,yes,yes,yes,yes,no,pass
-hosp/labevents,yes,yes,yes,yes,yes_for_feature_scan_and_required_time_for_AKI,yes,no,pass
-icu/inputevents,yes,yes,yes,yes,yes,yes,no,pass
-icu/outputevents,yes,yes,yes,yes,yes,yes,no,pass
-icu/procedureevents,yes,yes,yes,yes,yes,yes,no,pass
-hosp/prescriptions,yes,yes,task_regex_after_key_filter,yes,yes_for_array_scan,yes,no,pass
-hosp/microbiologyevents,yes,yes,not_applicable,yes,coalesced_time_before_anchor_pairing,yes,no,pass
